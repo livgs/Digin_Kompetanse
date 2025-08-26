@@ -8,9 +8,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b9446ac0-e68e-4d58-b2aa-dc84db7e91ec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Digin_Kompetanse/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Digin_Kompetanse/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Digin_Kompetanse/Views/Home/Privacy.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Digin_Kompetanse/Views/Home/Privacy.cshtml" afterDir="false" />
+    <list default="true" id="b9446ac0-e68e-4d58-b2aa-dc84db7e91ec" name="Changes" comment="Tekst under &quot;send inn&quot;">
+      <change beforePath="$PROJECT_DIR$/Digin_Kompetanse/Views/Home/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Digin_Kompetanse/Views/Home/Index.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +37,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="mock://C:/Users/adria/RiderProjects/Digin_Kompetanse/Digin_Kompetanse/Views/Home/Privacy.cshtml" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="SKIP_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -102,15 +102,63 @@
       <updated>1755600856936</updated>
       <workItem from="1755600861101" duration="1960000" />
       <workItem from="1756189559248" duration="1157000" />
-      <workItem from="1756190745623" duration="3280000" />
+      <workItem from="1756190745623" duration="6771000" />
     </task>
+    <task id="LOCAL-00001" summary="Revised privacy-page">
+      <option name="closed" value="true" />
+      <created>1756194094088</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1756194094088</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Revised gitignore">
+      <option name="closed" value="true" />
+      <created>1756195278426</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1756195278426</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Revised gitignore #2">
+      <option name="closed" value="true" />
+      <created>1756196054657</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1756196054657</updated>
+    </task>
+    <task id="LOCAL-00004" summary="workspace vet ikke">
+      <option name="closed" value="true" />
+      <created>1756196099353</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1756196099353</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Tekst under &quot;send inn&quot;">
+      <option name="closed" value="true" />
+      <created>1756197401461</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1756197401461</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Revised privacy-page" />
+    <MESSAGE value="Revised gitignore" />
+    <MESSAGE value="Revised gitignore #2" />
+    <MESSAGE value="workspace vet ikke" />
+    <MESSAGE value="Tekst under &quot;send inn&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tekst under &quot;send inn&quot;" />
   </component>
 </project>
