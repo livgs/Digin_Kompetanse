@@ -1,5 +1,52 @@
-bin/
-obj/
-/packages/
+# ------------------------
+# Rider / IntelliJ
+# ------------------------
+.idea/
+# Unntak for felles code style og inspeksjonsprofiler (kan være nyttig å dele)
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+
+# Rider spesifikke filer
 riderModule.iml
 /_ReSharper.Caches/
+
+# ------------------------
+# Visual Studio / .NET
+# ------------------------
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# ------------------------
+# Bygg & pakker
+# ------------------------
+/packages/
+/artifacts/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.dbmdl
+*.bak
+*.sql
+*.ldf
+*.mdf
+*.nupkg
+*.snupkg
+
+# NuGet
+project.lock.json
+project.fragment.lock.json
+.nuget/
+*.NuGet.props
+*.NuGet.targets
+
+# ------------------------
+# OS-spesifikke filer
+# ------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
