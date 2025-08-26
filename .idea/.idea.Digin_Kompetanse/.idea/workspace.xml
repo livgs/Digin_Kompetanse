@@ -8,7 +8,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b9446ac0-e68e-4d58-b2aa-dc84db7e91ec" name="Changes" comment="" />
+    <list default="true" id="b9446ac0-e68e-4d58-b2aa-dc84db7e91ec" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Digin_Kompetanse/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Digin_Kompetanse/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Digin_Kompetanse/Views/Home/Privacy.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Digin_Kompetanse/Views/Home/Privacy.cshtml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,6 +35,9 @@
     &quot;accountId&quot;: &quot;fbed821d-7090-4335-9ed2-fc35eedef8b4&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Users/adria/RiderProjects/Digin_Kompetanse/Digin_Kompetanse/Views/Home/Privacy.cshtml" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -96,7 +102,7 @@
       <updated>1755600856936</updated>
       <workItem from="1755600861101" duration="1960000" />
       <workItem from="1756189559248" duration="1157000" />
-      <workItem from="1756190745623" duration="1645000" />
+      <workItem from="1756190745623" duration="3280000" />
     </task>
     <servers />
   </component>
