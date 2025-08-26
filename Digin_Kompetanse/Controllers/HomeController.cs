@@ -41,6 +41,11 @@ public class HomeController : Controller
         return View(_kompetanser);
     }
 
+    public IActionResult Help()
+    {
+        return View(Help);
+    }
+    
     public IActionResult Privacy()
     {
         return View();
