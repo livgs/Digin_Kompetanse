@@ -6,16 +6,39 @@ namespace Digin_Kompetanse.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
+    //Midlertidig database i minnet
+    private static List<KompetanseModel> _kompetanser = new();
+   
+    [HttpGet]
     public IActionResult Index()
     {
         return View();
+    }
+
+    [HttpPost]
+    public IActionResult Index(string bedriftNavn, string bedriftEpost, string fagområdeNavn, string kompetanseNavn, string beskrivelse)
+    {
+        //Lag modellene
+        var bedrift = new BedriftModel { Navn = bedriftNavn, Epost = bedriftEpost };
+        var fagområde = new FagområdeModel { Navn = fagområdeNavn };
+        var kompetanse = new KompetanseModel
+        {
+            Bedrift = bedrift,
+            Fagområde = fagområde,
+            KompetanseNavn = kompetanseNavn,
+            Beskrivelse = beskrivelse
+        };
+        
+        //Legg til i listen
+        _kompetanser.Add(kompetanse);
+        
+        //send brukeren til oversikten
+        return RedirectToAction("Overview");
+    }
+
+    public IActionResult Overview()
+    {
+        return View(_kompetanser);
     }
 
     public IActionResult Privacy()
