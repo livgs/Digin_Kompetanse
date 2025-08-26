@@ -1,12 +1,19 @@
 # ------------------------
-# Rider / IntelliJ
+# Rider / IntelliJ IDEA
 # ------------------------
 .idea/
-# Unntak for felles code style og inspeksjonsprofiler (kan være nyttig å dele)
+# Allow project-wide code style and inspections to be shared
 !.idea/codeStyles/
 !.idea/inspectionProfiles/
 
-# Rider spesifikke filer
+# Ignore local IDE files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf/
+
+# Rider specific files
 riderModule.iml
 /_ReSharper.Caches/
 
@@ -20,7 +27,7 @@ obj/
 *.suo
 
 # ------------------------
-# Bygg & pakker
+# Build & packages
 # ------------------------
 /packages/
 /artifacts/
@@ -45,7 +52,7 @@ project.fragment.lock.json
 *.NuGet.targets
 
 # ------------------------
-# OS-spesifikke filer
+# OS-specific files
 # ------------------------
 .DS_Store
 Thumbs.db
