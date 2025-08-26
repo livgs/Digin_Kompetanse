@@ -53,40 +53,48 @@ body {
   transition: color 0.3s;
   margin-right: 60px;
   margin-top: 10px;
-  /* Custom styling for the logout link */
-}
-.nav-link .nav-logout {
-  margin-right: 1000px;
-}
-.nav-link:hover {
-  color: #006F35;
-}
-.nav-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 0;
-  height: 2px;
-  background-color: #006F35;
-  transition: width 0.3s ease;
-}
-.nav-link:hover::after {
-  width: 100%;
-}
-.nav-link.active {
-  font-weight: 700;
-  color: #1B589F;
-}
-.nav-link .logout-link {
-  /* Example Styles */
-  font-weight: 600; /* Makes the text bolder */
-  font-size: 100px !important; /* Adjusts the font size */
-  color: #dc3545; /* Changes the text color to Bootstrap's danger color */
-  /* Add any other desired styles */
-}
-.nav-link .logout-link:hover {
-  color: #a71d2a; /* Darker shade on hover */
-  text-decoration: underline; /* Underlines the text on hover */
-}
 
+  .nav-logout {
+    margin-right: 1000px;
+  }
+
+  &:hover {
+    color: #006F35;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #006F35;
+    transition: width 0.3s ease;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+
+  &.active {
+    font-weight: 700;
+    color: #1B589F;
+  }
+
+  /* Custom styling for the logout link */
+
+  .logout-link {
+    /* Example Styles */
+    font-weight: 600; /* Makes the text bolder */
+    font-size: 100px !important; /* Adjusts the font size */
+    color: #dc3545; /* Changes the text color to Bootstrap's danger color */
+    /* Add any other desired styles */
+  }
+
+  .logout-link:hover {
+    color: #a71d2a; /* Darker shade on hover */
+    text-decoration: underline; /* Underlines the text on hover */
+  }
+}
+ 
