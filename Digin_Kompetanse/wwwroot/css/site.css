@@ -1,4 +1,7 @@
-html {
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+                                                                                                                                                                          html {
   font-size: 14px;
 }
 
@@ -7,6 +10,38 @@ html {
     font-size: 16px;
   }
 }
+
+
+ h1, h2, h3, h4, h6 {
+     font-family: "DM Sans", sans-serif;
+     font-weight: 500;
+     font-style: normal;
+      text-align: center;
+    
+}
+
+h5, li, ol, ul {
+  text-align: left;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+h5 {
+  margin-top: 20px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+p {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  margin: 20px;
+  font-size: 16px;
+}
+
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
