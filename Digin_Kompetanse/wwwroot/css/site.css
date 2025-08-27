@@ -19,6 +19,35 @@ html {
 
 body {
   margin-bottom: 60px;
+  display: flex;
+  flex-direction: column; /* slik at nav - main blir under hverandre */
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 40px;
+}
+
+h2 {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 300px;
+}
+
+form input, form textarea, form button {
+  margin-bottom: 6px;
+  width: 100%;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -32,12 +61,13 @@ body {
 
 .navbar {
   display: flex;
+  justify-content: flex-start;
   background-color: #F7F7F7 !important;
   font-family: "Mulish", sans-serif;
   font-weight: 500;
   font-size: 15px;
   margin-top: 0;
-  padding-left: 0;
+  padding: 10px 20px;
 }
 
 .navbar-brand {
@@ -54,47 +84,162 @@ body {
   margin-right: 60px;
   margin-top: 10px;
 
-  .nav-logout {
-    margin-right: 1000px;
-  }
-
-  &:hover {
-    color: #006F35;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 2px;
-    background-color: #006F35;
-    transition: width 0.3s ease;
-  }
-
-  &:hover::after {
-    width: 100%;
-  }
-
-  &.active {
-    font-weight: 700;
-    color: #1B589F;
-  }
-
   /* Custom styling for the logout link */
-
-  .logout-link {
-    /* Example Styles */
-    font-weight: 600; /* Makes the text bolder */
-    font-size: 100px !important; /* Adjusts the font size */
-    color: #dc3545; /* Changes the text color to Bootstrap's danger color */
-    /* Add any other desired styles */
-  }
-
-  .logout-link:hover {
-    color: #a71d2a; /* Darker shade on hover */
-    text-decoration: underline; /* Underlines the text on hover */
-  }
 }
- 
+.nav-link .nav-logout {
+  margin-right: 1000px;
+}
+.nav-link:hover {
+  color: #006F35;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background-color: #006F35;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+.nav-link.active {
+  font-weight: 700;
+  color: #1B589F;
+}
+.nav-link .logout-link {
+  /* Example Styles */
+  font-weight: 600; /* Makes the text bolder */
+  font-size: 100px !important; /* Adjusts the font size */
+  color: #dc3545; /* Changes the text color to Bootstrap's danger color */
+  /* Add any other desired styles */
+}
+.nav-link .logout-link:hover {
+  color: #a71d2a; /* Darker shade on hover */
+  text-decoration: underline; /* Underlines the text on hover */
+}
+
+.nav-logout {
+  margin-right: 1000px;
+}
+
+&:hover {
+  color: #006F35;
+}
+
+&::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background-color: #006F35;
+  transition: width 0.3s ease;
+}
+
+&:hover::after {
+  width: 100%;
+}
+
+&.active {
+  font-weight: 700;
+  color: #1B589F;
+}
+
+/* Custom styling for the logout link */
+
+.logout-link {
+  /* Example Styles */
+  font-weight: 600; /* Makes the text bolder */
+  font-size: 100px !important; /* Adjusts the font size */
+  color: #dc3545; /* Changes the text color to Bootstrap's danger color */
+  /* Add any other desired styles */
+}
+
+.logout-link:hover {
+  color: #a71d2a; /* Darker shade on hover */
+  text-decoration: underline; /* Underlines the text on hover */
+}
+
+
+
+
+/* Hjemside */
+
+/*plassering av kompetanse elementer */
+
+.kompetanse-group {
+  display: flex;
+  flex-direction: column;
+  max-width: 190px;
+  margin-bottom: 4px;
+}
+
+
+/*dropdown knapp*/
+.dropbtn {
+  background-color: #0098D1;
+  color: white;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+
+/* Dropdown container */
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown-innhold (skjult som standard) */
+
+.dropdown-content {
+  position: relative;
+  background-color: lightblue;
+  min-width: 150px;
+  border: 1px solid #ddd;
+  z-index: 1;
+}
+
+/* Søkefelt */
+
+#input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Lenker i dropdown */
+
+.dropdown-content a {
+  color: black;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Vis dropdown */
+.show {
+  display: none;
+}
+
+.btn {
+  background-color: #0098D1;
+  color: white;
+}
+
+.no-link {
+  color: black;
+  text-decoration: none;
+}
