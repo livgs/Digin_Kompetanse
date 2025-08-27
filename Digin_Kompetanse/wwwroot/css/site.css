@@ -77,7 +77,11 @@ form input, form textarea, form button {
   padding: 0 24px;
   font-size: 16px;
   height: 50px;
-  
+  border: #0098D1 solid 2px;
+  border-radius: 6px;
+  background-color: #F8F8F8;
+
+
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -255,7 +259,6 @@ form input, form textarea, form button {
   box-sizing: border-box;
   width: 100%;
   padding: 8px;
-  border: none;
   border-bottom: 1px solid #ddd;
 }
 
