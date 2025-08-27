@@ -52,8 +52,7 @@ body {
   min-height: 100vh;
 }
 
-main {
-  flex: 1;
+form {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -69,8 +68,12 @@ form {
 }
 
 form input, form textarea, form button {
-  margin-bottom: 6px;
   width: 100%;
+  box-sizing: border-box;
+  padding: 0 24px;
+  font-size: 16px;
+  height: 50px;
+  
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -84,7 +87,8 @@ form input, form textarea, form button {
 
 .navbar {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
   background-color: #F7F7F7 !important;
   font-family: "Mulish", sans-serif;
   font-weight: 500;
@@ -192,12 +196,21 @@ form input, form textarea, form button {
 
 /* Hjemside */
 
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 40px;
+}
+
 /*plassering av kompetanse elementer */
 
 .kompetanse-group {
   display: flex;
   flex-direction: column;
-  max-width: 190px;
+  max-width: 250px;
   margin-bottom: 4px;
 }
 
@@ -206,10 +219,12 @@ form input, form textarea, form button {
 .dropbtn {
   background-color: #0098D1;
   color: white;
-  padding: 8px 10px;
-  font-size: 14px;
+  font-size: 16px;
+  height: 50px;
   border: none;
   cursor: pointer;
+  border-radius: 1.5px;
+  width: 100%;
 }
 
 
