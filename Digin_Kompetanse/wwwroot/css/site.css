@@ -309,7 +309,7 @@ form input, form textarea, form button {
   display: none;
 }
 
-.btn {
+.btn-submit {
   height: 50px;
   width:245px;
   padding: 0 24px;
@@ -318,7 +318,7 @@ form input, form textarea, form button {
   border-color: #0098D1;
 }
 
-.btn:hover {
+.btn-submit:hover {
   background-color: #0098D1; 
   color: white;
 }
@@ -340,20 +340,48 @@ form input, form textarea, form button {
   width:245px;
 }
 
-
-
-/* Admin  */
-
-.edit-btn {
-  height: 50px;
-  width:245px;
-  padding: 0 24px;
-  background-color: white;
-  color: #0098D1;
-  border-color: #0098D1;
+/* Right-align the group */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+  width: 100%;
+  margin: .5rem 0;
 }
 
+/* Add an icon without extra HTML */
+.btn.btn--icon {
+  position: relative;
+  padding-left: 1.8rem;    /* room for the 14px icon + gap */
+}
 
-.del-btn {
+/* The icon “glyph” */
+.btn.btn--icon::before {
+  content: "";
+  position: absolute;
+  left: .6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
 
+  /* Make the icon inherit the button text color */
+  background: currentColor;
+  mask: var(--icon) no-repeat center / 100% 100%;
+  -webkit-mask: var(--icon) no-repeat center / 100% 100%;
+}
+
+/* Icons (no colors here—your .btn decides the colors) */
+.btn.btn--edit {
+  --icon: url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
+<path d="M3 17.25V21h3.75L20.81 6.94a1 1 0 0 0 0-1.41L18.47 3.2a1 1 0 0 0-1.41 0L3 17.25Z"/>\
+</svg>');
+}
+
+.btn.btn--save {
+  --icon: url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
+<path d="M5 21h14a1 1 0 0 0 1-1V8.83a1 1 0 0 0-.29-.7l-3.84-3.84A1 1 0 0 0 15.41 4H5a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1Zm7-3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6-9h10v3H6V9Z"/>\
+</svg>');
 }
