@@ -1,38 +1,34 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Digin_Kompetanse.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Digin_Kompetanse.Controllers;
 
 public class HomeController : Controller
 {
-    //Midlertidig database i minnet
     private static List<KompetanseModel> _kompetanser = new();
-   
+
+    public HomeController() { }
+
     [HttpGet]
-    public IActionResult Index()
-    {
-        return View();
-    }
+    public IActionResult Index() => View();
 
     [HttpPost]
     public IActionResult Index(string bedriftNavn, string bedriftEpost, string fagområdeNavn, string kompetanseNavn, string beskrivelse)
     {
-        //Lag modellene
         var bedrift = new BedriftModel { Navn = bedriftNavn, Epost = bedriftEpost };
         var fagområde = new FagområdeModel { Navn = fagområdeNavn };
         var kompetanse = new KompetanseModel
         {
+            KompetanseId = _kompetanser.Count + 1,
+            Navn = kompetanseNavn,
             Bedrift = bedrift,
             Fagområde = fagområde,
-            KompetanseNavn = kompetanseNavn,
             Beskrivelse = beskrivelse
         };
-        
-        //Legg til i listen
+
         _kompetanser.Add(kompetanse);
-        
-        //send brukeren til oversikten
         return RedirectToAction("Overview");
     }
 
