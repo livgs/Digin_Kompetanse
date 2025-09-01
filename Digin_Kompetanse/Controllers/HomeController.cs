@@ -40,15 +40,25 @@ public class HomeController : Controller
     {
         return View(_kompetanser);
     }
-
-    public IActionResult Help()
-    {
-        return View(Help);
-    }
     
     public IActionResult Privacy()
     {
         return View();
+    }
+    
+    public IActionResult Help()
+    {
+        return View();
+    }
+
+    public IActionResult AdminView()
+    {
+        return View();
+    }
+    
+    public IActionResult AdminOverview()
+    {
+        return View(_kompetanser);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
