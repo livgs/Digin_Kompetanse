@@ -92,16 +92,20 @@ form {
   justify-content: center;
   align-items: center;
   padding-top: 40px;
+  gap: 16px;
+  width: 500px;
 }
 
-form {
+.form-group {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: 300px;
+  width: 70%;
+  margin-bottom: 16px;
 }
 
-form input, form textarea, form button {
+
+
+form input, form textarea, form button, form select {
   width: 100%;
   box-sizing: border-box;
   padding: 0 24px;
@@ -110,8 +114,6 @@ form input, form textarea, form button {
   border: #0098D1 solid 1px;
   border-radius: 6px;
   background-color: #F8F8F8;
-
-
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -230,8 +232,6 @@ form input, form textarea, form button {
 }
 
 
-
-
 /* Hjemside */
 
 .main {
@@ -248,65 +248,8 @@ form input, form textarea, form button {
 .kompetanse-group {
   display: flex;
   flex-direction: column;
-  max-width: 250px;
+  width: 100%; 
   margin-bottom: 4px;
-}
-
-
-/*dropdown knapp*/
-.dropbtn {
-  background-color: #0098D1;
-  color: white;
-  font-size: 16px;
-  height: 50px;
-  border: none;
-  cursor: pointer;
-  border-radius: 1.5px;
-  width: 100%;
-}
-
-
-/* Dropdown container */
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-/* Dropdown-innhold (skjult som standard) */
-
-.dropdown-content {
-  position: relative;
-  background-color: lightblue;
-  min-width: 150px;
-  border: 1px solid #ddd;
-  z-index: 1;
-}
-
-/* Søkefelt */
-
-#input {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-}
-
-/* Lenker i dropdown */
-
-.dropdown-content a {
-  color: black;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {
-  background-color: #f1f1f1;
-}
-
-/* Vis dropdown */
-.show {
-  display: none;
 }
 
 .btn-submit {
@@ -315,6 +258,7 @@ form input, form textarea, form button {
   padding: 0 24px;
   background-color: white;
   color: #0098D1;
+  border-radius:6px;
   border-color: #0098D1;
 }
 
@@ -337,8 +281,9 @@ form input, form textarea, form button {
 
 .beskrivelse {
   height: 50px;
-  width:245px;
+  width: 100%; 
 }
+
 
 /* Right-align the group */
 .actions {
@@ -384,4 +329,20 @@ form input, form textarea, form button {
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
 <path d="M5 21h14a1 1 0 0 0 1-1V8.83a1 1 0 0 0-.29-.7l-3.84-3.84A1 1 0 0 0 15.41 4H5a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1Zm7-3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6-9h10v3H6V9Z"/>\
 </svg>');
+}
+
+select[multiple] {
+  overflow-y: auto;
+  max-height: 40px;
+  min-height: 40px;
+  font-size: 16px;
+  border: #0098D1 solid 1px;
+  border-radius: 6px;
+  background-color: #F8F8F8;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hidden {
+  display: none;
 }

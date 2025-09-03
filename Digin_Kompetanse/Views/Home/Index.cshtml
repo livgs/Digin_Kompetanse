@@ -16,23 +16,105 @@
 <h2>Registrer kompetanse</h2>
 <script src="js/site.js"></script>
 
-<!-- Skjema for utfylling av kompetanse -->
-<!-- input name må være lik parametere i home controller -->
 <form method="post" action="">
-    <p><input name="bedriftNavn" placeholder="Bedriftens navn" required/></p>
+    <div class="form-group">
+        <p><input name="bedriftNavn" placeholder="Bedriftens navn" required/></p>
+    </div>
+    <div class="form-group">
+        <p><input name="bedriftEpost" type="email" placeholder="E-postadresse" required/></p>
+    </div>
+    @{
+        ViewData["Title"] = "Index";
+        var fagområder = ViewBag.Fagområder as List<Fagområde>;
+    }
+    <div class="form-group">
+        <label for="fagområde">Fagområde</label>
+        <select id="fagområde" name="fagområdeId">
+            <option value="">Fagområde</option>
+            @foreach (var f in fagområder)
+            {
+                <option value="@f.FagområdeId">@f.FagområdeNavn</option>
+            }
+        </select>
+    </div>
 
-    <p><input name="bedriftEpost" type="email" placeholder="E-postadresse" required/></p>
+    <br/>
+    <div class="form-group">
+        <label for="kompetanse">Kompetanse</label>
+        <select id="kompetanse" name="kompetanseId" multiple></select>
+    </div>
 
-    <p><input name="fagområdeNavn" placeholder="Fagområde" required/></p>
+    <br/>
+    <div class="form-group">
+        <label for="underkompetanse">Underkompetanse</label>
+        <select id="underkompetanse" name="underkompetanseId" multiple></select>
+    </div>
+    
+    <br/><br/>
 
-    <select id="fagområdeDropdown">
-        <!-- JS fyller inn her -->
-    </select>
+    @section Scripts {
+        <script>
+            document.getElementById("fagområde").addEventListener("change", function () {
+                const fagområdeId = this.value;
+                const kompetanseSelect = document.getElementById("kompetanse");
+                const underkompetanseSelect = document.getElementById("underkompetanse");
 
-    <div>
+                // Tøm eksisterende alternativer
+                kompetanseSelect.innerHTML = "";
+                underkompetanseSelect.innerHTML = "";
+
+                // Reset størrelser
+                kompetanseSelect.size = 2;
+                underkompetanseSelect.size = 2;
+
+                if (fagområdeId) {
+                    fetch(`/Home/GetKompetanser?fagområdeId=${fagområdeId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(k => {
+                                const option = document.createElement("option");
+                                option.value = k.kompetanseId;
+                                option.text = k.kompetanseKategori;
+                                kompetanseSelect.appendChild(option);
+                            });
+
+                            // Juster size etter antall (maks 10)
+                            kompetanseSelect.size = Math.min(Math.max(data.length, 2), 10);
+                        });
+                }
+            });
+
+            document.getElementById("kompetanse").addEventListener("change", function () {
+                const kompetanseId = this.value;
+                const underkompetanseSelect = document.getElementById("underkompetanse");
+
+                // Tøm eksisterende alternativer
+                underkompetanseSelect.innerHTML = "";
+                underkompetanseSelect.size = 2;
+
+                if (kompetanseId) {
+                    fetch(`/Home/GetUnderkompetanser?kompetanseId=${kompetanseId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(uk => {
+                                const option = document.createElement("option");
+                                option.value = uk.underkompetanseId;
+                                option.text = uk.underkompetanseNavn;
+                                underkompetanseSelect.appendChild(option);
+                            });
+
+                            // Juster size etter antall (maks 10)
+                            underkompetanseSelect.size = Math.min(Math.max(data.length, 2), 10);
+                        });
+                }
+            });
+        </script>
+    }
+
+    <div class="form-group">
         <p><textarea name="beskrivelse" placeholder="Beskrivelse" rows="4"></textarea></p>
     </div>
-    <p><button type="submit" class="btn-submit">Send inn</button></p>
+    <button type="submit" class="btn-submit">Send inn</button>
     <a asp-controller="Home" asp-action="Privacy" class="no-link">Ved innsending samtykker du til at Digin lagrer opplysningene dine internt.</a>
 </form>
 </div>
