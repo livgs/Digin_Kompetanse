@@ -1,47 +1,98 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Digin_Kompetanse.Models.ViewModels.KompetanseRegistreringViewModel
+
+@{
+    ViewData["Title"] = "Kompetansekartlegging";
+    var fagområder = ViewBag.Fagområder as List<Fagområde> ?? new List<Fagområde>();
 }
 
-
-<!DOCTYPE html>
-<html lang="no">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Kompetansekartlegging</title>
-</head>
-
-<body>
-<div class="main">
 <h2>Registrer kompetanse</h2>
 <script src="js/site.js"></script>
 
-<!-- Skjema for utfylling av kompetanse -->
-<!-- input name må være lik parametere i home controller -->
-<form method="post" action="">
-    <p><input name="bedriftNavn" placeholder="Bedriftens navn" required/></p>
-
-    <p><input name="bedriftEpost" type="email" placeholder="E-postadresse" required/></p>
-
-    <p><input name="fagområdeNavn" placeholder="Fagområde" required/></p>
-
-    <div class="kompetanse-group">
-        <button type="button" class="dropbtn" onclick="myFunction()">Velg kompetanse</button>
-        <div id="dropdownContent" class="dropdown-content">
-            <input type="text" placeholder="Søk.." id="input" onkeyup="filterFunction()">
-            <a href="#" onclick="selectCompetence('Java'); return false;">Java</a>
-            <a href="#" onclick="selectCompetence('C#'); return false;">C#</a>
-            <a href="#" onclick="selectCompetence('Excel'); return false;">Excel</a>
+<div class="form-container">
+    <form method="post">
+        <div class="form-group">
+            <input asp-for="BedriftNavn" placeholder="Bedriftens navn" required />
         </div>
-    </div>
-    <p><input type="text" class="margin-bottom" id="selectedCompetence" name="kompetanse" placeholder="Valgt kompetanse" readonly required></p>
+        <div class="form-group">
+            <input asp-for="BedriftEpost" type="email" placeholder="E-postadresse" required />
+        </div>
 
-    <div>
-        <p><textarea name="beskrivelse" placeholder="Beskrivelse" rows="4"></textarea></p>
-    </div>
-    <p><button type="submit" class="btn-submit">Send inn</button></p>
-    <a asp-controller="Home" asp-action="Privacy" class="no-link">Ved innsending samtykker du til at Digin lagrer opplysningene dine internt.</a>
-</form>
+        <div class="form-group">
+            <label for="fagområde">Fagområde</label>
+            <select asp-for="FagområdeId" id="fagområde">
+                <option value="">Velg fagområde</option>
+                @foreach (var f in fagområder)
+                {
+                    <option value="@f.FagområdeId">@f.FagområdeNavn</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="kompetanse">Kompetanse</label>
+            <select asp-for="KompetanseId" id="kompetanse" multiple></select>
+        </div>
+
+        <div class="form-group">
+            <label for="underkompetanse">Underkompetanse</label>
+            <select asp-for="UnderkompetanseId" id="underkompetanse"></select>
+        </div>
+
+        <div class="form-group">
+            <textarea asp-for="Beskrivelse" rows="4" placeholder="Beskrivelse"></textarea>
+        </div>
+
+        <div class="form-group button-wrapper">
+            <button type="submit" class="btn-submit">Send inn</button>
+        </div>
+    </form>
 </div>
-</body>
-</html>
+
+
+@section Scripts {
+<script>
+    const fagSelect = document.getElementById("fagområde");
+    const kompetanseSelect = document.getElementById("kompetanse");
+    const underkompetanseSelect = document.getElementById("underkompetanse");
+
+    fagSelect.addEventListener("change", function () {
+        const fagId = this.value;
+        kompetanseSelect.innerHTML = "";
+        underkompetanseSelect.innerHTML = "";
+
+        if (fagId) {
+            fetch(`/Home/GetKompetanser?fagområdeId=${fagId}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(k => {
+                        const opt = document.createElement("option");
+                        opt.value = k.kompetanseId;
+                        opt.text = k.kompetanseKategori;
+                        kompetanseSelect.appendChild(opt);
+                    });
+                    kompetanseSelect.size = Math.min(Math.max(data.length, 2), 10); // juster høyde på select
+                });
+        }
+    });
+
+    kompetanseSelect.addEventListener("change", function () {
+        const selectedIds = Array.from(this.selectedOptions).map(o => o.value);
+        underkompetanseSelect.innerHTML = "";
+
+        if (selectedIds.length > 0) {
+            // Bruk første valgt kompetanse for underkompetanser (kan utvides senere)
+            fetch(`/Home/GetUnderkompetanser?kompetanseId=${selectedIds[0]}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(uk => {
+                        const opt = document.createElement("option");
+                        opt.value = uk.underkompetanseId;
+                        opt.text = uk.underkompetanseNavn;
+                        underkompetanseSelect.appendChild(opt);
+                    });
+                    underkompetanseSelect.size = Math.min(Math.max(data.length, 2), 10);
+                });
+        }
+    });
+</script>
+}

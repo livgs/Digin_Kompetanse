@@ -1,41 +1,66 @@
-﻿@model IEnumerable<KompetanseModel>
-
+@model IEnumerable<Digin_Kompetanse.Models.Kompetanse>
 @{
-    ViewData["Title"] = "Overview";
+    ViewData["Title"] = "Kompetanseoversikt";
+
+    // Flatt ut alle fagområder per kompetanse, og filtrer bort de som ikke har en bedrift
+    var grupper = Model
+        .SelectMany(k => k.Fagområdes, (k, f) => new { Kompetanse = k, Fagområde = f })
+        .Where(x => x.Fagområde.Bedrift != null) // bare de med gyldig bedrift
+        .GroupBy(x => x.Fagområde.Bedrift)
+        .OrderBy(g => g.Key.BedriftNavn);
 }
 
-<h2>Oversikt over kompetanse</h2>
-<div class="table-box">
+<div class="container mt-5">
+    <h2>Kompetanseoversikt</h2>
 
-<table>
-
-    <thead>
-    <tr>
-        <th>Bedrift</th>
-        <th>E-postadresse</th>
-        <th>Fagområde</th>
-        <th>Kompetanse</th>
-        <th>Beskrivelse</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    @foreach (var k in Model)
+    @foreach (var bedriftGruppe in grupper)
     {
-        <tr>
-            <td>@(k.Bedrift.Navn)</td>
-            <td>@(k.Bedrift.Epost)</td>
-            <td>@k.Fagområde.Navn</td>
-            <td>@(k.Navn)</td>
-            <td>@k.Beskrivelse</td>
-        </tr>
+        <div class="mb-5">
+            <h4 class="text-secondary border-bottom pb-2">
+                @bedriftGruppe.Key.BedriftNavn
+                <small class="text-muted">(@bedriftGruppe.Key.BedriftEpost)</small>
+            </h4>
+
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fagområde</th>
+                            <th>Kompetanse</th>
+                            <th>Underkompetanser</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in bedriftGruppe)
+                        {
+                            var underkompetanser = item.Kompetanse.UnderKompetanses
+                                .Where(uk => uk.KompetanseId == item.Kompetanse.KompetanseId)
+                                .Select(uk => uk.UnderkompetanseNavn)
+                                .ToList();
+
+                            <tr>
+                                <td>@item.Fagområde.FagområdeNavn</td>
+                                <td>@item.Kompetanse.KompetanseKategori</td>
+                                <td>
+                                    @if (underkompetanser.Any())
+                                    {
+                                        <ul class="mb-0">
+                                            @foreach (var uk in underkompetanser)
+                                            {
+                                                <li>@uk</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Ingen</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     }
-    </tbody>
-</table>
 </div>
-
-<div class="actions">
-    <button type="button" class="btn btn--icon btn--edit">Rediger</button>
-    <button type="submit" class="btn btn--icon btn--save">Lagre</button>
-</div>
-

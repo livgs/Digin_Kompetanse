@@ -18,7 +18,9 @@ function filterFunction() {
     }
 }
 
-function selectCompetence(value) {
-    document.getElementById("selectedCompetence").value = value; // fyller input-feltet
-    document.getElementById("dropdownContent").classList.remove("show"); // lukker dropdown
-}
+fetch('/Fagområde/GetFagområder')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        // fyll dropdown eller skjema
+    });
