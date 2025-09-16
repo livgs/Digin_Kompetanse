@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Digin_Kompetanse.data;
 
-public partial class KompetanseContext : DbContext
+public class KompetanseContext : DbContext
 {
     public KompetanseContext()
     {
@@ -122,9 +122,9 @@ public partial class KompetanseContext : DbContext
                 .HasForeignKey(d => d.KompetanseId)
                 .HasConstraintName("under_kompetanse_kompetanse_id_fkey");
         });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+    
+    
+
+     

@@ -52,9 +52,8 @@ public IActionResult Index()
         _context.Fagområde.Update(fagområde);
         _context.SaveChanges();
     }
-
-    // Kompetanser (kan være flere)
-    if (model.KompetanseId != null && model.KompetanseId.Any())
+    
+    if (model.KompetanseId.Any())
     {
         foreach (var kId in model.KompetanseId)
         {
@@ -123,11 +122,32 @@ public IActionResult Index()
 
         return View(kompetanser);
     }
+    
+    public IActionResult Admin()
+    {
+        var viewModel = Queryable.SelectMany(
+                _context.Fagområde
+                    .Where(f => f.Bedrift != null),
+                f => f.Kompetanses.Select(k => new AdminViewModel
+                {
+                    BedriftId = f.Bedrift!.BedriftId,
+                    BedriftNavn = f.Bedrift!.BedriftNavn,
+                    Epost = f.Bedrift!.BedriftEpost,
+                    Fagområde = f.FagområdeNavn!,
+                    KompetanseKategori = k.KompetanseKategori!
+                }))
+            .ToList();
+
+
+
+        return View(viewModel);
+    }
+
+
 
     public IActionResult Privacy() => View();
     public IActionResult Help() => View();
-    public IActionResult AdminView() => View();
-    public IActionResult AdminOverview() => View(_context.Kompetanse.ToList());
+    
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

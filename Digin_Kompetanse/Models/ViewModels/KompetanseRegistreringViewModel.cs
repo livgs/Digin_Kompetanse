@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Digin_Kompetanse.Models.ViewModels
@@ -10,12 +9,10 @@ namespace Digin_Kompetanse.Models.ViewModels
         [Required, EmailAddress] public string BedriftEpost { get; set; } = string.Empty;
 
         [Required] public int FagområdeId { get; set; }
-
-        // Liste med valgte kompetanse-id'er
+        
         [Required(ErrorMessage = "Velg minst én kompetanse")]
         public List<int> KompetanseId { get; set; } = new List<int>();
-
-        // Valgfri underkompetanse
+        
         public int? UnderkompetanseId { get; set; }
 
         public string Beskrivelse { get; set; } = string.Empty;

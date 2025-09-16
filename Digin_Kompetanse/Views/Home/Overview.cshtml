@@ -2,12 +2,12 @@
 @{
     ViewData["Title"] = "Kompetanseoversikt";
 
-    // Flatt ut alle fagområder per kompetanse, og filtrer bort de som ikke har en bedrift
     var grupper = Model
         .SelectMany(k => k.Fagområdes, (k, f) => new { Kompetanse = k, Fagområde = f })
-        .Where(x => x.Fagområde.Bedrift != null) // bare de med gyldig bedrift
-        .GroupBy(x => x.Fagområde.Bedrift)
-        .OrderBy(g => g.Key.BedriftNavn);
+        .Where(x => x.Fagområde.Bedrift != null)
+        .GroupBy(x => x.Fagområde.Bedrift!) // ! fordi vi har filtrert bort null
+        .ToList();
+
 }
 
 <div class="container mt-5">
@@ -15,11 +15,13 @@
 
     @foreach (var bedriftGruppe in grupper)
     {
+        var bedrift = bedriftGruppe.Key!;
         <div class="mb-5">
             <h4 class="text-secondary border-bottom pb-2">
-                @bedriftGruppe.Key.BedriftNavn
-                <small class="text-muted">(@bedriftGruppe.Key.BedriftEpost)</small>
+                @bedrift.BedriftNavn
+                <small class="text-muted">(@bedrift.BedriftEpost)</small>
             </h4>
+
 
             <div class="table-responsive">
                 <table class="table table-striped align-middle">

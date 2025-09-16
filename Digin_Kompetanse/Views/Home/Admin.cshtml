@@ -1,0 +1,124 @@
+﻿@model IEnumerable<Digin_Kompetanse.Models.ViewModels.AdminViewModel>
+@{
+    ViewData["Title"] = "Admin";
+}
+
+    <h2 class="mb-4">Innsendinger</h2>
+
+    <table class="table">
+        <thead class="table">
+        <tr>
+            <th>Bedrift</th>
+            <th>E-post</th>
+            <th>Fagområde</th>
+            <th>Kompetanse</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.BedriftNavn</td>
+                <td>@item.Epost</td>
+                <td>@item.Fagområde</td>
+                <td>@item.KompetanseKategori</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+@*
+@model IEnumerable<KompetanseModel>
+
+@{
+    ViewData["Title"] = "AdminView";
+}
+
+<h2>Admin</h2>
+<div class="table-box">
+
+    <table>
+
+        <thead>
+        <tr>
+            <th>Bedrift</th>
+            <th>E-postadresse</th>
+            <th>Fagområde</th>
+            <th>Kompetanse</th>
+            <th>Beskrivelse</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+        <tr>
+            <td>Phonero</td>
+            <td>phonero@p.no</td>
+            <td>Telekommunikasjon</td>
+            <td>C#</td>
+            <td>Vi er et telefonselskap</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="table-shift">
+    <table>
+        <thead>
+        <tr>
+            <th>Bedrift</th>
+            <th>E-postadresse</th>
+            <th>Fagområde</th>
+            <th>Kompetanse</th>
+            <th>Beskrivelse</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+        <tr>
+            <td>Sikri</td>
+            <td>sikri@s.no</td>
+            <td>dokumentbehandling</td>
+            <td>KI</td>
+            <td>Vi bruker Elements</td>
+        </tr>
+        </tbody>
+    
+    </table>
+</div>
+
+
+<btn class="edit-btn">Rediger</btn>
+<btn class="del-btn">Slett</btn>
+*@
+@*
+@{
+       ViewData["Title"] = "AdminOverview";
+   }
+   
+   <h2>Admin: Oversikt over kompetanse</h2>
+   <div class="table-box">
+   
+       <table>
+   
+           <thead>
+           <tr>
+               <th>Bedrift</th>
+               <th>E-postadresse</th>
+               <th>Fagområde</th>
+               <th>Kompetanse</th>
+               <th>Beskrivelse</th>
+           </tr>
+           </thead>
+   
+           <tbody>
+               <tr>
+                   <td>Eksempel før me har kobla til database</td>
+                   <td>Eksempel før me har kobla til database</td>
+                   <td>Eksempel før me har kobla til database</td>
+                   <td>Eksempel før me har kobla til database</td>
+               </tr>
+           </tbody>
+       </table>
+   </div>
+   *@
