@@ -11,15 +11,16 @@
 <div class="form-container">
     <form method="post">
         <div class="form-group">
-            <input asp-for="BedriftNavn" placeholder="Bedriftens navn" required />
+            <input asp-for="BedriftNavn" placeholder="Bedriftens navn" class="form-control" required />
         </div>
+
         <div class="form-group">
-            <input asp-for="BedriftEpost" type="email" placeholder="E-postadresse" required />
+            <input asp-for="BedriftEpost" type="email" placeholder="E-postadresse" class="form-control" required />
         </div>
 
         <div class="form-group">
             <label for="fagområde">Fagområde</label>
-            <select asp-for="FagområdeId" id="fagområde">
+            <select asp-for="FagområdeId" id="fagområde" class="form-control">
                 <option value="">Velg fagområde</option>
                 @foreach (var f in fagområder)
                 {
@@ -30,24 +31,27 @@
 
         <div class="form-group">
             <label for="kompetanse">Kompetanse</label>
-            <select asp-for="KompetanseId" id="kompetanse" multiple></select>
+            <select asp-for="KompetanseId" id="kompetanse" class="form-control">
+                <option value="">Velg kompetanse</option>
+            </select>
         </div>
 
         <div class="form-group">
             <label for="underkompetanse">Underkompetanse</label>
-            <select asp-for="UnderkompetanseId" id="underkompetanse"></select>
+            <select asp-for="UnderkompetanseId" id="underkompetanse" class="form-control">
+                <option value="">Velg underkompetanse</option>
+            </select>
         </div>
 
         <div class="form-group">
-            <textarea asp-for="Beskrivelse" rows="4" placeholder="Beskrivelse"></textarea>
+            <textarea asp-for="Beskrivelse" rows="4" placeholder="Beskrivelse" class="form-control"></textarea>
         </div>
 
-        <div class="form-group button-wrapper">
-            <button type="submit" class="btn-submit">Send inn</button>
+        <div class="form-group button-wrapper mt-3">
+            <button type="submit" class="btn btn-primary btn-submit">Send inn</button>
         </div>
     </form>
 </div>
-
 
 @section Scripts {
 <script>
@@ -57,42 +61,39 @@
 
     fagSelect.addEventListener("change", function () {
         const fagId = this.value;
-        kompetanseSelect.innerHTML = "";
-        underkompetanseSelect.innerHTML = "";
+        kompetanseSelect.innerHTML = '<option value="">Velg kompetanse</option>';
+        underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
 
-        if (fagId) {
-            fetch(`/Home/GetKompetanser?fagområdeId=${fagId}`)
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(k => {
-                        const opt = document.createElement("option");
-                        opt.value = k.kompetanseId;
-                        opt.text = k.kompetanseKategori;
-                        kompetanseSelect.appendChild(opt);
-                    });
-                    kompetanseSelect.size = Math.min(Math.max(data.length, 2), 10); // juster høyde på select
+        if (!fagId) return;
+
+        fetch(`/Home/GetKompetanser?fagområdeId=${fagId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(k => {
+                    const opt = document.createElement("option");
+                    opt.value = k.kompetanseId;       // camelCase
+                    opt.text = k.kompetanseKategori;  // camelCase
+                    kompetanseSelect.appendChild(opt);
                 });
-        }
+            });
     });
 
     kompetanseSelect.addEventListener("change", function () {
-        const selectedIds = Array.from(this.selectedOptions).map(o => o.value);
-        underkompetanseSelect.innerHTML = "";
+        const kompetanseId = this.value;
+        underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
 
-        if (selectedIds.length > 0) {
-            // Bruk første valgt kompetanse for underkompetanser (kan utvides senere)
-            fetch(`/Home/GetUnderkompetanser?kompetanseId=${selectedIds[0]}`)
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(uk => {
-                        const opt = document.createElement("option");
-                        opt.value = uk.underkompetanseId;
-                        opt.text = uk.underkompetanseNavn;
-                        underkompetanseSelect.appendChild(opt);
-                    });
-                    underkompetanseSelect.size = Math.min(Math.max(data.length, 2), 10);
+        if (!kompetanseId) return;
+
+        fetch(`/Home/GetUnderkompetanser?kompetanseId=${kompetanseId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(uk => {
+                    const opt = document.createElement("option");
+                    opt.value = uk.underkompetanseId;       // camelCase
+                    opt.text = uk.underkompetanseNavn;      // camelCase
+                    underkompetanseSelect.appendChild(opt);
                 });
-        }
+            });
     });
 </script>
 }

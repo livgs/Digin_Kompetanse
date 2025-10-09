@@ -17,17 +17,22 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-public IActionResult Index()
-{
-    ViewBag.Fagområder = _context.Fagområde.AsNoTracking().ToList();
-    return View(new KompetanseRegistreringViewModel());
-}
+    public IActionResult Index()
+    {
+        ViewBag.Fagområder = _context.Fagområde
+            .AsNoTracking()
+            .Include(f => f.Kompetanses)
+            .ToList();
+        return View(new KompetanseRegistreringViewModel());
+    }
 
-    [HttpPost]
-    public IActionResult Index(KompetanseRegistreringViewModel model)
+ [HttpPost]
+public IActionResult Index(KompetanseRegistreringViewModel model)
 {
-    // Viktig: Sett alltid ViewBag før return
-    ViewBag.Fagområder = _context.Fagområde.ToList();
+    // Sett ViewBag for visning hvis ModelState ikke er valid
+    ViewBag.Fagområder = _context.Fagområde
+        .Include(f => f.Kompetanses)
+        .ToList();
 
     if (!ModelState.IsValid) return View(model);
 
@@ -42,62 +47,80 @@ public IActionResult Index()
         _context.SaveChanges();
     }
 
-    // Fagområde
+    // Hent fagområde
     var fagområde = _context.Fagområde.FirstOrDefault(f => f.FagområdeId == model.FagområdeId);
     if (fagområde == null) return NotFound("Fagområde ikke funnet");
 
+    // Koble fagområde til bedrift
     if (fagområde.BedriftId != bedrift.BedriftId)
     {
         fagområde.BedriftId = bedrift.BedriftId;
         _context.Fagområde.Update(fagområde);
         _context.SaveChanges();
     }
-    
-    if (model.KompetanseId.Any())
+
+    // Håndter valgt kompetanse
+    if (model.KompetanseId.HasValue)
     {
-        foreach (var kId in model.KompetanseId)
+        // Finn kompetanse
+        var kompetanse = _context.Kompetanse
+            .Include(k => k.Fagområdes)
+            .Include(k => k.UnderKompetanses)
+            .FirstOrDefault(k => k.KompetanseId == model.KompetanseId.Value);
+
+        if (kompetanse != null)
         {
-            var kompetanse = _context.Kompetanse
-                .Include(k => k.Fagområdes)
-                .Include(k => k.UnderKompetanses)
-                .FirstOrDefault(k => k.KompetanseId == kId);
+            // Fjern alle eksisterende koblinger til dette fagområdet først
+            var eksisterendeKobling = kompetanse.Fagområdes.FirstOrDefault(f => f.FagområdeId == fagområde.FagområdeId);
+            if (eksisterendeKobling != null)
+            {
+                kompetanse.Fagområdes.Remove(eksisterendeKobling);
+            }
 
-            if (kompetanse == null) continue;
+            // Legg til kun den valgte kompetansen
+            kompetanse.Fagområdes.Add(fagområde);
 
-            // Legg til fagområde hvis det ikke allerede er lagt til
-            if (!kompetanse.Fagområdes.Any(f => f.FagområdeId == fagområde.FagområdeId))
-                kompetanse.Fagområdes.Add(fagområde);
-
-            // Underkompetanse (valgfritt)
+            // Håndter valgt underkompetanse
             if (model.UnderkompetanseId.HasValue)
             {
-                var underkompetanse = _context.UnderKompetanse
-                    .FirstOrDefault(uk => uk.UnderkompetanseId == model.UnderkompetanseId.Value);
+                // Fjern eventuelle eksisterende underkompetanser for denne kompetansen
+                kompetanse.UnderKompetanses.Clear();
 
-                if (underkompetanse != null && underkompetanse.KompetanseId == kompetanse.KompetanseId)
+                var underkompetanse = _context.UnderKompetanse
+                    .FirstOrDefault(uk => uk.UnderkompetanseId == model.UnderkompetanseId.Value &&
+                                          uk.KompetanseId == kompetanse.KompetanseId);
+
+                if (underkompetanse != null)
                 {
-                    if (!kompetanse.UnderKompetanses.Any(uk => uk.UnderkompetanseId == underkompetanse.UnderkompetanseId))
-                        kompetanse.UnderKompetanses.Add(underkompetanse);
+                    kompetanse.UnderKompetanses.Add(underkompetanse);
                 }
             }
 
             _context.Kompetanse.Update(kompetanse);
+            _context.SaveChanges();
         }
-
-        _context.SaveChanges();
     }
 
     return RedirectToAction("Overview");
 }
+
     [HttpGet]
     public JsonResult GetKompetanser(int fagområdeId)
     {
-        var kompetanser = _context.Kompetanse
-            .Where(k => k.Fagområdes.Any(f => f.FagområdeId == fagområdeId))
+        var fagområde = _context.Fagområde
+            .Include(f => f.Kompetanses)
+            .FirstOrDefault(f => f.FagområdeId == fagområdeId);
+
+        if (fagområde == null) return Json(new List<object>());
+
+        var kompetanser = fagområde.Kompetanses
             .Select(k => new { k.KompetanseId, k.KompetanseKategori })
             .ToList();
 
-        return Json(kompetanser);
+        return Json(kompetanser, new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+        });
     }
 
     [HttpGet]
@@ -108,7 +131,10 @@ public IActionResult Index()
             .Select(uk => new { uk.UnderkompetanseId, uk.UnderkompetanseNavn })
             .ToList();
 
-        return Json(underkompetanser);
+        return Json(underkompetanser, new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+        });
     }
 
     [HttpGet]
@@ -117,12 +143,13 @@ public IActionResult Index()
         var kompetanser = _context.Kompetanse
             .Include(k => k.UnderKompetanses)
             .Include(k => k.Fagområdes)
-                .ThenInclude(f => f.Bedrift)
+            .ThenInclude(f => f.Bedrift)
             .ToList();
 
         return View(kompetanser);
     }
-    
+
+
     public IActionResult Admin()
     {
         var viewModel = Queryable.SelectMany(
@@ -138,16 +165,11 @@ public IActionResult Index()
                 }))
             .ToList();
 
-
-
         return View(viewModel);
     }
 
-
-
     public IActionResult Privacy() => View();
     public IActionResult Help() => View();
-    
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

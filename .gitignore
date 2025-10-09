@@ -57,3 +57,7 @@ project.fragment.lock.json
 .DS_Store
 Thumbs.db
 ehthumbs.db
+
+Digin_Kompetanse/appsettings.json
+
+qodana.yaml

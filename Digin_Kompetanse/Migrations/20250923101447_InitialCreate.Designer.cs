@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Digin_Kompetanse.Migrations
 {
     [DbContext(typeof(KompetanseContext))]
-    [Migration("20250903115849_MakeIdsAutoIncrement")]
-    partial class MakeIdsAutoIncrement
+    [Migration("20250923101447_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

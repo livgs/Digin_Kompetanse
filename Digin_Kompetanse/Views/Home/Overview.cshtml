@@ -1,13 +1,21 @@
 @model IEnumerable<Digin_Kompetanse.Models.Kompetanse>
 @{
     ViewData["Title"] = "Kompetanseoversikt";
-
+    
     var grupper = Model
         .SelectMany(k => k.Fagområdes, (k, f) => new { Kompetanse = k, Fagområde = f })
         .Where(x => x.Fagområde.Bedrift != null)
-        .GroupBy(x => x.Fagområde.Bedrift!) // ! fordi vi har filtrert bort null
+        .Select(x => new 
+        {
+            Bedrift = x.Fagområde.Bedrift!,
+            Fagområde = x.Fagområde,
+            Kompetanse = x.Kompetanse,
+            Underkompetanser = x.Kompetanse.UnderKompetanses
+                .Where(uk => uk.KompetanseId == x.Kompetanse.KompetanseId)
+                .ToList()
+        })
+        .GroupBy(x => x.Bedrift)
         .ToList();
-
 }
 
 <div class="container mt-5">
@@ -15,13 +23,12 @@
 
     @foreach (var bedriftGruppe in grupper)
     {
-        var bedrift = bedriftGruppe.Key!;
+        var bedrift = bedriftGruppe.Key;
         <div class="mb-5">
             <h4 class="text-secondary border-bottom pb-2">
                 @bedrift.BedriftNavn
                 <small class="text-muted">(@bedrift.BedriftEpost)</small>
             </h4>
-
 
             <div class="table-responsive">
                 <table class="table table-striped align-middle">
@@ -35,21 +42,16 @@
                     <tbody>
                         @foreach (var item in bedriftGruppe)
                         {
-                            var underkompetanser = item.Kompetanse.UnderKompetanses
-                                .Where(uk => uk.KompetanseId == item.Kompetanse.KompetanseId)
-                                .Select(uk => uk.UnderkompetanseNavn)
-                                .ToList();
-
                             <tr>
                                 <td>@item.Fagområde.FagområdeNavn</td>
                                 <td>@item.Kompetanse.KompetanseKategori</td>
                                 <td>
-                                    @if (underkompetanser.Any())
+                                    @if (item.Underkompetanser.Any())
                                     {
                                         <ul class="mb-0">
-                                            @foreach (var uk in underkompetanser)
+                                            @foreach (var uk in item.Underkompetanser)
                                             {
-                                                <li>@uk</li>
+                                                <li>@uk.UnderkompetanseNavn</li>
                                             }
                                         </ul>
                                     }

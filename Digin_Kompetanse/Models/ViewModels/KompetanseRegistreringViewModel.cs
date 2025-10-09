@@ -11,11 +11,12 @@ namespace Digin_Kompetanse.Models.ViewModels
         [Required] public int FagområdeId { get; set; }
         
         [Required(ErrorMessage = "Velg minst én kompetanse")]
-        public List<int> KompetanseId { get; set; } = new List<int>();
+        public int? KompetanseId { get; set; } 
         
-        public int? UnderkompetanseId { get; set; }
+        public int? UnderkompetanseId { get; set; } 
 
         public string Beskrivelse { get; set; } = string.Empty;
 
     }
+
 }
