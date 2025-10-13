@@ -1,70 +1,74 @@
-@model IEnumerable<Digin_Kompetanse.Models.Kompetanse>
+@model IEnumerable<Digin_Kompetanse.Models.BedriftKompetanse>
 @{
     ViewData["Title"] = "Kompetanseoversikt";
-    
-    var grupper = Model
-        .SelectMany(k => k.Fagområdes, (k, f) => new { Kompetanse = k, Fagområde = f })
-        .Where(x => x.Fagområde.Bedrift != null)
-        .Select(x => new 
-        {
-            Bedrift = x.Fagområde.Bedrift!,
-            Fagområde = x.Fagområde,
-            Kompetanse = x.Kompetanse,
-            Underkompetanser = x.Kompetanse.UnderKompetanses
-                .Where(uk => uk.KompetanseId == x.Kompetanse.KompetanseId)
-                .ToList()
-        })
-        .GroupBy(x => x.Bedrift)
+
+    var rader = Model
+        .OrderBy(bk => bk.Bedrift?.BedriftNavn)
+        .ThenBy(bk => bk.Fagområde?.FagområdeNavn)
+        .ThenBy(bk => bk.Kompetanse?.KompetanseKategori)
+        .ToList();
+
+    var grupper = rader
+        .GroupBy(bk => bk.Bedrift?.BedriftNavn ?? "(Ukjent bedrift)")
+        .OrderBy(g => g.Key)
         .ToList();
 }
 
 <div class="container mt-5">
     <h2>Kompetanseoversikt</h2>
 
-    @foreach (var bedriftGruppe in grupper)
+    @if (!grupper.Any())
     {
-        var bedrift = bedriftGruppe.Key;
-        <div class="mb-5">
-            <h4 class="text-secondary border-bottom pb-2">
-                @bedrift.BedriftNavn
-                <small class="text-muted">(@bedrift.BedriftEpost)</small>
-            </h4>
+        <p class="text-muted">Ingen innsendte kompetanser ennå.</p>
+    }
+    else
+    {
+        foreach (var bedriftGruppe in grupper)
+        {
+            var bedriftNavn = bedriftGruppe.Key;
+            var bedrift = bedriftGruppe.FirstOrDefault()?.Bedrift;
 
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Fagområde</th>
-                            <th>Kompetanse</th>
-                            <th>Underkompetanser</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in bedriftGruppe)
-                        {
+            <div class="mb-5">
+                <h4 class="text-secondary border-bottom pb-2">
+                    @bedriftNavn
+                    @if (!string.IsNullOrWhiteSpace(bedrift?.BedriftEpost))
+                    {
+                        <small class="text-muted">(@bedrift.BedriftEpost)</small>
+                    }
+                </h4>
+
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <td>@item.Fagområde.FagområdeNavn</td>
-                                <td>@item.Kompetanse.KompetanseKategori</td>
-                                <td>
-                                    @if (item.Underkompetanser.Any())
-                                    {
-                                        <ul class="mb-0">
-                                            @foreach (var uk in item.Underkompetanser)
-                                            {
-                                                <li>@uk.UnderkompetanseNavn</li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Ingen</span>
-                                    }
-                                </td>
+                                <th scope="col" style="width:22%">Fagområde</th>
+                                <th scope="col" style="width:22%">Kompetanse</th>
+                                <th scope="col" style="width:22%">Underkompetanse</th>
+                                <th scope="col" style="width:22%">Beskrivelse</th>
+                                <th scope="col" style="width:12%">Dato</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in bedriftGruppe)
+                            {
+                                <tr>
+                                    <td>@(item.Fagområde?.FagområdeNavn ?? "—")</td>
+                                    <td>@(item.Kompetanse?.KompetanseKategori ?? "—")</td>
+                                    <td>@(item.UnderKompetanse?.UnderkompetanseNavn ?? "Ingen")</td>
+                                    <td>
+                                        @{
+                                            var text = string.IsNullOrWhiteSpace(item.Beskrivelse) ? "—" : item.Beskrivelse!;
+                                            var shortText = text.Length > 120 ? text[..120] + "…" : text;
+                                        }
+                                        <span class="d-inline-block text-truncate" style="max-width: 420px" title="@text">@shortText</span>
+                                    </td>
+                                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        }
     }
 </div>

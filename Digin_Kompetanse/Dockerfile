@@ -1,24 +1,20 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
+﻿# SDK (for bygg og utvikling)
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
+
+# Kopier alt
+COPY . ./
+
+# Hvis vi kjører i prod → bygg ferdig appen
+ARG BUILD_MODE=Release
+RUN dotnet restore
+RUN dotnet build -c $BUILD_MODE
+
+# ==========================
+# Runtime (for produksjon)
+# ==========================
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
+COPY --from=build /app/bin/$BUILD_MODE/net9.0 .
 EXPOSE 8080
-EXPOSE 8081
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Digin_Kompetanse/Digin_Kompetanse.csproj", "Digin_Kompetanse/"]
-RUN dotnet restore "Digin_Kompetanse/Digin_Kompetanse.csproj"
-COPY . .
-WORKDIR "/src/Digin_Kompetanse"
-RUN dotnet build "./Digin_Kompetanse.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Digin_Kompetanse.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-COPY .env .env
 ENTRYPOINT ["dotnet", "Digin_Kompetanse.dll"]

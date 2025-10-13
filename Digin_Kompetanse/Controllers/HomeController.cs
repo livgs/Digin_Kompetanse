@@ -2,8 +2,10 @@ using Digin_Kompetanse.Models.ViewModels;
 using Digin_Kompetanse.data;
 using Digin_Kompetanse.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; 
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Digin_Kompetanse.Controllers;
 
@@ -16,153 +18,168 @@ public class HomeController : Controller
         _context = context;
     }
 
+    // Hjelper: bygg SelectList for fagområder
+    private SelectList BuildFagomradeSelectList(int? selectedId = null)
+    {
+        var items = _context.Fagområde
+            .AsNoTracking()
+            .OrderBy(f => f.FagområdeNavn)
+            .Select(f => new { f.FagområdeId, f.FagområdeNavn })
+            .ToList();
+
+        return new SelectList(items, "FagområdeId", "FagområdeNavn", selectedId);
+    }
+
     [HttpGet]
     public IActionResult Index()
     {
-        ViewBag.Fagområder = _context.Fagområde
-            .AsNoTracking()
-            .Include(f => f.Kompetanses)
-            .ToList();
+        ViewBag.Fagområder = BuildFagomradeSelectList();
         return View(new KompetanseRegistreringViewModel());
     }
 
- [HttpPost]
-public IActionResult Index(KompetanseRegistreringViewModel model)
-{
-    // Sett ViewBag for visning hvis ModelState ikke er valid
-    ViewBag.Fagområder = _context.Fagområde
-        .Include(f => f.Kompetanses)
-        .ToList();
-
-    if (!ModelState.IsValid) return View(model);
-
-    // Hent eller opprett bedrift
-    var bedrift = _context.Bedrift
-        .FirstOrDefault(b => b.BedriftNavn == model.BedriftNavn && b.BedriftEpost == model.BedriftEpost);
-
-    if (bedrift == null)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Index(KompetanseRegistreringViewModel model)
     {
-        bedrift = new Bedrift { BedriftNavn = model.BedriftNavn, BedriftEpost = model.BedriftEpost };
-        _context.Bedrift.Add(bedrift);
-        _context.SaveChanges();
-    }
+        // Repopulate dropdowns ved valideringsfeil
+        ViewBag.Fagområder = BuildFagomradeSelectList(model.FagområdeId);
 
-    // Hent fagområde
-    var fagområde = _context.Fagområde.FirstOrDefault(f => f.FagområdeId == model.FagområdeId);
-    if (fagområde == null) return NotFound("Fagområde ikke funnet");
+        if (!ModelState.IsValid) return View(model);
 
-    // Koble fagområde til bedrift
-    if (fagområde.BedriftId != bedrift.BedriftId)
-    {
-        fagområde.BedriftId = bedrift.BedriftId;
-        _context.Fagområde.Update(fagområde);
-        _context.SaveChanges();
-    }
+        // 1) Finn/lag bedrift (navn + epost)
+        var bedrift = _context.Bedrift
+            .FirstOrDefault(b => b.BedriftNavn == model.BedriftNavn && b.BedriftEpost == model.BedriftEpost);
 
-    // Håndter valgt kompetanse
-    if (model.KompetanseId.HasValue)
-    {
-        // Finn kompetanse
-        var kompetanse = _context.Kompetanse
-            .Include(k => k.Fagområdes)
-            .Include(k => k.UnderKompetanses)
-            .FirstOrDefault(k => k.KompetanseId == model.KompetanseId.Value);
-
-        if (kompetanse != null)
+        if (bedrift == null)
         {
-            // Fjern alle eksisterende koblinger til dette fagområdet først
-            var eksisterendeKobling = kompetanse.Fagområdes.FirstOrDefault(f => f.FagområdeId == fagområde.FagområdeId);
-            if (eksisterendeKobling != null)
+            bedrift = new Bedrift
             {
-                kompetanse.Fagområdes.Remove(eksisterendeKobling);
-            }
-
-            // Legg til kun den valgte kompetansen
-            kompetanse.Fagområdes.Add(fagområde);
-
-            // Håndter valgt underkompetanse
-            if (model.UnderkompetanseId.HasValue)
-            {
-                // Fjern eventuelle eksisterende underkompetanser for denne kompetansen
-                kompetanse.UnderKompetanses.Clear();
-
-                var underkompetanse = _context.UnderKompetanse
-                    .FirstOrDefault(uk => uk.UnderkompetanseId == model.UnderkompetanseId.Value &&
-                                          uk.KompetanseId == kompetanse.KompetanseId);
-
-                if (underkompetanse != null)
-                {
-                    kompetanse.UnderKompetanses.Add(underkompetanse);
-                }
-            }
-
-            _context.Kompetanse.Update(kompetanse);
+                BedriftNavn = model.BedriftNavn,
+                BedriftEpost = model.BedriftEpost
+            };
+            _context.Bedrift.Add(bedrift);
             _context.SaveChanges();
         }
-    }
 
-    return RedirectToAction("Overview");
-}
+        // 2) Sjekk at fagområde/kompetanse finnes
+        var fagområde = _context.Fagområde
+            .AsNoTracking()
+            .FirstOrDefault(f => f.FagområdeId == model.FagområdeId);
+        if (fagområde == null) return NotFound("Fagområde ikke funnet.");
+
+        if (!model.KompetanseId.HasValue) return BadRequest("Kompetanse må velges.");
+
+        var kompetanse = _context.Kompetanse
+            .AsNoTracking()
+            .FirstOrDefault(k => k.KompetanseId == model.KompetanseId.Value);
+        if (kompetanse == null) return NotFound("Kompetanse ikke funnet.");
+
+        // 3) Valgfri underkompetanse-validering
+        int? underId = null;
+        if (model.UnderkompetanseId.HasValue)
+        {
+            var under = _context.UnderKompetanse
+                .AsNoTracking()
+                .FirstOrDefault(uk => uk.UnderkompetanseId == model.UnderkompetanseId.Value
+                                   && uk.KompetanseId == kompetanse.KompetanseId);
+            if (under == null) return BadRequest("Ugyldig underkompetanse for valgt kompetanse.");
+            underId = under.UnderkompetanseId;
+        }
+
+        // 4) Lag/oppdater rad i bedrift_kompetanse
+        var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
+            bk.BedriftId == bedrift.BedriftId &&
+            bk.FagområdeId == fagområde.FagområdeId &&
+            bk.KompetanseId == kompetanse.KompetanseId &&
+            bk.UnderKompetanseId == underId
+        );
+
+        if (eksisterende == null)
+        {
+            var bk = new BedriftKompetanse
+            {
+                BedriftId = bedrift.BedriftId,
+                FagområdeId = fagområde.FagområdeId,
+                KompetanseId = kompetanse.KompetanseId,
+                UnderKompetanseId = underId,
+                Beskrivelse = model.Beskrivelse,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.BedriftKompetanse.Add(bk);
+        }
+        else
+        {
+            eksisterende.Beskrivelse = model.Beskrivelse;
+        }
+
+        _context.SaveChanges();
+        return RedirectToAction("Overview");
+    }
 
     [HttpGet]
     public JsonResult GetKompetanser(int fagområdeId)
     {
-        var fagområde = _context.Fagområde
+        var kompetanser = _context.Fagområde
+            .AsNoTracking()
             .Include(f => f.Kompetanses)
-            .FirstOrDefault(f => f.FagområdeId == fagområdeId);
-
-        if (fagområde == null) return Json(new List<object>());
-
-        var kompetanser = fagområde.Kompetanses
+            .Where(f => f.FagområdeId == fagområdeId)
+            .SelectMany(f => f.Kompetanses)
+            .OrderBy(k => k.KompetanseKategori)
             .Select(k => new { k.KompetanseId, k.KompetanseKategori })
             .ToList();
 
-        return Json(kompetanser, new System.Text.Json.JsonSerializerOptions
-        {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-        });
+        return Json(kompetanser);
     }
 
     [HttpGet]
     public JsonResult GetUnderkompetanser(int kompetanseId)
     {
         var underkompetanser = _context.UnderKompetanse
+            .AsNoTracking()
             .Where(uk => uk.KompetanseId == kompetanseId)
+            .OrderBy(uk => uk.UnderkompetanseNavn)
             .Select(uk => new { uk.UnderkompetanseId, uk.UnderkompetanseNavn })
             .ToList();
 
-        return Json(underkompetanser, new System.Text.Json.JsonSerializerOptions
-        {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-        });
+        return Json(underkompetanser);
     }
 
     [HttpGet]
     public IActionResult Overview()
     {
-        var kompetanser = _context.Kompetanse
-            .Include(k => k.UnderKompetanses)
-            .Include(k => k.Fagområdes)
-            .ThenInclude(f => f.Bedrift)
+        var rader = _context.BedriftKompetanse
+            .Include(bk => bk.Bedrift)
+            .Include(bk => bk.Fagområde)
+            .Include(bk => bk.Kompetanse)
+            .Include(bk => bk.UnderKompetanse)
+            .AsNoTracking()
+            .OrderBy(bk => bk.Bedrift.BedriftNavn)
+            .ThenBy(bk => bk.Fagområde.FagområdeNavn)
+            .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
             .ToList();
 
-        return View(kompetanser);
+        return View(rader);
     }
-
 
     public IActionResult Admin()
     {
-        var viewModel = Queryable.SelectMany(
-                _context.Fagområde
-                    .Where(f => f.Bedrift != null),
-                f => f.Kompetanses.Select(k => new AdminViewModel
-                {
-                    BedriftId = f.Bedrift!.BedriftId,
-                    BedriftNavn = f.Bedrift!.BedriftNavn,
-                    Epost = f.Bedrift!.BedriftEpost,
-                    Fagområde = f.FagområdeNavn!,
-                    KompetanseKategori = k.KompetanseKategori!
-                }))
+        var viewModel = _context.BedriftKompetanse
+            .Include(bk => bk.Bedrift)
+            .Include(bk => bk.Fagområde)
+            .Include(bk => bk.Kompetanse)
+            .AsNoTracking()
+            .Select(bk => new AdminViewModel
+            {
+                BedriftId = bk.BedriftId,
+                BedriftNavn = bk.Bedrift!.BedriftNavn,
+                Epost = bk.Bedrift!.BedriftEpost,
+                Fagområde = bk.Fagområde!.FagområdeNavn!,
+                KompetanseKategori = bk.Kompetanse!.KompetanseKategori!
+            })
+            .OrderBy(x => x.BedriftNavn)
+            .ThenBy(x => x.Fagområde)
+            .ThenBy(x => x.KompetanseKategori)
             .ToList();
 
         return View(viewModel);

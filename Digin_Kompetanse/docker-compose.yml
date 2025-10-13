@@ -1,22 +1,43 @@
-
 services:
-  postgres:
-    image: postgres:15
+  db:
+    image: postgres:17
     container_name: digin_postgres
-    restart: unless-stopped
+    env_file: .env
     environment:
-      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5068:5432"
+      - "5433:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - digin_net
+      - digin_kompetanse_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: mcr.microsoft.com/dotnet/sdk:9.0
+    container_name: digin_app
+    working_dir: /app
+    env_file: .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      DOTNET_USE_POLLING_FILE_WATCHER: ${DOTNET_USE_POLLING_FILE_WATCHER}
+      DOTNET_WATCH_RESTART_ON_RUDE_EDIT: ${DOTNET_WATCH_RESTART_ON_RUDE_EDIT}
+      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5068:8080"
+    volumes:
+      - .:/app
+      - /app/bin
+      - /app/obj
+    command: ["dotnet","watch","run","--no-launch-profile","--urls","http://0.0.0.0:8080"]
 
 volumes:
-  pgdata:
-
-networks:
-  digin_net:
+  digin_kompetanse_pgdata:
+    name: digin_kompetanse_pgdata

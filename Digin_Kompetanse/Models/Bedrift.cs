@@ -14,3 +14,4 @@ public class Bedrift
 
     public virtual ICollection<Fagområde> Fagområdes { get; set; } = new List<Fagområde>();
 }
+

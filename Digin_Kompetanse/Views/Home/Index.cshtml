@@ -1,99 +1,123 @@
 ﻿@model Digin_Kompetanse.Models.ViewModels.KompetanseRegistreringViewModel
-
+@using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "Kompetansekartlegging";
-    var fagområder = ViewBag.Fagområder as List<Fagområde> ?? new List<Fagområde>();
 }
 
 <h2>Registrer kompetanse</h2>
-<script src="js/site.js"></script>
 
-<div class="form-container">
-    <form method="post">
-        <div class="form-group">
-            <input asp-for="BedriftNavn" placeholder="Bedriftens navn" class="form-control" required />
-        </div>
+<form asp-action="Index" asp-controller="Home" method="post" class="form-container">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <input asp-for="BedriftEpost" type="email" placeholder="E-postadresse" class="form-control" required />
-        </div>
+    <div class="form-group mb-3">
+        <label asp-for="BedriftNavn" class="form-label">Bedriftens navn</label>
+        <input asp-for="BedriftNavn" class="form-control" />
+        <span asp-validation-for="BedriftNavn" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label for="fagområde">Fagområde</label>
-            <select asp-for="FagområdeId" id="fagområde" class="form-control">
-                <option value="">Velg fagområde</option>
-                @foreach (var f in fagområder)
-                {
-                    <option value="@f.FagområdeId">@f.FagområdeNavn</option>
-                }
-            </select>
-        </div>
+    <div class="form-group mb-3">
+        <label asp-for="BedriftEpost" class="form-label">Bedriftens e-post</label>
+        <input asp-for="BedriftEpost" class="form-control" />
+        <span asp-validation-for="BedriftEpost" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label for="kompetanse">Kompetanse</label>
-            <select asp-for="KompetanseId" id="kompetanse" class="form-control">
-                <option value="">Velg kompetanse</option>
-            </select>
-        </div>
+    <div class="form-group mb-3">
+        <label asp-for="FagområdeId" class="form-label">Fagområde</label>
+        <select asp-for="FagområdeId"
+                asp-items="@(ViewBag.Fagområder as SelectList)"
+                id="fagområde"
+                class="form-select">
+            <option value="">Velg fagområde</option>
+        </select>
+        <span asp-validation-for="FagområdeId" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label for="underkompetanse">Underkompetanse</label>
-            <select asp-for="UnderkompetanseId" id="underkompetanse" class="form-control">
-                <option value="">Velg underkompetanse</option>
-            </select>
-        </div>
+    <div class="form-group mb-3">
+        <label asp-for="KompetanseId" class="form-label">Kompetanse</label>
+        <select asp-for="KompetanseId" id="kompetanse" class="form-select">
+            <option value="">Velg kompetanse</option>
+        </select>
+        <span asp-validation-for="KompetanseId" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <textarea asp-for="Beskrivelse" rows="4" placeholder="Beskrivelse" class="form-control"></textarea>
-        </div>
+    <div class="form-group mb-3">
+        <label asp-for="UnderkompetanseId" class="form-label">Underkompetanse</label>
+        <select asp-for="UnderkompetanseId" id="underkompetanse" class="form-select">
+            <option value="">Velg underkompetanse</option>
+        </select>
+        <span asp-validation-for="UnderkompetanseId" class="text-danger"></span>
+    </div>
 
-        <div class="form-group button-wrapper mt-3">
-            <button type="submit" class="btn btn-primary btn-submit">Send inn</button>
-        </div>
-    </form>
-</div>
+    <div class="form-group mb-3">
+        <label asp-for="Beskrivelse" class="form-label">Beskrivelse</label>
+        <textarea asp-for="Beskrivelse" rows="4" class="form-control" placeholder="Beskrivelse"></textarea>
+        <span asp-validation-for="Beskrivelse" class="text-danger"></span>
+    </div>
+
+    <div class="form-group button-wrapper mt-3">
+        <button type="submit" class="btn btn-primary btn-submit">Send inn</button>
+    </div>
+</form>
 
 @section Scripts {
-<script>
-    const fagSelect = document.getElementById("fagområde");
-    const kompetanseSelect = document.getElementById("kompetanse");
-    const underkompetanseSelect = document.getElementById("underkompetanse");
+    <partial name="_ValidationScriptsPartial" />
 
-    fagSelect.addEventListener("change", function () {
-        const fagId = this.value;
-        kompetanseSelect.innerHTML = '<option value="">Velg kompetanse</option>';
-        underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
+    <script>
+        const fagSelect = document.getElementById("fagområde");
+        const kompetanseSelect = document.getElementById("kompetanse");
+        const underkompetanseSelect = document.getElementById("underkompetanse");
 
-        if (!fagId) return;
+        const getKompetanserUrl = '@Url.Action("GetKompetanser","Home")';
+        const getUnderkompetanserUrl = '@Url.Action("GetUnderkompetanser","Home")';
 
-        fetch(`/Home/GetKompetanser?fagområdeId=${fagId}`)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(k => {
+        function setLoading(selectEl, loading) { selectEl.disabled = loading; }
+
+        fagSelect.addEventListener("change", async function () {
+            const fagId = this.value;
+            kompetanseSelect.innerHTML = '<option value="">Velg kompetanse</option>';
+            underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
+            if (!fagId) return;
+
+            try {
+                setLoading(kompetanseSelect, true);
+                const res = await fetch(`${getKompetanserUrl}?fagområdeId=${encodeURIComponent(fagId)}`);
+                if (!res.ok) throw new Error('Kunne ikke hente kompetanser');
+                const data = await res.json(); // forventer camelCase fra server
+                for (const k of data) {
                     const opt = document.createElement("option");
-                    opt.value = k.kompetanseId;       // camelCase
-                    opt.text = k.kompetanseKategori;  // camelCase
+                    opt.value = k.kompetanseId;
+                    opt.text = k.kompetanseKategori;
                     kompetanseSelect.appendChild(opt);
-                });
-            });
-    });
+                }
+            } catch (e) {
+                alert(e.message);
+            } finally {
+                setLoading(kompetanseSelect, false);
+            }
+        });
 
-    kompetanseSelect.addEventListener("change", function () {
-        const kompetanseId = this.value;
-        underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
+        kompetanseSelect.addEventListener("change", async function () {
+            const kompetanseId = this.value;
+            underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
+            if (!kompetanseId) return;
 
-        if (!kompetanseId) return;
-
-        fetch(`/Home/GetUnderkompetanser?kompetanseId=${kompetanseId}`)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(uk => {
+            try {
+                setLoading(underkompetanseSelect, true);
+                const res = await fetch(`${getUnderkompetanserUrl}?kompetanseId=${encodeURIComponent(kompetanseId)}`);
+                if (!res.ok) throw new Error('Kunne ikke hente underkompetanser');
+                const data = await res.json();
+                for (const uk of data) {
                     const opt = document.createElement("option");
-                    opt.value = uk.underkompetanseId;       // camelCase
-                    opt.text = uk.underkompetanseNavn;      // camelCase
+                    opt.value = uk.underkompetanseId;
+                    opt.text = uk.underkompetanseNavn;
                     underkompetanseSelect.appendChild(opt);
-                });
-            });
-    });
-</script>
+                }
+            } catch (e) {
+                alert(e.message);
+            } finally {
+                setLoading(underkompetanseSelect, false);
+            }
+        });
+    </script>
 }
