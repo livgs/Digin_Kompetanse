@@ -82,7 +82,7 @@ namespace Digin_Kompetanse.Controllers
                 var under = _context.UnderKompetanse
                     .AsNoTracking()
                     .FirstOrDefault(uk => uk.UnderkompetanseId == model.UnderkompetanseId.Value
-                                       && uk.KompetanseId == kompetanse.KompetanseId);
+                                          && uk.KompetanseId == kompetanse.KompetanseId);
                 if (under == null) return BadRequest("Ugyldig underkompetanse for valgt kompetanse.");
                 underId = under.UnderkompetanseId;
             }
@@ -193,10 +193,7 @@ namespace Digin_Kompetanse.Controllers
                 return View(new List<AdminViewModel>());
             }
         }
-
-        public IActionResult Privacy() => View();
-        public IActionResult Help() => View();
-
+        
         [HttpGet]
         public IActionResult Login()
         {
@@ -215,6 +212,27 @@ namespace Digin_Kompetanse.Controllers
 
             ViewBag.Error = "Feil brukernavn eller passord.";
             return View();
+        }
+
+
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            // Slett alt i session
+            HttpContext.Session.Clear();
+
+            // Send brukeren tilbake til innloggingssiden
+            return RedirectToAction("Login", "Home");
+        }
+
+
+        public IActionResult Privacy() => View();
+        public IActionResult Help() => View();
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

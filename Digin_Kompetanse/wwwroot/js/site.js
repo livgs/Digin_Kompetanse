@@ -17,10 +17,3 @@ function filterFunction() {
         }
     }
 }
-
-fetch('/Fagområde/GetFagområder')
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        // fyll dropdown eller skjema
-    });
