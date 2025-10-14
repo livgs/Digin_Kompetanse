@@ -3,29 +3,30 @@
     ViewData["Title"] = "Admin";
 }
 
-    <h2 class="mb-4">Innsendinger</h2>
+<h2 class="mb-4">Innsendinger</h2>
 
-    <table class="table">
-        <thead class="table">
+<table class="table">
+    <thead class="table">
+    <tr>
+        <th>Bedrift</th>
+        <th>E-post</th>
+        <th>Fagområde</th>
+        <th>Kompetanse</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
         <tr>
-            <th>Bedrift</th>
-            <th>E-post</th>
-            <th>Fagområde</th>
-            <th>Kompetanse</th>
+            <td>@item.BedriftNavn</td>
+            <td>@item.Epost</td>
+            <td>@item.Fagområde</td>
+            <td>@item.KompetanseKategori</td>
         </tr>
-        </thead>
-        <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.BedriftNavn</td>
-                <td>@item.Epost</td>
-                <td>@item.Fagområde</td>
-                <td>@item.KompetanseKategori</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    }
+    </tbody>
+</table>
+
 @*
 @model IEnumerable<KompetanseModel>
 
@@ -122,3 +123,4 @@
        </table>
    </div>
    *@
+   

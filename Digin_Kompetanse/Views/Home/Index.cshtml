@@ -1,8 +1,13 @@
 ﻿@model Digin_Kompetanse.Models.ViewModels.KompetanseRegistreringViewModel
 @using Microsoft.AspNetCore.Mvc.Rendering
+
 @{
-    ViewData["Title"] = "Kompetansekartlegging";
+ViewData["Title"] = "Kompetansekartlegging";
 }
+
+<!-- ===========================
+     SIDE: REGISTRER KOMPETANSE
+     =========================== -->
 
 <h2>Registrer kompetanse</h2>
 
@@ -10,6 +15,9 @@
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+    <!-- ======================
+         FELT: BEDRIFT
+         ====================== -->
     <div class="form-group mb-3">
         <label asp-for="BedriftNavn" class="form-label">Bedriftens navn</label>
         <input asp-for="BedriftNavn" class="form-control" />
@@ -22,6 +30,9 @@
         <span asp-validation-for="BedriftEpost" class="text-danger"></span>
     </div>
 
+    <!-- ======================
+         FELT: FAGOMRÅDE
+         ====================== -->
     <div class="form-group mb-3">
         <label asp-for="FagområdeId" class="form-label">Fagområde</label>
         <select asp-for="FagområdeId"
@@ -33,6 +44,9 @@
         <span asp-validation-for="FagområdeId" class="text-danger"></span>
     </div>
 
+    <!-- ======================
+         FELT: KOMPETANSE
+         ====================== -->
     <div class="form-group mb-3">
         <label asp-for="KompetanseId" class="form-label">Kompetanse</label>
         <select asp-for="KompetanseId" id="kompetanse" class="form-select">
@@ -41,6 +55,9 @@
         <span asp-validation-for="KompetanseId" class="text-danger"></span>
     </div>
 
+    <!-- ======================
+         FELT: UNDERKOMPETANSE
+         ====================== -->
     <div class="form-group mb-3">
         <label asp-for="UnderkompetanseId" class="form-label">Underkompetanse</label>
         <select asp-for="UnderkompetanseId" id="underkompetanse" class="form-select">
@@ -49,75 +66,104 @@
         <span asp-validation-for="UnderkompetanseId" class="text-danger"></span>
     </div>
 
+    <!-- ======================
+         FELT: BESKRIVELSE
+         ====================== -->
     <div class="form-group mb-3">
         <label asp-for="Beskrivelse" class="form-label">Beskrivelse</label>
-        <textarea asp-for="Beskrivelse" rows="4" class="form-control" placeholder="Beskrivelse"></textarea>
+        <textarea asp-for="Beskrivelse"
+                  rows="4"
+                  class="form-control"
+                  placeholder="Beskrivelse"></textarea>
         <span asp-validation-for="Beskrivelse" class="text-danger"></span>
     </div>
 
+    <!-- ======================
+         KNAPP: SEND INN
+         ====================== -->
     <div class="form-group button-wrapper mt-3">
         <button type="submit" class="btn btn-primary btn-submit">Send inn</button>
     </div>
 </form>
 
+<!-- ===========================
+     SCRIPTS
+     =========================== -->
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<partial name="_ValidationScriptsPartial" />
 
-    <script>
-        const fagSelect = document.getElementById("fagområde");
-        const kompetanseSelect = document.getElementById("kompetanse");
-        const underkompetanseSelect = document.getElementById("underkompetanse");
+<script>
+    // Elementreferanser
+    const fagSelect = document.getElementById("fagområde");
+    const kompetanseSelect = document.getElementById("kompetanse");
+    const underkompetanseSelect = document.getElementById("underkompetanse");
 
-        const getKompetanserUrl = '@Url.Action("GetKompetanser","Home")';
-        const getUnderkompetanserUrl = '@Url.Action("GetUnderkompetanser","Home")';
+    // URL-er til controller-metoder
+    const getKompetanserUrl = '@Url.Action("GetKompetanser", "Home")';
+    const getUnderkompetanserUrl = '@Url.Action("GetUnderkompetanser", "Home")';
 
-        function setLoading(selectEl, loading) { selectEl.disabled = loading; }
+    // Funksjon: Sett loading-state
+    function setLoading(selectEl, loading) {
+        selectEl.disabled = loading;
+    }
 
-        fagSelect.addEventListener("change", async function () {
-            const fagId = this.value;
-            kompetanseSelect.innerHTML = '<option value="">Velg kompetanse</option>';
-            underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
-            if (!fagId) return;
+    // ======================
+    // HENT KOMPETANSER
+    // ======================
+    fagSelect.addEventListener("change", async function () {
+        const fagId = this.value;
 
-            try {
-                setLoading(kompetanseSelect, true);
-                const res = await fetch(`${getKompetanserUrl}?fagområdeId=${encodeURIComponent(fagId)}`);
-                if (!res.ok) throw new Error('Kunne ikke hente kompetanser');
-                const data = await res.json(); // forventer camelCase fra server
-                for (const k of data) {
-                    const opt = document.createElement("option");
-                    opt.value = k.kompetanseId;
-                    opt.text = k.kompetanseKategori;
-                    kompetanseSelect.appendChild(opt);
-                }
-            } catch (e) {
-                alert(e.message);
-            } finally {
-                setLoading(kompetanseSelect, false);
+        // Nullstill avhengige valg
+        kompetanseSelect.innerHTML = '<option value="">Velg kompetanse</option>';
+        underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
+
+        if (!fagId) return;
+
+        try {
+            setLoading(kompetanseSelect, true);
+            const res = await fetch(`${getKompetanserUrl}?fagområdeId=${encodeURIComponent(fagId)}`);
+            if (!res.ok) throw new Error('Kunne ikke hente kompetanser');
+
+            const data = await res.json();
+            for (const k of data) {
+                const opt = document.createElement("option");
+                opt.value = k.kompetanseId;
+                opt.text = k.kompetanseKategori;
+                kompetanseSelect.appendChild(opt);
             }
-        });
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            setLoading(kompetanseSelect, false);
+        }
+    });
 
-        kompetanseSelect.addEventListener("change", async function () {
-            const kompetanseId = this.value;
-            underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
-            if (!kompetanseId) return;
+    // ======================
+    // HENT UNDERKOMPETANSER
+    // ======================
+    kompetanseSelect.addEventListener("change", async function () {
+        const kompetanseId = this.value;
 
-            try {
-                setLoading(underkompetanseSelect, true);
-                const res = await fetch(`${getUnderkompetanserUrl}?kompetanseId=${encodeURIComponent(kompetanseId)}`);
-                if (!res.ok) throw new Error('Kunne ikke hente underkompetanser');
-                const data = await res.json();
-                for (const uk of data) {
-                    const opt = document.createElement("option");
-                    opt.value = uk.underkompetanseId;
-                    opt.text = uk.underkompetanseNavn;
-                    underkompetanseSelect.appendChild(opt);
-                }
-            } catch (e) {
-                alert(e.message);
-            } finally {
-                setLoading(underkompetanseSelect, false);
+        underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
+        if (!kompetanseId) return;
+
+        try {
+            setLoading(underkompetanseSelect, true);
+            const res = await fetch(`${getUnderkompetanserUrl}?kompetanseId=${encodeURIComponent(kompetanseId)}`);
+            if (!res.ok) throw new Error('Kunne ikke hente underkompetanser');
+
+            const data = await res.json();
+            for (const uk of data) {
+                const opt = document.createElement("option");
+                opt.value = uk.underkompetanseId;
+                opt.text = uk.underkompetanseNavn;
+                underkompetanseSelect.appendChild(opt);
             }
-        });
-    </script>
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            setLoading(underkompetanseSelect, false);
+        }
+    });
+</script>
 }

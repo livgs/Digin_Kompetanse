@@ -1,4 +1,4 @@
-﻿using Digin_Kompetanse.Models;
+using Digin_Kompetanse.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Digin_Kompetanse.data;
