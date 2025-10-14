@@ -3,8 +3,14 @@
 @media (min-width: 768px) {
 }
 
+/* Fjern standard marg og padding fra body og html */
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
   html {
-    font-size: 16px;
+    font-size: 18px;
     position: relative;
     min-height: 100%;
   }
@@ -106,6 +112,11 @@ h2 {
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.nav-item .btn i {
+    font-size: 1.1em;
+    vertical-align: middle;
 }
 
 body {
@@ -392,4 +403,45 @@ select[multiple] {
   display: flex;
   justify-content: center; /* midtstill horisontalt */
   width: 100%;
+}
+
+
+/* Help side */
+
+/* Midtstill hele hjelpeseksjonen */
+.help {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.step {
+    width: 600px;
+    text-align: left;
+    background-color: #f9f9f9; /* lys boksfarge */
+    padding: 20px 25px;         /* luft inni boksen */
+    border-radius: 8px;         /* rundede hjørner */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* lett skygge */
+    margin-bottom: 20px;        /* luft mellom steg */
+}
+
+/* Gjør alt konsekvent */
+.step h5 {
+    margin: 0 0 5px 0;
+    padding-left: 10px; /* juster etter behov */
+    color: #0098D1;
+}
+
+.step p {
+    margin: 0;
+    padding-left: 10px; /* juster etter behov */
+    font-size: 18px;
+}
+
+/* Topptekst og introduksjon */
+h2 {
+    text-align: center;
+    margin-bottom: 5px;
 }
