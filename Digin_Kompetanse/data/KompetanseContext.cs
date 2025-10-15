@@ -16,6 +16,7 @@ public class KompetanseContext : DbContext
     // Nye tabeller
     public virtual DbSet<BedriftKompetanse> BedriftKompetanse { get; set; }
     public virtual DbSet<LoginToken> LoginToken { get; set; }
+    public virtual DbSet<Admin> Admin { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
