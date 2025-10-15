@@ -22,7 +22,9 @@ builder.Services.AddSession(options =>
 builder.Services.AddSession(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
 builder.Services.AddHttpContextAccessor();

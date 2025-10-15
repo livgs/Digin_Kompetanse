@@ -133,32 +133,50 @@ namespace Digin_Kompetanse.Controllers
             return Json(kompetanser);
         }
 
-        [HttpGet]
-        public JsonResult GetUnderkompetanser(int kompetanseId)
-        {
-            var underkompetanser = _context.UnderKompetanse
-                .AsNoTracking()
-                .Where(uk => uk.KompetanseId == kompetanseId)
-                .OrderBy(uk => uk.UnderkompetanseNavn)
-                .Select(uk => new { uk.UnderkompetanseId, uk.UnderkompetanseNavn })
-                .ToList();
+    [HttpGet]
+    public IActionResult Overview()
+    {
+        var role = HttpContext.Session.GetString("Role");
+        var bedriftId = HttpContext.Session.GetInt32("BedriftId");
+        
+        if (role != "Bedrift" || bedriftId is null)
+            return RedirectToAction("Index", "Home"); // evt. return Unauthorized();
+        
+        var rader = _context.BedriftKompetanse
+            .Where(bk => bk.BedriftId == bedriftId.Value)
+            .Include(bk => bk.Bedrift)
+            .Include(bk => bk.Fagområde)
+            .Include(bk => bk.Kompetanse)
+            .Include(bk => bk.UnderKompetanse)
+            .AsNoTracking()
+            .OrderBy(bk => bk.Bedrift.BedriftNavn)
+            .ThenBy(bk => bk.Fagområde.FagområdeNavn)
+            .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
+            .ToList();
 
             return Json(underkompetanser);
         }
 
-        [HttpGet]
-        public IActionResult Overview()
-        {
-            var rader = _context.BedriftKompetanse
-                .Include(bk => bk.Bedrift)
-                .Include(bk => bk.Fagområde)
-                .Include(bk => bk.Kompetanse)
-                .Include(bk => bk.UnderKompetanse)
-                .AsNoTracking()
-                .OrderBy(bk => bk.Bedrift.BedriftNavn)
-                .ThenBy(bk => bk.Fagområde.FagområdeNavn)
-                .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
-                .ToList();
+
+    public IActionResult Admin()
+    {
+        var viewModel = _context.BedriftKompetanse
+            .Include(bk => bk.Bedrift)
+            .Include(bk => bk.Fagområde)
+            .Include(bk => bk.Kompetanse)
+            .AsNoTracking()
+            .Select(bk => new AdminViewModel
+            {
+                BedriftId = bk.BedriftId,
+                BedriftNavn = bk.Bedrift!.BedriftNavn,
+                Epost = bk.Bedrift!.BedriftEpost,
+                Fagområde = bk.Fagområde!.FagområdeNavn!,
+                KompetanseKategori = bk.Kompetanse!.KompetanseKategori!
+            })
+            .OrderBy(x => x.BedriftNavn)
+            .ThenBy(x => x.Fagområde)
+            .ThenBy(x => x.KompetanseKategori)
+            .ToList();
 
             return View(rader);
         }
