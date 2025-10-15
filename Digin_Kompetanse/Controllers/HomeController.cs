@@ -145,24 +145,30 @@ namespace Digin_Kompetanse.Controllers
 
             return Json(underkompetanser);
         }
-
-        [HttpGet]
-        public IActionResult Overview()
-        {
-            var rader = _context.BedriftKompetanse
-                .Include(bk => bk.Bedrift)
-                .Include(bk => bk.Fagområde)
-                .Include(bk => bk.Kompetanse)
-                .Include(bk => bk.UnderKompetanse)
-                .AsNoTracking()
-                .OrderBy(bk => bk.Bedrift.BedriftNavn)
-                .ThenBy(bk => bk.Fagområde.FagområdeNavn)
-                .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
-                .ToList();
-
-            return View(rader);
-        }
         
+    [HttpGet]
+    public IActionResult Overview()
+    {
+        var role = HttpContext.Session.GetString("Role");
+        var bedriftId = HttpContext.Session.GetInt32("BedriftId");
+        
+        if (role != "Bedrift" || bedriftId is null)
+            return RedirectToAction("Index", "Home"); // evt. return Unauthorized();
+        
+        var rader = _context.BedriftKompetanse
+            .Where(bk => bk.BedriftId == bedriftId.Value)
+            .Include(bk => bk.Bedrift)
+            .Include(bk => bk.Fagområde)
+            .Include(bk => bk.Kompetanse)
+            .Include(bk => bk.UnderKompetanse)
+            .AsNoTracking()
+            .OrderBy(bk => bk.Bedrift.BedriftNavn)
+            .ThenBy(bk => bk.Fagområde.FagområdeNavn)
+            .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
+            .ToList();
+
+        return View(rader);
+    }
 
         public IActionResult Privacy() => View();
         public IActionResult Help() => View();
