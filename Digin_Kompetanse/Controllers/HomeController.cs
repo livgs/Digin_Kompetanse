@@ -178,5 +178,35 @@ namespace Digin_Kompetanse.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        
+        [HttpGet]
+        public IActionResult UserLogin()
+        {
+            // Hvis brukeren allerede er logget inn, send rett til forsiden
+            var username = HttpContext.Session.GetString("Username");
+            if (!string.IsNullOrEmpty(username))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult UserLogin(string username, string password)
+        {
+            // Foreløpig "fake login" – du legger inn engangskode senere
+            // Her kan du evt. validere brukeren mot databasen
+            if (username == "TestBedrift" && password == "1234")
+            {
+                HttpContext.Session.SetString("Username", username);
+                HttpContext.Session.SetString("Role", "Bedrift");
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Error = "Feil brukernavn eller passord.";
+            return View();
+        }
+
     }
 }

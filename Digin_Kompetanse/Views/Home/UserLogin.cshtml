@@ -1,5 +1,5 @@
 @{
-ViewData["Title"] = "Administratorinnlogging";
+    ViewData["Title"] = "Brukerinnlogging";
 }
 
 <style>
@@ -23,7 +23,7 @@ ViewData["Title"] = "Administratorinnlogging";
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         width: 100%;
         max-width: 400px;
-        padding: 2rem 2.5rem;
+        padding: 2rem 2.5rem; /* litt bredere padding */
         box-sizing: border-box;
 
         display: flex;
@@ -46,7 +46,7 @@ ViewData["Title"] = "Administratorinnlogging";
     }
 
     .form-group {
-        width: 85%;
+        width: 85%; /* smalere felt */
         margin-bottom: 1rem;
     }
 
@@ -57,7 +57,7 @@ ViewData["Title"] = "Administratorinnlogging";
         color: #333;
     }
 
-    input[type="email"],
+    input[type="text"],
     input[type="password"] {
         width: 100%;
         padding: 9px 12px;
@@ -82,7 +82,7 @@ ViewData["Title"] = "Administratorinnlogging";
         border: none;
         border-radius: 6px;
         padding: 10px;
-        width: 85%;
+        width: 85%; /* samme bredde som feltene */
         margin-top: 0.5rem;
         cursor: pointer;
         transition: background-color 0.25s ease;
@@ -121,17 +121,17 @@ ViewData["Title"] = "Administratorinnlogging";
 
 <div class="login-wrapper">
     <div class="login-card">
-        <h2>Logg inn som administrator</h2>
+        <h2>Logg inn som bedrift</h2>
 
         @if (ViewBag.Error != null)
         {
-        <div class="alert">@ViewBag.Error</div>
+            <div class="alert">@ViewBag.Error</div>
         }
 
-        <form asp-action="Login" method="post">
+        <form asp-action="UserLogin" method="post">
             <div class="form-group">
-                <label for="email">E-post</label>
-                <input type="email" id="email" name="email" required />
+                <label for="username">Brukernavn</label>
+                <input type="text" id="username" name="username" required />
             </div>
 
             <div class="form-group">
@@ -142,8 +142,8 @@ ViewData["Title"] = "Administratorinnlogging";
             <button type="submit" class="btn-login">Logg inn</button>
         </form>
 
-        <a asp-controller="Home" asp-action="UserLogin" class="back-link">
-            Tilbake til brukerinnlogging
+        <a asp-controller="Admin" asp-action="Login" class="back-link">
+            Administrator
         </a>
     </div>
 </div>
