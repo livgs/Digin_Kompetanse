@@ -162,69 +162,7 @@ namespace Digin_Kompetanse.Controllers
 
             return View(rader);
         }
-
-        public IActionResult Admin()
-        {
-            try
-            {
-                var viewModel = _context.BedriftKompetanse
-                    .Include(bk => bk.Bedrift)
-                    .Include(bk => bk.Fagområde)
-                    .Include(bk => bk.Kompetanse)
-                    .AsNoTracking()
-                    .Select(bk => new AdminViewModel
-                    {
-                        BedriftId = bk.BedriftId,
-                        BedriftNavn = bk.Bedrift!.BedriftNavn,
-                        Epost = bk.Bedrift!.BedriftEpost,
-                        Fagområde = bk.Fagområde!.FagområdeNavn!,
-                        KompetanseKategori = bk.Kompetanse!.KompetanseKategori!
-                    })
-                    .OrderBy(x => x.BedriftNavn)
-                    .ThenBy(x => x.Fagområde)
-                    .ThenBy(x => x.KompetanseKategori)
-                    .ToList();
-
-                return View(viewModel);
-            }
-            catch
-            {
-                ViewBag.Error = "Kunne ikke hente data fra databasen.";
-                return View(new List<AdminViewModel>());
-            }
-        }
         
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(string username, string password)
-        {
-            // Hardkodet bruker
-            if (username == "Digin" && password == "Admin123")
-            {
-                HttpContext.Session.SetString("Username", "Digin");
-                return RedirectToAction("Admin");
-            }
-
-            ViewBag.Error = "Feil brukernavn eller passord.";
-            return View();
-        }
-
-
-        [HttpPost]
-        public IActionResult Logout()
-        {
-            // Slett alt i session
-            HttpContext.Session.Clear();
-
-            // Send brukeren tilbake til innloggingssiden
-            return RedirectToAction("Login", "Home");
-        }
-
 
         public IActionResult Privacy() => View();
         public IActionResult Help() => View();
