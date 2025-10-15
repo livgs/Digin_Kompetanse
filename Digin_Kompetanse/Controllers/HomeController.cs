@@ -133,6 +133,19 @@ namespace Digin_Kompetanse.Controllers
             return Json(kompetanser);
         }
 
+        [HttpGet]
+        public JsonResult GetUnderkompetanser(int kompetanseId)
+        {
+            var underkompetanser = _context.UnderKompetanse
+                .AsNoTracking()
+                .Where(uk => uk.KompetanseId == kompetanseId)
+                .OrderBy(uk => uk.UnderkompetanseNavn)
+                .Select(uk => new { uk.UnderkompetanseId, uk.UnderkompetanseNavn })
+                .ToList();
+
+            return Json(underkompetanser);
+        }
+        
     [HttpGet]
     public IActionResult Overview()
     {
@@ -154,33 +167,8 @@ namespace Digin_Kompetanse.Controllers
             .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
             .ToList();
 
-            return Json(underkompetanser);
-        }
-
-
-    public IActionResult Admin()
-    {
-        var viewModel = _context.BedriftKompetanse
-            .Include(bk => bk.Bedrift)
-            .Include(bk => bk.Fagområde)
-            .Include(bk => bk.Kompetanse)
-            .AsNoTracking()
-            .Select(bk => new AdminViewModel
-            {
-                BedriftId = bk.BedriftId,
-                BedriftNavn = bk.Bedrift!.BedriftNavn,
-                Epost = bk.Bedrift!.BedriftEpost,
-                Fagområde = bk.Fagområde!.FagområdeNavn!,
-                KompetanseKategori = bk.Kompetanse!.KompetanseKategori!
-            })
-            .OrderBy(x => x.BedriftNavn)
-            .ThenBy(x => x.Fagområde)
-            .ThenBy(x => x.KompetanseKategori)
-            .ToList();
-
-            return View(rader);
-        }
-        
+        return View(rader);
+    }
 
         public IActionResult Privacy() => View();
         public IActionResult Help() => View();
