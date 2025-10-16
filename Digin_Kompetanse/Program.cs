@@ -4,14 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
 builder.Services.AddControllersWithViews();
 
-// Legg til DbContext
 builder.Services.AddDbContext<KompetanseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 👇 Legg til session
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -41,7 +38,6 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -55,7 +51,6 @@ app.UseSession();
 
 app.UseRouting();
 
-// 👇 Aktiver session før authorization
 app.UseSession();
 
 app.UseAuthorization();

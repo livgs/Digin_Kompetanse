@@ -5,19 +5,13 @@
 ViewData["Title"] = "Kompetansekartlegging";
 }
 
-<!-- ===========================
-     SIDE: REGISTRER KOMPETANSE
-     =========================== -->
 
 <h2>Registrer kompetanse</h2>
 
 <form asp-action="Index" asp-controller="Home" method="post" class="form-container">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <!-- ======================
-         FELT: BEDRIFT
-         ====================== -->
+    
     <div class="form-group mb-3">
         <label asp-for="BedriftNavn" class="form-label">Bedriftens navn</label>
         <input asp-for="BedriftNavn" class="form-control" />
@@ -29,10 +23,7 @@ ViewData["Title"] = "Kompetansekartlegging";
         <input asp-for="BedriftEpost" class="form-control" />
         <span asp-validation-for="BedriftEpost" class="text-danger"></span>
     </div>
-
-    <!-- ======================
-         FELT: FAGOMRÅDE
-         ====================== -->
+    
     <div class="form-group mb-3">
         <label asp-for="FagområdeId" class="form-label">Fagområde</label>
         <select asp-for="FagområdeId"
@@ -43,10 +34,7 @@ ViewData["Title"] = "Kompetansekartlegging";
         </select>
         <span asp-validation-for="FagområdeId" class="text-danger"></span>
     </div>
-
-    <!-- ======================
-         FELT: KOMPETANSE
-         ====================== -->
+    
     <div class="form-group mb-3">
         <label asp-for="KompetanseId" class="form-label">Kompetanse</label>
         <select asp-for="KompetanseId" id="kompetanse" class="form-select">
@@ -54,10 +42,7 @@ ViewData["Title"] = "Kompetansekartlegging";
         </select>
         <span asp-validation-for="KompetanseId" class="text-danger"></span>
     </div>
-
-    <!-- ======================
-         FELT: UNDERKOMPETANSE
-         ====================== -->
+    
     <div class="form-group mb-3">
         <label asp-for="UnderkompetanseId" class="form-label">Underkompetanse</label>
         <select asp-for="UnderkompetanseId" id="underkompetanse" class="form-select">
@@ -65,10 +50,7 @@ ViewData["Title"] = "Kompetansekartlegging";
         </select>
         <span asp-validation-for="UnderkompetanseId" class="text-danger"></span>
     </div>
-
-    <!-- ======================
-         FELT: BESKRIVELSE
-         ====================== -->
+    
     <div class="form-group mb-3">
         <label asp-for="Beskrivelse" class="form-label">Beskrivelse</label>
         <textarea asp-for="Beskrivelse"
@@ -77,43 +59,31 @@ ViewData["Title"] = "Kompetansekartlegging";
                   placeholder="Beskrivelse"></textarea>
         <span asp-validation-for="Beskrivelse" class="text-danger"></span>
     </div>
-
-    <!-- ======================
-         KNAPP: SEND INN
-         ====================== -->
+    
     <div class="form-group button-wrapper mt-3">
         <button type="submit" class="btn btn-primary btn-submit">Send inn</button>
     </div>
 </form>
-
-<!-- ===========================
-     SCRIPTS
-     =========================== -->
+     
 @section Scripts {
 <partial name="_ValidationScriptsPartial" />
 
 <script>
-    // Elementreferanser
+    
     const fagSelect = document.getElementById("fagområde");
     const kompetanseSelect = document.getElementById("kompetanse");
     const underkompetanseSelect = document.getElementById("underkompetanse");
-
-    // URL-er til controller-metoder
+    
     const getKompetanserUrl = '@Url.Action("GetKompetanser", "Home")';
     const getUnderkompetanserUrl = '@Url.Action("GetUnderkompetanser", "Home")';
-
-    // Funksjon: Sett loading-state
+    
     function setLoading(selectEl, loading) {
         selectEl.disabled = loading;
     }
-
-    // ======================
-    // HENT KOMPETANSER
-    // ======================
+    
     fagSelect.addEventListener("change", async function () {
         const fagId = this.value;
-
-        // Nullstill avhengige valg
+        
         kompetanseSelect.innerHTML = '<option value="">Velg kompetanse</option>';
         underkompetanseSelect.innerHTML = '<option value="">Velg underkompetanse</option>';
 
@@ -137,10 +107,7 @@ ViewData["Title"] = "Kompetansekartlegging";
             setLoading(kompetanseSelect, false);
         }
     });
-
-    // ======================
-    // HENT UNDERKOMPETANSER
-    // ======================
+    
     kompetanseSelect.addEventListener("change", async function () {
         const kompetanseId = this.value;
 

@@ -12,14 +12,12 @@ namespace Digin_Kompetanse.Controllers
     public class HomeController : Controller
     {
         private readonly KompetanseContext _context;
-
-        // ✅ Constructor for dependency injection
+        
         public HomeController(KompetanseContext context)
         {
             _context = context;
         }
-
-        // Hjelper: bygg SelectList for fagområder
+        
         private SelectList BuildFagomradeSelectList(int? selectedId = null)
         {
             var items = _context.Fagområde
@@ -42,25 +40,19 @@ namespace Digin_Kompetanse.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Index(KompetanseRegistreringViewModel model)
         {
+            // Krev innlogging (BedriftId i session)
+            var bedriftId = HttpContext.Session.GetInt32("BedriftId");
+            if (bedriftId == null)
+                return RedirectToAction("Login", "Auth");
+
             // Repopulate dropdowns ved valideringsfeil
             ViewBag.Fagområder = BuildFagomradeSelectList(model.FagområdeId);
-
             if (!ModelState.IsValid) return View(model);
 
-            // 1) Finn/lag bedrift (navn + epost)
-            var bedrift = _context.Bedrift
-                .FirstOrDefault(b => b.BedriftNavn == model.BedriftNavn && b.BedriftEpost == model.BedriftEpost);
-
+            // 1) Hent innlogget bedrift fra DB via session (ikke bruk navn/epost fra form)
+            var bedrift = _context.Bedrift.FirstOrDefault(b => b.BedriftId == bedriftId.Value);
             if (bedrift == null)
-            {
-                bedrift = new Bedrift
-                {
-                    BedriftNavn = model.BedriftNavn,
-                    BedriftEpost = model.BedriftEpost
-                };
-                _context.Bedrift.Add(bedrift);
-                _context.SaveChanges();
-            }
+                return Unauthorized("Innlogget bedrift ikke funnet.");
 
             // 2) Sjekk at fagområde/kompetanse finnes
             var fagområde = _context.Fagområde
@@ -82,12 +74,11 @@ namespace Digin_Kompetanse.Controllers
                 var under = _context.UnderKompetanse
                     .AsNoTracking()
                     .FirstOrDefault(uk => uk.UnderkompetanseId == model.UnderkompetanseId.Value
-                                          && uk.KompetanseId == kompetanse.KompetanseId);
+                                       && uk.KompetanseId == kompetanse.KompetanseId);
                 if (under == null) return BadRequest("Ugyldig underkompetanse for valgt kompetanse.");
                 underId = under.UnderkompetanseId;
             }
-
-            // 4) Lag/oppdater rad i bedrift_kompetanse
+            
             var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
                 bk.BedriftId == bedrift.BedriftId &&
                 bk.FagområdeId == fagområde.FagområdeId &&
@@ -145,30 +136,30 @@ namespace Digin_Kompetanse.Controllers
 
             return Json(underkompetanser);
         }
-        
-    [HttpGet]
-    public IActionResult Overview()
-    {
-        var role = HttpContext.Session.GetString("Role");
-        var bedriftId = HttpContext.Session.GetInt32("BedriftId");
-        
-        if (role != "Bedrift" || bedriftId is null)
-            return RedirectToAction("Index", "Home"); // evt. return Unauthorized();
-        
-        var rader = _context.BedriftKompetanse
-            .Where(bk => bk.BedriftId == bedriftId.Value)
-            .Include(bk => bk.Bedrift)
-            .Include(bk => bk.Fagområde)
-            .Include(bk => bk.Kompetanse)
-            .Include(bk => bk.UnderKompetanse)
-            .AsNoTracking()
-            .OrderBy(bk => bk.Bedrift.BedriftNavn)
-            .ThenBy(bk => bk.Fagområde.FagområdeNavn)
-            .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
-            .ToList();
 
-        return View(rader);
-    }
+        [HttpGet]
+        public IActionResult Overview()
+        {
+            var role = HttpContext.Session.GetString("Role");
+            var bedriftId = HttpContext.Session.GetInt32("BedriftId");
+
+            if (role != "Bedrift" || bedriftId is null)
+                return RedirectToAction("Index", "Home"); // evt. return Unauthorized();
+
+            var rader = _context.BedriftKompetanse
+                .Where(bk => bk.BedriftId == bedriftId.Value)
+                .Include(bk => bk.Bedrift)
+                .Include(bk => bk.Fagområde)
+                .Include(bk => bk.Kompetanse)
+                .Include(bk => bk.UnderKompetanse)
+                .AsNoTracking()
+                .OrderBy(bk => bk.Bedrift.BedriftNavn)
+                .ThenBy(bk => bk.Fagområde.FagområdeNavn)
+                .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
+                .ToList();
+
+            return View(rader);
+        }
 
         public IActionResult Privacy() => View();
         public IActionResult Help() => View();
