@@ -25,7 +25,7 @@ public class AdminController : Controller
     [HttpPost]
     public IActionResult Login(string email, string password)
     {
-        // 1️⃣ Hardkodet admin (bruk hash for sikkerhet)
+        // Hardkodet admin 
         const string hardcodedEmail = "digin@dgn.no";
         const string hardcodedPasswordHash = "$2a$11$TTl31f/y3FAKOR3n0hwq4uJR6Q0u.mamXVDGIcPGmGoJNx0/SiFUO";
         
@@ -37,7 +37,7 @@ public class AdminController : Controller
             return RedirectToAction("AdminDashboard");
         }
 
-        // 3️⃣ Feil brukernavn/passord
+        // Feil brukernavn/passord
         ViewBag.Error = "Feil e-post eller passord.";
         return View();
     }
@@ -45,7 +45,7 @@ public class AdminController : Controller
     [HttpGet]
     public IActionResult AdminDashboard()
     {
-        // sjek at brukeren er logget inn som admin
+        // Sjekk at brukeren er logget inn som admin
         if (HttpContext.Session.GetString("Role") != "Admin")
             return RedirectToAction("Login");
 
