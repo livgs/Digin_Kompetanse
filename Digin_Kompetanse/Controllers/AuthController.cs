@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
-    // 📩 Send engangskode (OTP)
+    // Send engangskode (OTP)
     [HttpPost("request-otp")]
     public async Task<IActionResult> RequestOtp([FromBody] RequestOtpDto dto)
     {
@@ -49,7 +49,7 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Kode sendt (dev: sjekk serverlogg)." });
     }
 
-    // ✅ Verifiser OTP og logg inn
+    // Verifiser OTP og logg inn
     [HttpPost("verify-otp")]
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
     {
@@ -64,11 +64,11 @@ public class AuthController : ControllerBase
         if (bedrift == null)
             return NotFound(new { message = "Bedrift ikke funnet." });
 
-        // 🔹 Fjern eventuell admin-session først
+        // Fjern eventuell admin-session først
         HttpContext.Session.Remove("AdminId");
         HttpContext.Session.Remove("Role");
 
-        // 🔹 Lagre innlogget bedrift i session
+        // Lagre innlogget bedrift i session
         HttpContext.Session.SetInt32("BedriftId", bedrift.BedriftId);
         HttpContext.Session.SetString("Role", "Bedrift");
 
@@ -76,8 +76,7 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "Innlogging vellykket!", bedriftId = bedrift.BedriftId });
     }
-
-    // 🚪 Logg ut bedrift (Alternativ B)
+    
     [HttpPost("logout")]
     public IActionResult LogoutBedrift()
     {

@@ -22,15 +22,12 @@ public class KompetanseContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            // La DI håndtere konfigurering (Program.cs)
+            
         }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // =========================
-        // BEDRIFT
-        // =========================
         modelBuilder.Entity<Bedrift>(entity =>
         {
             entity.ToTable("bedrift");
@@ -53,9 +50,7 @@ public class KompetanseContext : DbContext
                 .HasColumnName("beskrivelse");
         });
 
-        // =========================
-        // FAGOMRADE (merk ASCII)
-        // =========================
+       
         modelBuilder.Entity<Fagområde>(entity =>
         {
             entity.ToTable("fagomrade");
@@ -68,8 +63,7 @@ public class KompetanseContext : DbContext
             entity.Property(e => e.FagområdeNavn)
                 .HasMaxLength(45)
                 .HasColumnName("fagomrade_navn");
-
-            // M:N Fagområde <-> Kompetanse via join-tabell
+            
             entity.HasMany(d => d.Kompetanses)
                   .WithMany(p => p.Fagområdes)
                   .UsingEntity<Dictionary<string, object>>(
@@ -92,10 +86,7 @@ public class KompetanseContext : DbContext
                         j.IndexerProperty<int>("kompetanse_id").HasColumnName("kompetanse_id");
                     });
         });
-
-        // =========================
-        // KOMPETANSE
-        // =========================
+        
         modelBuilder.Entity<Kompetanse>(entity =>
         {
             entity.ToTable("kompetanse");
@@ -109,10 +100,7 @@ public class KompetanseContext : DbContext
                 .HasMaxLength(45)
                 .HasColumnName("kompetanse_kategori");
         });
-
-        // =========================
-        // UNDER_KOMPETANSE
-        // =========================
+        
         modelBuilder.Entity<UnderKompetanse>(entity =>
         {
             entity.ToTable("under_kompetanse");
@@ -134,10 +122,7 @@ public class KompetanseContext : DbContext
                 .HasForeignKey(d => d.KompetanseId)
                 .HasConstraintName("under_kompetanse_kompetanse_id_fkey");
         });
-
-        // =========================
-        // BEDRIFT_KOMPETANSE
-        // =========================
+        
         modelBuilder.Entity<BedriftKompetanse>(entity =>
         {
             entity.ToTable("bedrift_kompetanse");
@@ -211,9 +196,7 @@ public class KompetanseContext : DbContext
                   .HasDatabaseName("ux_bedrift_kompetanse_unique_choice");
         });
 
-        // =========================
-        // LOGIN_TOKEN
-        // =========================
+        
         modelBuilder.Entity<LoginToken>(e =>
         {
             e.ToTable("login_token");
