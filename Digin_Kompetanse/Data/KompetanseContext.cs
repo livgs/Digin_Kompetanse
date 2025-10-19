@@ -12,8 +12,6 @@ public class KompetanseContext : DbContext
     public virtual DbSet<Fagområde> Fagområde { get; set; }
     public virtual DbSet<Kompetanse> Kompetanse { get; set; }
     public virtual DbSet<UnderKompetanse> UnderKompetanse { get; set; }
-
-    // Nye tabeller
     public virtual DbSet<BedriftKompetanse> BedriftKompetanse { get; set; }
     public virtual DbSet<LoginToken> LoginToken { get; set; }
     public virtual DbSet<Admin> Admin { get; set; }
@@ -49,8 +47,7 @@ public class KompetanseContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("beskrivelse");
         });
-
-       
+        
         modelBuilder.Entity<Fagområde>(entity =>
         {
             entity.ToTable("fagomrade");
@@ -63,6 +60,7 @@ public class KompetanseContext : DbContext
             entity.Property(e => e.FagområdeNavn)
                 .HasMaxLength(45)
                 .HasColumnName("fagomrade_navn");
+
             
             entity.HasMany(d => d.Kompetanses)
                   .WithMany(p => p.Fagområdes)
@@ -86,6 +84,7 @@ public class KompetanseContext : DbContext
                         j.IndexerProperty<int>("kompetanse_id").HasColumnName("kompetanse_id");
                     });
         });
+
         
         modelBuilder.Entity<Kompetanse>(entity =>
         {
@@ -122,7 +121,8 @@ public class KompetanseContext : DbContext
                 .HasForeignKey(d => d.KompetanseId)
                 .HasConstraintName("under_kompetanse_kompetanse_id_fkey");
         });
-        
+
+       
         modelBuilder.Entity<BedriftKompetanse>(entity =>
         {
             entity.ToTable("bedrift_kompetanse");

@@ -5,14 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Linq;
 
 namespace Digin_Kompetanse.Controllers
 {
     public class HomeController : Controller
     {
         private readonly KompetanseContext _context;
-        
+
         public HomeController(KompetanseContext context)
         {
             _context = context;
@@ -29,6 +28,28 @@ namespace Digin_Kompetanse.Controllers
             return new SelectList(items, "FagområdeId", "FagområdeNavn", selectedId);
         }
 
+        // Viser innloggingssiden (Views/Auth/Login.cshtml)
+        [HttpGet("/auth/login")]
+        public IActionResult Login()
+        {
+            // Hvis allerede innlogget som bedrift → gå til oversikt
+            if (HttpContext.Session.GetString("Role") == "Bedrift" &&
+                HttpContext.Session.GetInt32("BedriftId") is not null)
+            {
+                return RedirectToAction(nameof(Overview));
+            }
+            
+            return View("~/Views/Auth/Login.cshtml");
+        }
+        
+        [HttpGet("/auth/logout")]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            TempData["Message"] = "Du er logget ut.";
+            return RedirectToAction(nameof(Login));
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -40,21 +61,18 @@ namespace Digin_Kompetanse.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Index(KompetanseRegistreringViewModel model)
         {
-            // Krev innlogging (BedriftId i session)
+           
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
             if (bedriftId == null)
-                return RedirectToAction("Login", "Auth");
-
-            // Repopulate dropdowns ved valideringsfeil
+                return RedirectToAction(nameof(Login)); //
+            
             ViewBag.Fagområder = BuildFagomradeSelectList(model.FagområdeId);
             if (!ModelState.IsValid) return View(model);
-
-            // 1) Hent innlogget bedrift fra DB via session (ikke bruk navn/epost fra form)
+            
             var bedrift = _context.Bedrift.FirstOrDefault(b => b.BedriftId == bedriftId.Value);
             if (bedrift == null)
                 return Unauthorized("Innlogget bedrift ikke funnet.");
-
-            // 2) Sjekk at fagområde/kompetanse finnes
+            
             var fagområde = _context.Fagområde
                 .AsNoTracking()
                 .FirstOrDefault(f => f.FagområdeId == model.FagområdeId);
@@ -66,8 +84,7 @@ namespace Digin_Kompetanse.Controllers
                 .AsNoTracking()
                 .FirstOrDefault(k => k.KompetanseId == model.KompetanseId.Value);
             if (kompetanse == null) return NotFound("Kompetanse ikke funnet.");
-
-            // 3) Valgfri underkompetanse-validering
+            
             int? underId = null;
             if (model.UnderkompetanseId.HasValue)
             {
@@ -106,7 +123,7 @@ namespace Digin_Kompetanse.Controllers
             }
 
             _context.SaveChanges();
-            return RedirectToAction("Overview");
+            return RedirectToAction(nameof(Overview));
         }
 
         [HttpGet]
@@ -144,7 +161,7 @@ namespace Digin_Kompetanse.Controllers
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
 
             if (role != "Bedrift" || bedriftId is null)
-                return RedirectToAction("Index", "Home"); // evt. return Unauthorized();
+                return RedirectToAction(nameof(Login));
 
             var rader = _context.BedriftKompetanse
                 .Where(bk => bk.BedriftId == bedriftId.Value)

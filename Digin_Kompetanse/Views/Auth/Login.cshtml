@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Innlogging – Bedrift";
+}
+<form asp-action="Login" asp-controller="Home" method="post" class="form-container">
+<div class="container mt-5" style="max-width: 500px;">
+    <h2>Logg inn</h2>
+
+    <div class="card shadow-sm p-4">
+        <div id="step-email">
+            <form id="emailForm">
+                <div class="form-group mb-3">
+                    <label for="email" class="form-label">Bedriftens e-post</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="f.eks. post@firma.no" required />
+                </div>
+
+                <button type="submit" class="btn custom-btn">Send engangskode</button>
+            </form>
+        </div>
+
+        <div id="step-code" class="d-none">
+            <form id="otpForm">
+                <div class="form-group mb-3">
+                    <label for="otp" class="form-label">Engangskode</label>
+                    <input type="text" id="otp" name="otp" class="form-control" maxlength="6" placeholder="Skriv inn koden du fikk på e-post" required />
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Logg inn</button>
+            </form>
+
+            <button id="backBtn" class="btn btn-link w-100 mt-2">Tilbake</button>
+        </div>
+
+        <div id="message" class="text-center mt-3"></div>
+    </div>
+</div>
+</form>
+
+@section Scripts {
+    <script>
+        const requestUrl = '/auth/request-otp';
+        const verifyUrl = '/auth/verify-otp';
+
+        const emailForm = document.getElementById('emailForm');
+        const otpForm = document.getElementById('otpForm');
+        const stepEmail = document.getElementById('step-email');
+        const stepCode = document.getElementById('step-code');
+        const messageDiv = document.getElementById('message');
+        const backBtn = document.getElementById('backBtn');
+
+        // Trinn 1: Send engangskode
+        emailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+
+            messageDiv.innerHTML = '<span class="text-muted">Sender kode...</span>';
+
+            try {
+                const response = await fetch(requestUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    messageDiv.innerHTML = `<span class="text-success">${data.message}</span>`;
+                    stepEmail.classList.add('d-none');
+                    stepCode.classList.remove('d-none');
+                } else {
+                    messageDiv.innerHTML = `<span class="text-danger">${data.message}</span>`;
+                }
+            } catch {
+                messageDiv.innerHTML = '<span class="text-danger">Noe gikk galt. Prøv igjen.</span>';
+            }
+        });
+
+        // Trinn 2: Verifiser kode
+        otpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const code = document.getElementById('otp').value;
+
+            messageDiv.innerHTML = '<span class="text-muted">Verifiserer kode...</span>';
+
+            try {
+                const response = await fetch(verifyUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    messageDiv.innerHTML = `<span class="text-success">${data.message}</span>`;
+                    // ⬇️ send videre til forsiden etter suksess
+                    setTimeout(() => window.location.href = '/', 1000);
+                } else {
+                    messageDiv.innerHTML = `<span class="text-danger">${data.message}</span>`;
+                }
+            } catch {
+                messageDiv.innerHTML = '<span class="text-danger">Noe gikk galt under verifisering.</span>';
+            }
+        });
+
+        backBtn.addEventListener('click', () => {
+            stepCode.classList.add('d-none');
+            stepEmail.classList.remove('d-none');
+            messageDiv.innerHTML = '';
+        });
+    </script>
+}

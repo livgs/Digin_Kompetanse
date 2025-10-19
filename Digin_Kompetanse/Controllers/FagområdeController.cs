@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Digin_Kompetanse.Controllers;
 
+[Route("fagomrade")]
 public class FagområdeController : Controller
 {
     private readonly KompetanseContext _context;
@@ -15,7 +16,7 @@ public class FagområdeController : Controller
     }
 
     
-    [HttpGet]
+    [HttpGet("")]
     public async Task<IActionResult> GetFagområde()
     {
         var fagomrader = await _context.Fagområde

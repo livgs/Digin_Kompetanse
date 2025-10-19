@@ -3,6 +3,7 @@ using System;
 using Digin_Kompetanse.data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Digin_Kompetanse.Migrations
 {
     [DbContext(typeof(KompetanseContext))]
-    partial class KompetanseContextModelSnapshot : ModelSnapshot
+    [Migration("20251017124542_UpdateModel_20251017")]
+    partial class UpdateModel_20251017
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -14,13 +14,6 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-});
-
-builder.Services.AddSession(options =>
-{
-    options.Cookie.HttpOnly = true;
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.IsEssential = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
@@ -36,6 +29,11 @@ builder.Services.Configure<OtpOptions>(o =>
 builder.Services.AddSingleton<IOtpRateLimiter, InMemoryOtpRateLimiter>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 
+builder.Services.AddControllersWithViews(options =>
+{
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -50,8 +48,6 @@ app.UseStaticFiles();
 app.UseSession();
 
 app.UseRouting();
-
-app.UseSession();
 
 app.UseAuthorization();
 

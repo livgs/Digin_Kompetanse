@@ -15,15 +15,12 @@ public class AdminController : Controller
     {
         _context = context;
     }
-
+    
     [HttpGet]
-    public IActionResult Login()
-    {
-        return View();
-    }
+    public IActionResult AdminLogin() => View("AdminLogin");
     
     [HttpPost]
-    public IActionResult Login(string email, string password)
+    public IActionResult AdminLogin(string email, string password)
     {
         // Hardkodet admin 
         const string hardcodedEmail = "digin@dgn.no";
@@ -69,8 +66,7 @@ public class AdminController : Controller
                 .ThenBy(x => x.Fagområde)
                 .ThenBy(x => x.KompetanseKategori)
                 .ToList();
-
-            // Returnerer view med data
+            
             return View(viewModel);
         }
         catch
