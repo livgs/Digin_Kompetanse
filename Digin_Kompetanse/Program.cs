@@ -26,6 +26,20 @@ builder.Services.Configure<OtpOptions>(o =>
     o.MaxRequestsPerEmailPerHour = 5;
 });
 
+// E-postinnstillinger fra env
+builder.Services.Configure<EmailOptions>(o =>
+{
+    o.Host = builder.Configuration["SMTP_HOST"] ?? "";
+    o.Port = int.TryParse(builder.Configuration["SMTP_PORT"], out var p) ? p : 587;
+    o.User = builder.Configuration["SMTP_USER"] ?? "";
+    o.Pass = builder.Configuration["SMTP_PASS"] ?? "";
+    o.From = builder.Configuration["SMTP_FROM"] ?? o.User;
+    o.EnableStartTls = (builder.Configuration["SMTP_ENABLE_STARTTLS"] ?? "true").ToLowerInvariant() == "true";
+});
+
+// Bytt til MailKit
+builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
+
 builder.Services.AddSingleton<IOtpRateLimiter, InMemoryOtpRateLimiter>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 

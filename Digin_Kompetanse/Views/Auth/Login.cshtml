@@ -1,111 +1,150 @@
 @{
     ViewData["Title"] = "Innlogging – Bedrift";
 }
-<form asp-action="Login" asp-controller="Home" method="post" class="form-container">
-<div class="container mt-5" style="max-width: 500px;">
-    <h2>Logg inn</h2>
 
-    <div class="card shadow-sm p-4">
-        <div id="step-email">
-            <form id="emailForm">
-                <div class="form-group mb-3">
+<div class="container mt-5" style="max-width: 520px;">
+    <h2 class="mb-3 text-center">Logg inn</h2>
+
+    @if (TempData["Message"] is string flash && !string.IsNullOrWhiteSpace(flash))
+    {
+        <div class="alert alert-info" role="alert">@flash</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <!-- Steg 1: e-post -->
+            <div id="step-email">
+                <div class="mb-3">
                     <label for="email" class="form-label">Bedriftens e-post</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="f.eks. post@firma.no" required />
+                    <input type="email" id="email" class="form-control" placeholder="f.eks. post@firma.no" required />
                 </div>
 
-                <button type="submit" class="btn custom-btn">Send engangskode</button>
-            </form>
-        </div>
+                <button id="btnSend" class="btn btn-primary w-100" type="button">Send engangskode</button>
+            </div>
 
-        <div id="step-code" class="d-none">
-            <form id="otpForm">
-                <div class="form-group mb-3">
+            <!-- Steg 2: OTP -->
+            <div id="step-otp" class="d-none">
+                <div class="mb-3">
                     <label for="otp" class="form-label">Engangskode</label>
-                    <input type="text" id="otp" name="otp" class="form-control" maxlength="6" placeholder="Skriv inn koden du fikk på e-post" required />
+                    <input type="text" id="otp" class="form-control" maxlength="6" inputmode="numeric" placeholder="6-sifret kode" required />
+                    <div class="form-text">Koden er gyldig i noen minutter.</div>
                 </div>
 
-                <button type="submit" class="btn btn-success w-100">Logg inn</button>
-            </form>
+                <button id="btnVerify" class="btn btn-success w-100" type="button">Logg inn</button>
 
-            <button id="backBtn" class="btn btn-link w-100 mt-2">Tilbake</button>
+                <hr />
+            </div>
+
+            <div id="message" class="text-center mt-3"></div>
         </div>
-
-        <div id="message" class="text-center mt-3"></div>
     </div>
 </div>
-</form>
 
 @section Scripts {
-    <script>
-        const requestUrl = '/auth/request-otp';
-        const verifyUrl = '/auth/verify-otp';
+<script>
+    // Endepunkter fra AuthController (API)
+    const REQUEST_URL = '/auth/request-otp';
+    const VERIFY_URL  = '/auth/verify-otp';
 
-        const emailForm = document.getElementById('emailForm');
-        const otpForm = document.getElementById('otpForm');
-        const stepEmail = document.getElementById('step-email');
-        const stepCode = document.getElementById('step-code');
-        const messageDiv = document.getElementById('message');
-        const backBtn = document.getElementById('backBtn');
+    const el = {
+        stepEmail:  document.getElementById('step-email'),
+        stepOtp:    document.getElementById('step-otp'),
+        email:      document.getElementById('email'),
+        otp:        document.getElementById('otp'),
+        btnSend:    document.getElementById('btnSend'),
+        btnVerify:  document.getElementById('btnVerify'),
+        btnBack:    document.getElementById('btnBack'),
+        btnResend:  document.getElementById('btnResend'),
+        message:    document.getElementById('message')
+    };
 
-        // Trinn 1: Send engangskode
-        emailForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
+    function setMsg(text, type = 'muted') {
+        el.message.innerHTML = `<span class="text-${type}">${text}</span>`;
+    }
 
-            messageDiv.innerHTML = '<span class="text-muted">Sender kode...</span>';
+    function toggle(disabled) {
+        [el.btnSend, el.btnVerify, el.btnResend, el.btnBack].forEach(b => b && (b.disabled = disabled));
+        el.email.disabled = disabled;
+        el.otp.disabled = disabled;
+    }
 
-            try {
-                const response = await fetch(requestUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    messageDiv.innerHTML = `<span class="text-success">${data.message}</span>`;
-                    stepEmail.classList.add('d-none');
-                    stepCode.classList.remove('d-none');
-                } else {
-                    messageDiv.innerHTML = `<span class="text-danger">${data.message}</span>`;
-                }
-            } catch {
-                messageDiv.innerHTML = '<span class="text-danger">Noe gikk galt. Prøv igjen.</span>';
-            }
+    async function postJson(url, payload) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
+        // Prøv å lese JSON, men tåle tom body
+        let data = {};
+        try { data = await res.json(); } catch { /* ignore */ }
+        return { ok: res.ok, status: res.status, data };
+    }
 
-        // Trinn 2: Verifiser kode
-        otpForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const code = document.getElementById('otp').value;
+    // Steg 1: be om kode
+    el.btnSend.addEventListener('click', async () => {
+        const email = el.email.value.trim();
+        if (!email) { setMsg('Skriv inn e-post først.', 'danger'); return; }
 
-            messageDiv.innerHTML = '<span class="text-muted">Verifiserer kode...</span>';
+        toggle(true);
+        setMsg('Sender kode …');
 
-            try {
-                const response = await fetch(verifyUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, code })
-                });
+        const { ok, data, status } = await postJson(REQUEST_URL, { email });
+        toggle(false);
 
-                const data = await response.json();
-                if (response.ok) {
-                    messageDiv.innerHTML = `<span class="text-success">${data.message}</span>`;
-                    // ⬇️ send videre til forsiden etter suksess
-                    setTimeout(() => window.location.href = '/', 1000);
-                } else {
-                    messageDiv.innerHTML = `<span class="text-danger">${data.message}</span>`;
-                }
-            } catch {
-                messageDiv.innerHTML = '<span class="text-danger">Noe gikk galt under verifisering.</span>';
-            }
-        });
+        if (ok) {
+            setMsg(data.message ?? 'Kode sendt. Sjekk e-posten (dev: serverlogg).', 'success');
+            el.stepEmail.classList.add('d-none');
+            el.stepOtp.classList.remove('d-none');
+            el.otp.focus();
+        } else {
+            const msg = data.message || (status === 404 ? 'E-post ikke registrert.' : 'Kunne ikke sende kode.');
+            setMsg(msg, 'danger');
+        }
+    });
 
-        backBtn.addEventListener('click', () => {
-            stepCode.classList.add('d-none');
-            stepEmail.classList.remove('d-none');
-            messageDiv.innerHTML = '';
-        });
-    </script>
+    // Steg 2: verifiser kode
+    el.btnVerify.addEventListener('click', async () => {
+        const email = el.email.value.trim();
+        const code  = el.otp.value.trim();
+        if (!code) { setMsg('Skriv inn koden du mottok.', 'danger'); return; }
+
+        toggle(true);
+        setMsg('Verifiserer kode …');
+
+        const { ok, data, status } = await postJson(VERIFY_URL, { email, code });
+        toggle(false);
+
+        if (ok) {
+            setMsg(data.message ?? 'Innlogging vellykket! Sender deg videre …', 'success');
+            // Ved suksess settes session på serveren. Gå til Overview eller forsiden.
+            setTimeout(() => window.location.href = '/Home/Overview', 600);
+        } else {
+            const msg = data.message || (status === 400 ? 'Feil eller utløpt kode.' : 'Noe gikk galt under verifisering.');
+            setMsg(msg, 'danger');
+        }
+    });
+
+    // Send ny kode i steg 2
+    el.btnResend.addEventListener('click', async () => {
+        const email = el.email.value.trim();
+        if (!email) { setMsg('E-post mangler.', 'danger'); return; }
+        toggle(true);
+        setMsg('Sender ny kode …');
+        const { ok, data } = await postJson(REQUEST_URL, { email });
+        toggle(false);
+        setMsg(ok ? (data.message ?? 'Ny kode sendt.') : (data.message ?? 'Kunne ikke sende ny kode.'), ok ? 'success' : 'danger');
+    });
+
+    // Tilbake til e-poststeg
+    el.btnBack.addEventListener('click', () => {
+        el.stepOtp.classList.add('d-none');
+        el.stepEmail.classList.remove('d-none');
+        setMsg('');
+        el.email.focus();
+    });
+
+    // Enter for å gå videre
+    el.email.addEventListener('keydown', (e) => { if (e.key === 'Enter') el.btnSend.click(); });
+    el.otp.addEventListener('keydown',   (e) => { if (e.key === 'Enter') el.btnVerify.click(); });
+</script>
 }
