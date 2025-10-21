@@ -1,12 +1,12 @@
 @model IEnumerable<Digin_Kompetanse.Models.ViewModels.AdminViewModel>
 
 @{
-    ViewData["Title"] = "Administrasjonspanel";
-    var fagomrader = ViewBag.Fagomrader as List<string> ?? new List<string>();
-    var kompetanser = ViewBag.Kompetanser as List<string> ?? new List<string>();
+ViewData["Title"] = "Administrasjonspanel";
+var fagomrader = ViewBag.Fagomrader as List<string> ?? new List<string>();
+var kompetanser = ViewBag.Kompetanser as List<string> ?? new List<string>();
 
-    var valgtFagomrade = Context.Request.Query["fagomrade"].ToString();
-    var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
+var valgtFagomrade = Context.Request.Query["fagomrade"].ToString();
+var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
 }
 
 <!DOCTYPE html>
@@ -112,43 +112,113 @@
         .text-muted {
             color: #888;
         }
+
+        .btn-outline-danger {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
-    <div>
-        <h2>@ViewData["Title"]</h2>
+<div>
+    <h2>@ViewData["Title"]</h2>
 
-<table class="table table-striped align-middle">
-    <thead class="table-light">
-    <tr>
-        <th>Bedrift</th>
-        <th>E-post</th>
-        <th>Fagområde</th>
-        <th>Kompetanse</th>
-        <th>Handling</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.BedriftNavn</td>
-            <td>@item.Epost</td>
-            <td>@item.Fagområde</td>
-            <td>@item.KompetanseKategori</td>
-            <td>
-                <form asp-action="DeleteBedrift" asp-controller="Admin" 
-                      asp-route-id="@item.BedriftId" method="post" class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                            onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
-                        Slett bedrift
+    <!-- Filterboks -->
+    <div class="step">
+        <h5><strong>Filtrer innsendinger</strong></h5>
+
+        <form method="get" asp-action="AdminDashboard">
+            <div class="filter-row">
+                <!-- Fagområde -->
+                <div>
+                    <label for="fagomrade" class="form-label fw-semibold mb-1">Fagområde</label>
+                    <select id="fagomrade" name="fagomrade" class="form-select form-select-sm">
+                        <option value="">Alle</option>
+                        @foreach (var fag in fagomrader)
+                        {
+                        <option value="@fag" selected="@(valgtFagomrade == fag)">@fag</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Kompetanse -->
+                <div>
+                    <label for="kompetanse" class="form-label fw-semibold mb-1">Kompetanse</label>
+                    <select id="kompetanse" name="kompetanse" class="form-select form-select-sm">
+                        <option value="">Alle</option>
+                        @foreach (var komp in kompetanser)
+                        {
+                        <option value="@komp" selected="@(valgtKompetanse == komp)">@komp</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Knapper -->
+                <div class="d-flex align-items-end" style="gap: 0.75rem;">
+                    <button type="submit" class="btn btn-digin btn-sm d-flex align-items-center px-3">
+                        <i class="bi bi-search me-1"></i> Filtrer
                     </button>
-                </form>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+                    <a asp-action="AdminDashboard" class="btn btn-outline-digin btn-sm d-flex align-items-center px-3">
+                        <i class="bi bi-x-circle me-1"></i> Tøm
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Innsendingstabell -->
+    <div class="step">
+        <h5><strong>Innsendinger</strong></h5>
+
+        <div class="table-responsive">
+            <table class="table align-middle text-center mb-0">
+                <thead>
+                <tr>
+                    <th>Bedrift</th>
+                    <th>E-post</th>
+                    <th>Fagområde</th>
+                    <th>Kompetanse</th>
+                    <th>Handling</th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Any())
+                {
+                <tr><td colspan="5" class="text-muted py-4">Ingen treff på valgt filter.</td></tr>
+                }
+                else
+                {
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>@item.BedriftNavn</td>
+                    <td>@item.Epost</td>
+                    <td>@item.Fagområde</td>
+                    <td>@item.KompetanseKategori</td>
+                    <td>
+                        <form asp-action="DeleteBedrift" asp-controller="Admin"
+                              asp-route-id="@item.BedriftId" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
+                                Slett bedrift
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 </body>
 </html>
