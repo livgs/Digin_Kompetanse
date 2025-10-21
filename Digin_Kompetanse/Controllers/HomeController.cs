@@ -42,14 +42,6 @@ namespace Digin_Kompetanse.Controllers
             return View("~/Views/Auth/Login.cshtml");
         }
         
-        [HttpGet("/auth/logout")]
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            TempData["Message"] = "Du er logget ut.";
-            return RedirectToAction(nameof(Login));
-        }
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)

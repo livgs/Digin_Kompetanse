@@ -3,17 +3,36 @@
 @media (min-width: 768px) {
 }
 
-/* Fjern standard marg og padding fra body og html */
 html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
+    font-family: "DM Sans", sans-serif;
 }
 
-  html {
-    font-size: 18px;
-    position: relative;
-    min-height: 100%;
-  }
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* alltid minst hele viewport */
+}
+
+main {
+    flex: 1; /* tar all ledig plass mellom navbar og footer */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* starter øverst */
+    padding: 40px 20px; /* luft rundt innholdet */
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    color: white;
+    text-align: center;
+}
 
  h1, h2, h3, h4, h6 {
      font-family: "DM Sans", sans-serif;
@@ -117,13 +136,6 @@ h2 {
 .nav-item .btn i {
     font-size: 1.1em;
     vertical-align: middle;
-}
-
-body {
-  margin-bottom: 60px;
-  display: flex;
-  flex-direction: column; /* slik at nav - main blir under hverandre */
-  min-height: 100vh;
 }
 
 form {
@@ -240,21 +252,6 @@ form input, form textarea, form button, form select {
   margin-right: 1000px;
 }
 
-&:hover {
-  color: #006F35;
-}
-
-&::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 0;
-  height: 2px;
-  background-color: #006F35;
-  transition: width 0.3s ease;
-}
-
 &:hover::after {
   width: 100%;
 }
@@ -281,15 +278,6 @@ form input, form textarea, form button, form select {
 
 
 /* Hjemside */
-
-.main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 40px;
-}
 
 /*plassering av kompetanse elementer */
 
@@ -484,6 +472,3 @@ h2 {
     background-color: #2B6CB0;
 }
 
-body {
-    background-color: #f8f9fa; /* Lys grå bakgrunn */
-}

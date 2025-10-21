@@ -1,4 +1,4 @@
-﻿using Digin_Kompetanse.data;
+using Digin_Kompetanse.data;
 using Digin_Kompetanse.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +11,20 @@ namespace Digin_Kompetanse.Controllers;
 public class AdminController : Controller
 {
     private readonly KompetanseContext _context;
+    private readonly ILogger<HomeController> _logger;
 
 
-    public AdminController(KompetanseContext context)
+    public AdminController(KompetanseContext context, ILogger<HomeController> logger)
     {
         _context = context;
+        _logger = logger;
     }
     
     [HttpGet]
     public IActionResult AdminLogin() => View("AdminLogin");
     
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult AdminLogin(string email, string password)
     {
         // Hardkodet admin 
@@ -79,12 +82,15 @@ public class AdminController : Controller
     }
     
     [HttpPost]
-    public IActionResult Logout()
+    [ValidateAntiForgeryToken]
+    public IActionResult LogoutAdmin()
     {
-        HttpContext.Session.Remove("Role");
+        // Fjern admin-session
         HttpContext.Session.Remove("AdminEmail");
+        HttpContext.Session.Remove("Role");
         return RedirectToAction("AdminLogin");
     }
+
     
     [HttpPost]
     [ValidateAntiForgeryToken]

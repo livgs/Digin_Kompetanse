@@ -36,6 +36,7 @@ public class AuthController : ControllerBase
 
     // Send engangskode (OTP)
     [HttpPost("request-otp")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> RequestOtp([FromBody] RequestOtpDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Email))
@@ -121,6 +122,7 @@ public class AuthController : ControllerBase
 
     // Verifiser OTP og logg inn
     [HttpPost("verify-otp")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Code))
@@ -147,7 +149,8 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Innlogging vellykket!", bedriftId = bedrift.BedriftId });
     }
     
-    [HttpPost("logout")]
+    [HttpPost("logout-bedrift")]
+    [ValidateAntiForgeryToken]
     public IActionResult LogoutBedrift()
     {
         var role = HttpContext.Session.GetString("Role");
