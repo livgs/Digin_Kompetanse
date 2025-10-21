@@ -1,24 +1,30 @@
-﻿using Digin_Kompetanse.data;
+using Digin_Kompetanse.data;
 using Digin_Kompetanse.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace Digin_Kompetanse.Controllers;
 
 public class AdminController : Controller
 {
     private readonly KompetanseContext _context;
+    private readonly ILogger<HomeController> _logger;
 
-    public AdminController(KompetanseContext context)
+
+    public AdminController(KompetanseContext context, ILogger<HomeController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [HttpGet]
     public IActionResult AdminLogin() => View("AdminLogin");
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult AdminLogin(string email, string password)
     {
         // Hardkodet admin 
@@ -43,7 +49,7 @@ public class AdminController : Controller
     {
         // Sjekk at brukeren er logget inn som admin
         if (HttpContext.Session.GetString("Role") != "Admin")
-            return RedirectToAction("Login");
+            return RedirectToAction("AdminLogin");
 
         try
         {
@@ -100,10 +106,40 @@ public class AdminController : Controller
     }
 
     [HttpPost]
-    public IActionResult Logout()
+    [ValidateAntiForgeryToken]
+    public IActionResult LogoutAdmin()
     {
-        HttpContext.Session.Remove("Role");
+        // Fjern admin-session
         HttpContext.Session.Remove("AdminEmail");
-        return RedirectToAction("Login");
+        HttpContext.Session.Remove("Role");
+        return RedirectToAction("AdminLogin");
     }
+}
+
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteBedrift(int id)
+    {
+        var bedrift = _context.Bedrift
+            .Include(b => b.BedriftKompetanser)
+            .FirstOrDefault(b => b.BedriftId == id);
+
+        if (bedrift == null)
+        {
+            TempData["Error"] = "Fant ikke bedriften.";
+            return RedirectToAction(nameof(AdminDashboard));
+        }
+        
+        if (bedrift.BedriftKompetanser?.Any() == true)
+            _context.BedriftKompetanse.RemoveRange(bedrift.BedriftKompetanser);
+
+        _context.Bedrift.Remove(bedrift);
+        _context.SaveChanges();
+
+        TempData["Success"] = "Bedriften og tilhørende kompetanser ble slettet.";
+        return RedirectToAction(nameof(AdminDashboard));
+    }
+
+
 }

@@ -13,5 +13,8 @@ public class Bedrift
     public string? Beskrivelse { get; set; }
 
     public virtual ICollection<Fagområde> Fagområdes { get; set; } = new List<Fagområde>();
+    
+    public virtual ICollection<BedriftKompetanse> BedriftKompetanser { get; set; } = new List<BedriftKompetanse>();
+
 }
 

@@ -61,30 +61,28 @@ public class KompetanseContext : DbContext
                 .HasMaxLength(45)
                 .HasColumnName("fagomrade_navn");
 
-            
             entity.HasMany(d => d.Kompetanses)
                   .WithMany(p => p.Fagområdes)
                   .UsingEntity<Dictionary<string, object>>(
-                    "fagomrade_has_kompetanse",
-                    r => r.HasOne<Kompetanse>().WithMany()
-                          .HasForeignKey("kompetanse_id")
-                          .OnDelete(DeleteBehavior.ClientSetNull)
-                          .HasConstraintName("fagomrade_has_kompetanse_kompetanse_id_fkey"),
-                    l => l.HasOne<Fagområde>().WithMany()
-                          .HasForeignKey("fagomrade_id")
-                          .OnDelete(DeleteBehavior.ClientSetNull)
-                          .HasConstraintName("fagomrade_has_kompetanse_fagomrade_id_fkey"),
-                    j =>
-                    {
-                        j.ToTable("fagomrade_has_kompetanse");
-                        j.HasKey("fagomrade_id", "kompetanse_id")
-                         .HasName("fagomrade_has_kompetanse_pkey");
+                      "fagomrade_has_kompetanse",
+                      r => r.HasOne<Kompetanse>().WithMany()
+                           .HasForeignKey("kompetanse_id")
+                           .OnDelete(DeleteBehavior.ClientSetNull)
+                           .HasConstraintName("fagomrade_has_kompetanse_kompetanse_id_fkey"),
+                      l => l.HasOne<Fagområde>().WithMany()
+                           .HasForeignKey("fagomrade_id")
+                           .OnDelete(DeleteBehavior.ClientSetNull)
+                           .HasConstraintName("fagomrade_has_kompetanse_fagomrade_id_fkey"),
+                      j =>
+                      {
+                          j.ToTable("fagomrade_has_kompetanse");
+                          j.HasKey("fagomrade_id", "kompetanse_id")
+                           .HasName("fagomrade_has_kompetanse_pkey");
 
-                        j.IndexerProperty<int>("fagomrade_id").HasColumnName("fagomrade_id");
-                        j.IndexerProperty<int>("kompetanse_id").HasColumnName("kompetanse_id");
-                    });
+                          j.IndexerProperty<int>("fagomrade_id").HasColumnName("fagomrade_id");
+                          j.IndexerProperty<int>("kompetanse_id").HasColumnName("kompetanse_id");
+                      });
         });
-
         
         modelBuilder.Entity<Kompetanse>(entity =>
         {
@@ -121,8 +119,7 @@ public class KompetanseContext : DbContext
                 .HasForeignKey(d => d.KompetanseId)
                 .HasConstraintName("under_kompetanse_kompetanse_id_fkey");
         });
-
-       
+        
         modelBuilder.Entity<BedriftKompetanse>(entity =>
         {
             entity.ToTable("bedrift_kompetanse");
@@ -132,18 +129,13 @@ public class KompetanseContext : DbContext
                 .ValueGeneratedOnAdd()
                 .HasColumnName("id");
 
-            entity.Property(e => e.BedriftId)
-                .HasColumnName("bedrift_id");
+            entity.Property(e => e.BedriftId).HasColumnName("bedrift_id");
 
-            // Merk: Kolonnenavn er 'fagomrade_id' (ASCII), selv om C#-feltet heter FagområdeId
-            entity.Property(e => e.FagområdeId)
-                .HasColumnName("fagomrade_id");
+            // C#-navn FagområdeId → DB-kolonne fagomrade_id
+            entity.Property(e => e.FagområdeId).HasColumnName("fagomrade_id");
 
-            entity.Property(e => e.KompetanseId)
-                .HasColumnName("kompetanse_id");
-
-            entity.Property(e => e.UnderKompetanseId)
-                .HasColumnName("underkompetanse_id");
+            entity.Property(e => e.KompetanseId).HasColumnName("kompetanse_id");
+            entity.Property(e => e.UnderKompetanseId).HasColumnName("underkompetanse_id");
 
             entity.Property(e => e.Beskrivelse)
                 .HasMaxLength(200)
@@ -153,9 +145,20 @@ public class KompetanseContext : DbContext
                 .HasColumnName("created_at")
                 .HasColumnType("timestamp with time zone")
                 .HasDefaultValueSql("now()");
+            
+            entity.Property(e => e.IsActive)
+                .HasColumnName("is_active")
+                .HasDefaultValue(true);
+
+            entity.Property(e => e.ModifiedAt)
+                .HasColumnName("modified_at")
+                .HasColumnType("timestamp with time zone");
+
+            entity.Property(e => e.ModifiedByBedriftId)
+                .HasColumnName("modified_by_bedrift_id");
 
             entity.HasOne(d => d.Bedrift)
-                .WithMany()
+                .WithMany(b => b.BedriftKompetanser)
                 .HasForeignKey(d => d.BedriftId)
                 .HasConstraintName("fk_bedrift_kompetanse_bedrift")
                 .OnDelete(DeleteBehavior.Restrict);
@@ -177,8 +180,7 @@ public class KompetanseContext : DbContext
                 .HasForeignKey(d => d.UnderKompetanseId)
                 .HasConstraintName("fk_bedrift_kompetanse_underkompetanse")
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Indekser (ASCII-navn)
+            
             entity.HasIndex(e => e.BedriftId)
                   .HasDatabaseName("ix_bedrift_kompetanse_bedrift_id");
 
@@ -190,12 +192,12 @@ public class KompetanseContext : DbContext
 
             entity.HasIndex(e => e.UnderKompetanseId)
                   .HasDatabaseName("ix_bedrift_kompetanse_underkompetanse_id");
-
+            
             entity.HasIndex(e => new { e.BedriftId, e.FagområdeId, e.KompetanseId, e.UnderKompetanseId })
                   .IsUnique()
-                  .HasDatabaseName("ux_bedrift_kompetanse_unique_choice");
+                  .HasDatabaseName("ux_bedrift_kompetanse_unique_choice_active")
+                  .HasFilter("\"is_active\" = true"); // Postgres-filter
         });
-
         
         modelBuilder.Entity<LoginToken>(e =>
         {

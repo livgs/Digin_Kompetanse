@@ -11,6 +11,10 @@ namespace Digin_Kompetanse.Models
 
         public string? Beskrivelse { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
+        public bool IsActive { get; set; } = true;
+        public DateTime? ModifiedAt { get; set; }
+        public int? ModifiedByBedriftId { get; set; }
 
         public Bedrift Bedrift { get; set; } = null!;
         public Fagområde Fagområde { get; set; } = null!;

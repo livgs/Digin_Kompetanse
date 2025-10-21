@@ -42,12 +42,22 @@ namespace Digin_Kompetanse.Controllers
             return View("~/Views/Auth/Login.cshtml");
         }
         
-        [HttpGet("/auth/logout")]
-        public IActionResult Logout()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
         {
-            HttpContext.Session.Clear();
-            TempData["Message"] = "Du er logget ut.";
-            return RedirectToAction(nameof(Login));
+            var row = _context.BedriftKompetanse.Find(id);
+            if (row == null)
+            {
+                TempData["Error"] = "Fant ikke posten.";
+                return RedirectToAction(nameof(Overview));
+            }
+
+            _context.BedriftKompetanse.Remove(row); // eller row.IsDeleted = true;
+            _context.SaveChanges();
+
+            TempData["Success"] = "Kompetansen ble slettet.";
+            return RedirectToAction(nameof(Overview));
         }
 
         [HttpGet]
@@ -159,25 +169,27 @@ namespace Digin_Kompetanse.Controllers
         {
             var role = HttpContext.Session.GetString("Role");
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
-
             if (role != "Bedrift" || bedriftId is null)
-                return RedirectToAction(nameof(Login));
-
+                return RedirectToAction("Login", "Auth");
+            
             var rader = _context.BedriftKompetanse
-                .Where(bk => bk.BedriftId == bedriftId.Value)
+                .Where(bk => bk.BedriftId == bedriftId.Value /* && bk.IsActive */)
                 .Include(bk => bk.Bedrift)
                 .Include(bk => bk.Fagområde)
                 .Include(bk => bk.Kompetanse)
                 .Include(bk => bk.UnderKompetanse)
                 .AsNoTracking()
-                .OrderBy(bk => bk.Bedrift.BedriftNavn)
-                .ThenBy(bk => bk.Fagområde.FagområdeNavn)
-                .ThenBy(bk => bk.Kompetanse.KompetanseKategori)
                 .ToList();
+            
+            if (rader.Count == 0)
+            {
+                TempData["Info"] = "Du har ikke registrert kompetanse ennå. Fyll inn skjemaet først.";
+                return RedirectToAction("Index");
+            }
 
             return View(rader);
         }
-
+        
         public IActionResult Privacy() => View();
         public IActionResult Help() => View();
 
@@ -187,34 +199,5 @@ namespace Digin_Kompetanse.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
         
-        [HttpGet]
-        public IActionResult UserLogin()
-        {
-            // Hvis brukeren allerede er logget inn, send rett til forsiden
-            var username = HttpContext.Session.GetString("Username");
-            if (!string.IsNullOrEmpty(username))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult UserLogin(string username, string password)
-        {
-            // Foreløpig "fake login" – du legger inn engangskode senere
-            // Her kan du evt. validere brukeren mot databasen
-            if (username == "TestBedrift" && password == "1234")
-            {
-                HttpContext.Session.SetString("Username", username);
-                HttpContext.Session.SetString("Role", "Bedrift");
-                return RedirectToAction("Index", "Home");
-            }
-
-            ViewBag.Error = "Feil brukernavn eller passord.";
-            return View();
-        }
-
     }
 }

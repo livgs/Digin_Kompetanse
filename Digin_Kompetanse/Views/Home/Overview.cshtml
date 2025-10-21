@@ -63,6 +63,15 @@
                                         <span class="d-inline-block text-truncate" style="max-width: 420px" title="@text">@shortText</span>
                                     </td>
                                     <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                                    <td>
+                                        <form asp-action="Delete" asp-controller="Home" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Slette denne kompetansen?');">
+                                                Slett
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
