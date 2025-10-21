@@ -6,13 +6,14 @@
 <body>
 <h2 class="mb-4">Innsendinger</h2>
 
-<table class="table">
-    <thead class="table">
+<table class="table table-striped align-middle">
+    <thead class="table-light">
     <tr>
         <th>Bedrift</th>
         <th>E-post</th>
         <th>Fagområde</th>
         <th>Kompetanse</th>
+        <th>Handling</th>
     </tr>
     </thead>
     <tbody>
@@ -23,6 +24,16 @@
             <td>@item.Epost</td>
             <td>@item.Fagområde</td>
             <td>@item.KompetanseKategori</td>
+            <td>
+                <form asp-action="DeleteBedrift" asp-controller="Admin" 
+                      asp-route-id="@item.BedriftId" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
+                        Slett bedrift
+                    </button>
+                </form>
+            </td>
         </tr>
     }
     </tbody>

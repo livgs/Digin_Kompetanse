@@ -3,6 +3,8 @@ using Digin_Kompetanse.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace Digin_Kompetanse.Controllers;
 
@@ -44,7 +46,7 @@ public class AdminController : Controller
     {
         // Sjekk at brukeren er logget inn som admin
         if (HttpContext.Session.GetString("Role") != "Admin")
-            return RedirectToAction("Login");
+            return RedirectToAction("AdminLogin");
 
         try
         {
@@ -81,7 +83,32 @@ public class AdminController : Controller
     {
         HttpContext.Session.Remove("Role");
         HttpContext.Session.Remove("AdminEmail");
-        return RedirectToAction("Login");
+        return RedirectToAction("AdminLogin");
     }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteBedrift(int id)
+    {
+        var bedrift = _context.Bedrift
+            .Include(b => b.BedriftKompetanser)
+            .FirstOrDefault(b => b.BedriftId == id);
+
+        if (bedrift == null)
+        {
+            TempData["Error"] = "Fant ikke bedriften.";
+            return RedirectToAction(nameof(AdminDashboard));
+        }
+        
+        if (bedrift.BedriftKompetanser?.Any() == true)
+            _context.BedriftKompetanse.RemoveRange(bedrift.BedriftKompetanser);
+
+        _context.Bedrift.Remove(bedrift);
+        _context.SaveChanges();
+
+        TempData["Success"] = "Bedriften og tilhørende kompetanser ble slettet.";
+        return RedirectToAction(nameof(AdminDashboard));
+    }
+
 
 }
