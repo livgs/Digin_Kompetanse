@@ -11,7 +11,7 @@ using MimeKit;
 namespace Digin_Kompetanse.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("auth")]
 public class AuthController : Controller
 {
     private readonly KompetanseContext _db;
