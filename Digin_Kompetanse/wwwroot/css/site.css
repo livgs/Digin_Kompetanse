@@ -1,6 +1,9 @@
 
                                                                                                                                                                         
 @media (min-width: 768px) {
+    form .step {
+        width: 90%;
+    }
 }
 
 html, body {
@@ -13,15 +16,15 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* alltid minst hele viewport */
+    min-height: 100vh;
 }
 
 main {
-    flex: 1; /* tar all ledig plass mellom navbar og footer */
+    flex: 1; 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* starter øverst */
-    padding: 40px 20px; /* luft rundt innholdet */
+    justify-content: flex-start; 
+    padding: 40px 20px; 
 }
 
 .footer {
@@ -42,6 +45,7 @@ main {
     
 }
 
+ /* kompetansetabell */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -63,41 +67,12 @@ main {
   background-color: #f0f8ff;
 }
 
+/* tekstfarger */
 .text-primary {
   color: #007BFF;
 }
-
 .text-muted {
   color: #6c757d;
-}
-
-.table-box, .table-shift {
-   background-color: #f0f0f0; /* Light gray background */
-   padding: 20px; /* Add some spacing inside the box */
-   border: 1px solid #ccc;
-   height: 200px;
-   width: 100%;
-   margin-top: 50px;
-  text-align: center;
-  
-
-}
-
-.table-box table, .table-shift table {
-  border-collapse: separate;
-  border-spacing: 100px 0; /* 10px vertikal avstand, 0px horisontal */
-}
- 
-.table-box th, .table-shift th {
-     font-weight: bold;
-     padding: 8px 12px;
-     color: #0098D1;
-}
-
-.table-shift {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #f0f0f0;
 }
  
 h5, li, ol, ul {
@@ -107,12 +82,11 @@ h5, li, ol, ul {
   font-style: normal;
 }
 
-h5 {
-  margin-top: 20px;
-  text-align: left;
-  font-family: "DM Sans", sans-serif;
-  font-weight: 500;
-  font-style: normal;
+h2 {
+    text-align: center;
+    margin-bottom: 5px;
+    color: #0098D1;
+    padding: 10px;
 }
 
 p {
@@ -122,12 +96,6 @@ p {
   margin: 20px;
   font-size: 16px;
 }
-
-h2 {
-  color: #0098D1;
-  padding: 20px;
-}
-
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
@@ -147,13 +115,13 @@ form {
 }
 
 .form-container {
-  max-width: 400px;   /* Maks bredde på skjemaet */
-  margin: 0 auto;     /* Midtstill horisontalt */
-  padding: 20px;      /* Litt luft inni skjemaet */
+  max-width: 400px;   
+  margin: 0 auto;     
+  padding: 20px;      
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #fff; /* Valgfri bakgrunn */
+  background-color: #fff; 
 }
 
 .form-group {
@@ -162,8 +130,6 @@ form {
   width: 100%;
   margin-bottom: 16px;
 }
-
-
 
 form input, form textarea, form button, form select {
   width: 100%;
@@ -176,26 +142,19 @@ form input, form textarea, form button, form select {
   background-color: #F8F8F8;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
-
+/* Navbar container */
 .navbar {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #F7F7F7 !important;
+  background-color: #F7F7F7;
   font-family: "Mulish", sans-serif;
   font-weight: 500;
   font-size: 15px;
   margin-top: 0;
   padding: 10px 20px;
 }
+
 
 .navbar-brand {
   padding-right: 30px;
@@ -210,15 +169,9 @@ form input, form textarea, form button, form select {
   transition: color 0.3s;
   margin-right: 60px;
   margin-top: 10px;
+}
 
-  /* Custom styling for the logout link */
-}
-.nav-link .nav-logout {
-  margin-right: 1000px;
-}
-.nav-link:hover {
-  color: black;
-}
+/* Hover effekt */
 .nav-link::after {
   content: "";
   position: absolute;
@@ -229,51 +182,18 @@ form input, form textarea, form button, form select {
   background-color: black;
   transition: width 0.3s ease;
 }
+
+.nav-link:hover {
+    color: black;
+}
+
 .nav-link:hover::after {
-  width: 100%;
+    width: 100%;
 }
+
 .nav-link.active {
-  font-weight: 700;
-  color: #0098D1;
-}
-.nav-link .logout-link {
-  /* Example Styles */
-  font-weight: 600; /* Makes the text bolder */
-  font-size: 100px !important; /* Adjusts the font size */
-  color: #dc3545; /* Changes the text color to Bootstrap's danger color */
-  /* Add any other desired styles */
-}
-.nav-link .logout-link:hover {
-  color: #a71d2a; /* Darker shade on hover */
-  text-decoration: underline; /* Underlines the text on hover */
-}
-
-.nav-logout {
-  margin-right: 1000px;
-}
-
-&:hover::after {
-  width: 100%;
-}
-
-&.active {
-  font-weight: 700;
-  color: #1B589F;
-}
-
-/* Custom styling for the logout link */
-
-.logout-link {
-  /* Example Styles */
-  font-weight: 600; /* Makes the text bolder */
-  font-size: 100px !important; /* Adjusts the font size */
-  color: #dc3545; /* Changes the text color to Bootstrap's danger color */
-  /* Add any other desired styles */
-}
-
-.logout-link:hover {
-  color: #a71d2a; /* Darker shade on hover */
-  text-decoration: underline; /* Underlines the text on hover */
+    font-weight: 700;
+    color: #0098D1;
 }
 
 
@@ -319,13 +239,7 @@ form input, form textarea, form button, form select {
   text-decoration: underline;
 }
 
-.beskrivelse {
-  height: 50px;
-  width: 100%; 
-}
-
-
-/* Right-align the group */
+/* Knapper i tabeller/skjema */
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -334,29 +248,7 @@ form input, form textarea, form button, form select {
   margin: .5rem 0;
 }
 
-/* Add an icon without extra HTML */
-.btn.btn--icon {
-  position: relative;
-  padding-left: 1.8rem;    /* room for the 14px icon + gap */
-}
-
-/* The icon “glyph” */
-.btn.btn--icon::before {
-  content: "";
-  position: absolute;
-  left: .6rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
-
-  /* Make the icon inherit the button text color */
-  background: currentColor;
-  mask: var(--icon) no-repeat center / 100% 100%;
-  -webkit-mask: var(--icon) no-repeat center / 100% 100%;
-}
-
-/* Icons (no colors here—your .btn decides the colors) */
+/* Ikoner */
 .btn.btn--edit {
   --icon: url('data:image/svg+xml;utf8,\
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
@@ -389,12 +281,12 @@ select[multiple] {
 
 .button-wrapper {
   display: flex;
-  justify-content: center; /* midtstill horisontalt */
+  justify-content: center; 
   width: 100%;
 }
 
 
-/* Help side */
+/* Hjelp side */
 
 /* Midtstill hele hjelpeseksjonen */
 .help {
@@ -408,44 +300,37 @@ select[multiple] {
 .step {
     width: 600px;
     text-align: left;
-    background-color: #f9f9f9; /* lys boksfarge */
-    padding: 20px 25px;         /* luft inni boksen */
-    border-radius: 8px;         /* rundede hjørner */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* lett skygge */
-    margin-bottom: 20px;        /* luft mellom steg */
+    background-color: #f9f9f9; 
+    padding: 20px 25px;         
+    border-radius: 8px;        
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+    margin-bottom: 20px;        
 }
 
-/* Gjør alt konsekvent */
 .step h5 {
-    margin: 0 0 5px 0;
-    padding-left: 10px; /* juster etter behov */
+    margin: 20px 0 5px 0;
+    padding-left: 10px; 
     color: #0098D1;
 }
 
 .step p {
     margin: 0;
-    padding-left: 10px; /* juster etter behov */
+    padding-left: 10px; 
     font-size: 18px;
 }
 
-/* Topptekst og introduksjon */
-h2 {
-    text-align: center;
-    margin-bottom: 5px;
-}
-
+/* Generelle knapper */
 .custom-btn {
     background-color: #0098D1; /* blå */
     color: white;
     border: none;
 }
-
 .custom-btn:hover {
     background-color: #0087b8; /* mørkere blå ved hover */
     color: white;
 }
 
-/* Kortet */
+/* login-kortet */
 .login-card {
     width: 100%;
     max-width: 420px;
@@ -459,7 +344,7 @@ h2 {
     font-size: 1rem;
 }
 
-/* Knapp */
+/* Primærknapp */
 .btn-primary {
     background-color: #4299E1;
     border: none;
@@ -472,6 +357,14 @@ h2 {
     background-color: #2B6CB0;
 }
 
+/* Admin login*/
+.center-adm-login {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+}
 
 /* Grunnleggende stil for navigasjonslenker */
 .navbar .nav-link {
@@ -488,7 +381,7 @@ h2 {
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 0%;
+    width: 0;
     height: 2px;
     background-color: #005fa3; /* Digin blå */
     transition: width 0.25s ease-in-out;
@@ -510,8 +403,7 @@ h2 {
     color: #212529;
 }
 
-/* ========== ADMIN DASHBOARD STYLING ========== */
-
+/* Admin dashboard */ 
 body.admin-dashboard {
     font-family: 'Segoe UI', sans-serif;
     background-color: #fff;
@@ -529,9 +421,9 @@ body.admin-dashboard {
 
 /* Bokser / seksjoner */
 .admin-dashboard .step {
-    background-color: #f9f9f9; /* Lys grå bakgrunn */
+    background-color: #f9f9f9; 
     border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* Myk skygge */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
     padding: 2rem 3rem;
     margin-bottom: 2rem;
     max-width: 1800px;
@@ -594,12 +486,12 @@ body.admin-dashboard {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-    background-color: #fff; /* Hvit bakgrunn i tabellen for kontrast */
+    background-color: #fff;
     border-radius: 6px;
 }
 
 .admin-dashboard thead {
-    background-color: #E6F4FB; /* Lys blå bakgrunn */
+    background-color: #E6F4FB; 
 }
 
 .admin-dashboard th {
