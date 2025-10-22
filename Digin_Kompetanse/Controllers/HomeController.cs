@@ -63,6 +63,18 @@ namespace Digin_Kompetanse.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            // Sjekk om bedrift er logget inn
+            var role = HttpContext.Session.GetString("Role");
+            var bedriftId = HttpContext.Session.GetInt32("BedriftId");
+
+            if (role != "Bedrift" || bedriftId == null)
+            {
+                TempData["Message"] = "Du må være logget inn som bedrift for å registrere kompetanse.";
+                TempData["MessageType"] = "warning";
+                return RedirectToAction("Login", "Auth");
+            }
+
+            // Hvis innlogget, vis registreringsskjema
             ViewBag.Fagområder = BuildFagomradeSelectList();
             return View(new KompetanseRegistreringViewModel());
         }
@@ -74,7 +86,11 @@ namespace Digin_Kompetanse.Controllers
            
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
             if (bedriftId == null)
-                return RedirectToAction(nameof(Login)); //
+            {
+                TempData["Message"] = "Du må være logget inn som bedrift for å registrere kompetanse.";
+                TempData["MessageType"] = "warning";
+                return RedirectToAction("Login", "Auth"); //
+            }
             
             ViewBag.Fagområder = BuildFagomradeSelectList(model.FagområdeId);
             if (!ModelState.IsValid) return View(model);

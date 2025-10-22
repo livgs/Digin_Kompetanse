@@ -11,8 +11,8 @@ using MimeKit;
 namespace Digin_Kompetanse.Controllers;
 
 [ApiController]
-[Route("auth")]
-public class AuthController : ControllerBase
+[Route("[controller]/[action]")]
+public class AuthController : Controller
 {
     private readonly KompetanseContext _db;
     private readonly IOtpRateLimiter _limiter;
@@ -147,13 +147,19 @@ public class AuthController : ControllerBase
         var bedriftId = HttpContext.Session.GetInt32("BedriftId");
 
         if (role != "Bedrift" || bedriftId == null)
-            return BadRequest(new { message = "Ingen bedrift er logget inn." });
+        {
+            TempData["Message"] = "Ingen bedrift er logget inn.";
+            TempData["MessageType"] = "warning"; // kan brukes for farge på alert
+            return RedirectToAction("Index", "Home"); // send til ønsket side
+        }
 
         HttpContext.Session.Remove("BedriftId");
         HttpContext.Session.Remove("Role");
 
         _logger.LogInformation("Bedrift (ID: {BedriftId}) logget ut.", bedriftId);
-        return Ok(new { message = "Du er nå logget ut." });
+        TempData["Message"] = "Du er nå logget ut.";
+        TempData["MessageType"] = "success";
+        return RedirectToAction("Index", "Home");
     }
 
     // — helpers (maskering) —
