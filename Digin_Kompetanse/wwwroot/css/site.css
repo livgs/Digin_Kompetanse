@@ -183,7 +183,7 @@ form input, form textarea, form button, form select {
 }
 
 .nav-link:hover {
-    color: black;
+    color: #0098D1;
 }
 
 .nav-link:hover::after {
@@ -382,7 +382,7 @@ select[multiple] {
     bottom: 0;
     width: 0;
     height: 2px;
-    background-color: #005fa3; /* Digin blå */
+    background-color: #0098D1; /* Digin blå */
     transition: width 0.25s ease-in-out;
     border-radius: 1px;
 }
