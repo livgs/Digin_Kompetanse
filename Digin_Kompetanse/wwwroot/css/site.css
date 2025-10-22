@@ -85,6 +85,7 @@ h2 {
     margin-bottom: 5px;
     color: #0098D1;
     padding: 10px;
+    font-weight: 600;
 }
 
 p {
@@ -532,4 +533,50 @@ body.admin-dashboard {
     letter-spacing: 0.3px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Myk skygge  */
     z-index: 10;
+}
+
+/* === CSV-knapp (grønn, men tilpasset Digin-stil) === */
+.btn-csv {
+    background-color: #34A853;
+    color: #fff;
+    border: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-csv:hover {
+    background-color: #2c8e45;
+    color: #fff;
+}
+
+/* === Jevn størrelse på alle knapper i filterseksjonen === */
+.filter-row .btn {
+    height: 36px;
+    font-size: 0.9rem;
+    padding: 0 0.9rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* === CSV-knapp tilpasset høyde og farge === */
+.btn-csv {
+    background-color: #2f855a; /* Dempet grønn */
+    color: #fff;
+    border: none;
+    height: 36px;
+    font-size: 0.9rem;
+    padding: 0 0.9rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-csv:hover {
+    background-color: #276749;
+    color: #fff;
+}
+
+/* Ikon og tekst spacing */
+.btn-csv i {
+    margin-right: 6px;
+    font-size: 1rem;
 }

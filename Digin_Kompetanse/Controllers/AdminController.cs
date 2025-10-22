@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
+using System.Text;
 
 namespace Digin_Kompetanse.Controllers
 {
@@ -19,6 +19,9 @@ namespace Digin_Kompetanse.Controllers
             _logger = logger;
         }
 
+        // -----------------------------
+        // LOGIN
+        // -----------------------------
         [HttpGet]
         public IActionResult AdminLogin() => View("AdminLogin");
 
@@ -26,11 +29,10 @@ namespace Digin_Kompetanse.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AdminLogin(string email, string password)
         {
-            // Hardkodet admin 
+            // Hardkodet adminbruker
             const string hardcodedEmail = "digin@dgn.no";
             const string hardcodedPasswordHash = "$2a$11$TTl31f/y3FAKOR3n0hwq4uJR6Q0u.mamXVDGIcPGmGoJNx0/SiFUO";
 
-            // Verifiser innlogging
             if (email == hardcodedEmail && BCrypt.Net.BCrypt.Verify(password, hardcodedPasswordHash))
             {
                 HttpContext.Session.SetString("Role", "Admin");
@@ -42,6 +44,9 @@ namespace Digin_Kompetanse.Controllers
             return View();
         }
 
+        // -----------------------------
+        // DASHBOARD
+        // -----------------------------
         [HttpGet]
         public IActionResult AdminDashboard(string? fagomrade, string? kompetanse)
         {
@@ -98,6 +103,66 @@ namespace Digin_Kompetanse.Controllers
             }
         }
 
+        // -----------------------------
+        // CSV EKSPORT
+        // -----------------------------
+        [HttpGet]
+        public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse)
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+                return RedirectToAction("AdminLogin");
+
+            var query = _context.BedriftKompetanse
+                .Include(bk => bk.Bedrift)
+                .Include(bk => bk.Fagområde)
+                .Include(bk => bk.Kompetanse)
+                .AsNoTracking()
+                .Select(bk => new AdminViewModel
+                {
+                    BedriftId = bk.BedriftId,
+                    BedriftNavn = bk.Bedrift!.BedriftNavn,
+                    Epost = bk.Bedrift!.BedriftEpost,
+                    Fagområde = bk.Fagområde!.FagområdeNavn!,
+                    KompetanseKategori = bk.Kompetanse!.KompetanseKategori!
+                })
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(fagomrade))
+                query = query.Where(x => x.Fagområde == fagomrade);
+
+            if (!string.IsNullOrEmpty(kompetanse))
+                query = query.Where(x => x.KompetanseKategori == kompetanse);
+
+            var data = await query
+                .OrderBy(x => x.BedriftNavn)
+                .ThenBy(x => x.Fagområde)
+                .ThenBy(x => x.KompetanseKategori)
+                .ToListAsync();
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Bedrift;E-post;Fagområde;Kompetanse");
+
+            foreach (var item in data)
+            {
+                var bedrift = item.BedriftNavn?.Replace(";", ",") ?? "";
+                var epost = item.Epost?.Replace(";", ",") ?? "";
+                var fag = item.Fagområde?.Replace(";", ",") ?? "";
+                var komp = item.KompetanseKategori?.Replace(";", ",") ?? "";
+
+                sb.AppendLine($"{bedrift};{epost};{fag};{komp}");
+            }
+
+            // BOM for riktig visning av æøå i Excel
+            var bytes = Encoding.UTF8.GetPreamble()
+                .Concat(Encoding.UTF8.GetBytes(sb.ToString()))
+                .ToArray();
+
+            return File(bytes, "text/csv", "innsendinger.csv");
+        }
+
+        // -----------------------------
+        // LOGOUT
+        // -----------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult LogoutAdmin()
@@ -107,6 +172,9 @@ namespace Digin_Kompetanse.Controllers
             return RedirectToAction("AdminLogin");
         }
 
+        // -----------------------------
+        // SLETT BEDRIFT
+        // -----------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteBedrift(int id)

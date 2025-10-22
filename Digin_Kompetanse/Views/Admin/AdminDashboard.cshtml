@@ -64,6 +64,14 @@
                     <a asp-action="AdminDashboard" class="btn btn-outline-digin btn-sm d-flex align-items-center px-3">
                         <i class="bi bi-x-circle me-1"></i> Tøm
                     </a>
+                    <a asp-action="ExportCsv"
+                       asp-controller="Admin"
+                       asp-route-fagomrade="@valgtFagomrade"
+                       asp-route-kompetanse="@valgtKompetanse"
+                       class="btn btn-success btn-sm d-flex align-items-center px-3">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Eksporter
+                    </a>
+
                 </div>
             </div>
         </form>
