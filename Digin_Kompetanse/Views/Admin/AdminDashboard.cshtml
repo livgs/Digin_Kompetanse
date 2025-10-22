@@ -1,21 +1,15 @@
 @model IEnumerable<Digin_Kompetanse.Models.ViewModels.AdminViewModel>
 
 @{
-ViewData["Title"] = "Administrasjonspanel";
-var fagomrader = ViewBag.Fagomrader as List<string> ?? new List<string>();
-var kompetanser = ViewBag.Kompetanser as List<string> ?? new List<string>();
+    ViewData["Title"] = "Administrasjonspanel";
+    var fagomrader = ViewBag.Fagomrader as List<string> ?? new List<string>();
+    var kompetanser = ViewBag.Kompetanser as List<string> ?? new List<string>();
 
-var valgtFagomrade = Context.Request.Query["fagomrade"].ToString();
-var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
+    var valgtFagomrade = Context.Request.Query["fagomrade"].ToString();
+    var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
 }
 
-<!DOCTYPE html>
-<html lang="no">
-<head>
-    <title>@ViewData["Title"]</title>
-</head>
-<body class="admin-dashboard">
-<div>
+<div class="admin-dashboard">
     <h2>@ViewData["Title"]</h2>
 
     <!-- Filterboks -->
@@ -31,7 +25,14 @@ var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
                         <option value="">Alle</option>
                         @foreach (var fag in fagomrader)
                         {
-                        <option value="@fag" selected="@(valgtFagomrade == fag)">@fag</option>
+                            if (valgtFagomrade == fag)
+                            {
+                                <option value="@fag" selected>@fag</option>
+                            }
+                            else
+                            {
+                                <option value="@fag">@fag</option>
+                            }
                         }
                     </select>
                 </div>
@@ -43,7 +44,14 @@ var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
                         <option value="">Alle</option>
                         @foreach (var komp in kompetanser)
                         {
-                        <option value="@komp" selected="@(valgtKompetanse == komp)">@komp</option>
+                            if (valgtKompetanse == komp)
+                            {
+                                <option value="@komp" selected>@komp</option>
+                            }
+                            else
+                            {
+                                <option value="@komp">@komp</option>
+                            }
                         }
                     </select>
                 </div>
@@ -68,47 +76,45 @@ var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
         <div class="table-responsive">
             <table class="table align-middle text-center mb-0">
                 <thead>
-                <tr>
-                    <th>Bedrift</th>
-                    <th>E-post</th>
-                    <th>Fagområde</th>
-                    <th>Kompetanse</th>
-                    <th>Handling</th>
-                </tr>
+                    <tr>
+                        <th>Bedrift</th>
+                        <th>E-post</th>
+                        <th>Fagområde</th>
+                        <th>Kompetanse</th>
+                        <th>Handling</th>
+                    </tr>
                 </thead>
                 <tbody>
-                @if (!Model.Any())
+                @if (Model?.Any() != true)
                 {
-                <tr>
-                    <td colspan="5" class="text-muted py-4">Ingen treff på valgt filter.</td>
-                </tr>
+                    <tr>
+                        <td colspan="5" class="text-muted py-4">Ingen treff på valgt filter.</td>
+                    </tr>
                 }
                 else
                 {
-                @foreach (var item in Model)
-                {
-                <tr>
-                    <td>@item.BedriftNavn</td>
-                    <td>@item.Epost</td>
-                    <td>@item.Fagområde</td>
-                    <td>@item.KompetanseKategori</td>
-                    <td>
-                        <form asp-action="DeleteBedrift" asp-controller="Admin"
-                              asp-route-id="@item.BedriftId" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                    onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
-                                Slett bedrift
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                }
+                    foreach (var item in Model!)
+                    {
+                        <tr>
+                            <td>@item.BedriftNavn</td>
+                            <td>@item.Epost</td>
+                            <td>@item.Fagområde</td>
+                            <td>@item.KompetanseKategori</td>
+                            <td>
+                                <form asp-action="DeleteBedrift" asp-controller="Admin"
+                                      asp-route-id="@item.BedriftId" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
+                                        Slett bedrift
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
                 }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-</body>
-</html>
