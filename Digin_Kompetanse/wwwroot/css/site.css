@@ -472,3 +472,161 @@ h2 {
     background-color: #2B6CB0;
 }
 
+
+/* Grunnleggende stil for navigasjonslenker */
+.navbar .nav-link {
+    position: relative;
+    color: #212529;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+    padding-bottom: 4px;
+}
+
+/* Blå strek under lenken ved hover */
+.navbar .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #005fa3; /* Digin blå */
+    transition: width 0.25s ease-in-out;
+    border-radius: 1px;
+}
+
+/* Utvider streken når du holder musen over */
+.navbar .nav-link:hover::after {
+    width: 100%;
+}
+
+/* Aktiv side beholder streken */
+.navbar .nav-link.active-link::after {
+    width: 100%;
+}
+
+/* Ikke endre tekstfarge ved hover */
+.navbar .nav-link:hover {
+    color: #212529;
+}
+
+/* ========== ADMIN DASHBOARD STYLING ========== */
+
+body.admin-dashboard {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #fff;
+    color: #222;
+}
+
+/* Overskrift */
+.admin-dashboard h2 {
+    text-align: center;
+    color: #009FE3; /* Digin blå */
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Bokser / seksjoner */
+.admin-dashboard .step {
+    background-color: #f9f9f9; /* Lys grå bakgrunn */
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* Myk skygge */
+    padding: 2rem 3rem;
+    margin-bottom: 2rem;
+    max-width: 1800px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.admin-dashboard .step h5 {
+    color: #009FE3;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* Filterrad */
+.admin-dashboard .filter-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: end;
+    flex-wrap: nowrap;
+    gap: 2rem;
+}
+
+/* Nedtrekksmenyer */
+.admin-dashboard .form-select {
+    border-radius: 8px;
+    width: 260px;
+}
+
+/* Digin-knapper */
+.btn-digin {
+    background-color: #009FE3;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    height: 36px;
+}
+
+.btn-digin:hover {
+    background-color: #008AC5;
+}
+
+.btn-outline-digin {
+    border: 1px solid #009FE3;
+    color: #009FE3;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    height: 36px;
+}
+
+.btn-outline-digin:hover {
+    background-color: #009FE3;
+    color: #fff;
+}
+
+/* Tabell */
+.admin-dashboard table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: #fff; /* Hvit bakgrunn i tabellen for kontrast */
+    border-radius: 6px;
+}
+
+.admin-dashboard thead {
+    background-color: #E6F4FB; /* Lys blå bakgrunn */
+}
+
+.admin-dashboard th {
+    color: #009FE3;
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.admin-dashboard td {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.admin-dashboard .text-muted {
+    color: #888;
+}
+
+/* Slett-knapp */
+.btn-outline-danger {
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+

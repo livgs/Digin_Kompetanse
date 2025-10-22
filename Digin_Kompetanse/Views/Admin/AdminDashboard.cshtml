@@ -13,120 +13,8 @@ var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
 <html lang="no">
 <head>
     <title>@ViewData["Title"]</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #fff;
-            color: #222;
-        }
-
-        h2 {
-            text-align: center;
-            color: #009FE3; /* Digin blå */
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .step {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 2rem 3rem;
-            margin-bottom: 2rem;
-
-            /* Gjør den 3x bredere */
-            max-width: 1800px;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .step h5 {
-            color: #009FE3;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .filter-row {
-            display: flex;
-            justify-content: flex-start;
-            align-items: end;
-            flex-wrap: nowrap;
-            gap: 2rem;
-        }
-
-        .form-select {
-            border-radius: 8px;
-            width: 260px;
-        }
-
-        .btn-digin {
-            background-color: #009FE3;
-            border: none;
-            color: #fff;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-            height: 36px;
-        }
-
-        .btn-digin:hover {
-            background-color: #008AC5;
-        }
-
-        .btn-outline-digin {
-            border: 1px solid #009FE3;
-            color: #009FE3;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            height: 36px;
-        }
-
-        .btn-outline-digin:hover {
-            background-color: #009FE3;
-            color: #fff;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        thead {
-            background-color: #E6F4FB; /* Lys blå bakgrunn */
-        }
-
-        th {
-            color: #009FE3;
-            font-weight: 600;
-            padding: 1rem;
-        }
-
-        td {
-            padding: 1rem;
-            border-top: 1px solid #eee;
-        }
-
-        .text-muted {
-            color: #888;
-        }
-
-        .btn-outline-danger {
-            border: 1px solid #dc3545;
-            color: #dc3545;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #dc3545;
-            color: #fff;
-        }
-    </style>
 </head>
-<body>
+<body class="admin-dashboard">
 <div>
     <h2>@ViewData["Title"]</h2>
 
@@ -191,7 +79,9 @@ var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
                 <tbody>
                 @if (!Model.Any())
                 {
-                <tr><td colspan="5" class="text-muted py-4">Ingen treff på valgt filter.</td></tr>
+                <tr>
+                    <td colspan="5" class="text-muted py-4">Ingen treff på valgt filter.</td>
+                </tr>
                 }
                 else
                 {
