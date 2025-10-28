@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-
+// liten endring for å trigge git push
 namespace Digin_Kompetanse.Migrations
 {
     /// <inheritdoc />
@@ -19,7 +19,7 @@ namespace Digin_Kompetanse.Migrations
                 name: "is_active",
                 table: "bedrift_kompetanse",
                 type: "boolean",
-                nullable: false,
+                nullable: false, 
                 defaultValue: true);
 
             migrationBuilder.AddColumn<DateTime>(
