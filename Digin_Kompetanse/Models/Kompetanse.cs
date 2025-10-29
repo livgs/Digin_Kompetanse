@@ -7,7 +7,7 @@ public class Kompetanse
 
     public string? KompetanseKategori { get; set; }
 
-    public virtual ICollection<UnderKompetanse> UnderKompetanses { get; set; } = new List<UnderKompetanse>();
+    public virtual ICollection<UnderKompetanse> UnderKompetanser { get; set; } = new List<UnderKompetanse>();
 
-    public virtual ICollection<Fagområde> Fagområdes { get; set; } = new List<Fagområde>();
+    public virtual ICollection<Fagområde> Fagområder { get; set; } = new List<Fagområde>();
 }

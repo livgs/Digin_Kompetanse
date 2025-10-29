@@ -68,11 +68,8 @@ namespace Digin_Kompetanse.Controllers
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
 
             if (role != "Bedrift" || bedriftId == null)
-            {
-                TempData["Message"] = "Du må være logget inn som bedrift for å registrere kompetanse.";
-                TempData["MessageType"] = "warning";
                 return RedirectToAction("Login", "Auth");
-            }
+            
 
             // Hvis innlogget, vis registreringsskjema
             ViewBag.Fagområder = BuildFagomradeSelectList();
@@ -157,9 +154,9 @@ namespace Digin_Kompetanse.Controllers
         {
             var kompetanser = _context.Fagområde
                 .AsNoTracking()
-                .Include(f => f.Kompetanses)
+                .Include(f => f.Kompetanser)
                 .Where(f => f.FagområdeId == fagområdeId)
-                .SelectMany(f => f.Kompetanses)
+                .SelectMany(f => f.Kompetanser)
                 .OrderBy(k => k.KompetanseKategori)
                 .Select(k => new { k.KompetanseId, k.KompetanseKategori })
                 .ToList();

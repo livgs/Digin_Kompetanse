@@ -20,7 +20,7 @@ public class FagområdeController : Controller
     public async Task<IActionResult> GetFagområde()
     {
         var fagomrader = await _context.Fagområde
-            .Include(f => f.Kompetanses)
+            .Include(f => f.Kompetanser)
             .ToListAsync();
         return Json(fagomrader);
     }

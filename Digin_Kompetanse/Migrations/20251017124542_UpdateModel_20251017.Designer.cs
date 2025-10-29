@@ -312,7 +312,7 @@ namespace Digin_Kompetanse.Migrations
             modelBuilder.Entity("Digin_Kompetanse.Models.Fagområde", b =>
                 {
                     b.HasOne("Digin_Kompetanse.Models.Bedrift", null)
-                        .WithMany("Fagområdes")
+                        .WithMany("Fagområder")
                         .HasForeignKey("BedriftId");
                 });
 
@@ -331,7 +331,7 @@ namespace Digin_Kompetanse.Migrations
             modelBuilder.Entity("Digin_Kompetanse.Models.UnderKompetanse", b =>
                 {
                     b.HasOne("Digin_Kompetanse.Models.Kompetanse", "Kompetanse")
-                        .WithMany("UnderKompetanses")
+                        .WithMany("UnderKompetanser")
                         .HasForeignKey("KompetanseId")
                         .HasConstraintName("under_kompetanse_kompetanse_id_fkey");
 
@@ -355,12 +355,12 @@ namespace Digin_Kompetanse.Migrations
 
             modelBuilder.Entity("Digin_Kompetanse.Models.Bedrift", b =>
                 {
-                    b.Navigation("Fagområdes");
+                    b.Navigation("Fagområder");
                 });
 
             modelBuilder.Entity("Digin_Kompetanse.Models.Kompetanse", b =>
                 {
-                    b.Navigation("UnderKompetanses");
+                    b.Navigation("UnderKompetanser");
                 });
 #pragma warning restore 612, 618
         }

@@ -17,6 +17,21 @@ body {
     min-height: 100vh;
 }
 
+/* Hvis admin */
+body.role-admin .navbar .nav-link {
+    margin-right: 0.8rem;
+}
+
+/* Hvis bedrift */
+body.role-bedrift .navbar .nav-link {
+    margin-right: 1rem;
+}
+
+/* Hvis gjest */
+body.role-guest .navbar .nav-link {
+    margin-right: 0.8rem;
+}
+
 main {
     flex: 1; 
     display: flex;
@@ -156,18 +171,29 @@ form input, form textarea, form button, form select {
 
 
 .navbar-brand {
-  padding-right: 30px;
+  padding-right: 0;
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 100px; /* avstand mellom lenker */
+    padding-left: 0;
+    margin-left: 30px;
+    list-style: none;
 }
 
 .nav-link {
   font-family: "Mulish", sans-serif;
   font-weight: 400;
   font-size: 20px;
+  flex: unset; /* fjerner flex:1 som lager ulik spacing */
   text-decoration: none;
+  text-align: center; /* sentrerer teksten */
   position: relative;
   transition: color 0.3s;
-  margin-right: 60px;
-  margin-top: 10px;
+  margin-right: 0; /* fjern ekstra margin */
+  margin-top: 0;   /* fjern ekstra toppmargin */
 }
 
 /* Hover effekt */
@@ -195,6 +221,9 @@ form input, form textarea, form button, form select {
     color: #0098D1;
 }
 
+.logout-item {
+ margin-left: auto;   
+}
 
 /* Hjemside */
 

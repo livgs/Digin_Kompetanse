@@ -6,7 +6,7 @@ public class Fagområde
 
     public string? FagområdeNavn { get; set; }
 
-    public virtual ICollection<Kompetanse> Kompetanses { get; set; } = new List<Kompetanse>();
+    public virtual ICollection<Kompetanse> Kompetanser { get; set; } = new List<Kompetanse>();
 }
 
 
