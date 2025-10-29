@@ -18,10 +18,7 @@ namespace Digin_Kompetanse.Controllers
             _context = context;
             _logger = logger;
         }
-
-        // -----------------------------
-        // LOGIN
-        // -----------------------------
+        
         [HttpGet]
         public IActionResult AdminLogin() => View("AdminLogin");
 
@@ -43,10 +40,7 @@ namespace Digin_Kompetanse.Controllers
             ViewBag.Error = "Feil e-post eller passord.";
             return View();
         }
-
-        // -----------------------------
-        // DASHBOARD
-        // -----------------------------
+        
         [HttpGet]
         public IActionResult AdminDashboard(string? fagomrade, string? kompetanse)
         {
@@ -102,10 +96,7 @@ namespace Digin_Kompetanse.Controllers
                 return View(new List<AdminViewModel>());
             }
         }
-
-        // -----------------------------
-        // CSV EKSPORT
-        // -----------------------------
+        
         [HttpGet]
         public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse)
         {
@@ -151,18 +142,14 @@ namespace Digin_Kompetanse.Controllers
 
                 sb.AppendLine($"{bedrift};{epost};{fag};{komp}");
             }
-
-            // BOM for riktig visning av æøå i Excel
+            
             var bytes = Encoding.UTF8.GetPreamble()
                 .Concat(Encoding.UTF8.GetBytes(sb.ToString()))
                 .ToArray();
 
             return File(bytes, "text/csv", "innsendinger.csv");
         }
-
-        // -----------------------------
-        // LOGOUT
-        // -----------------------------
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult LogoutAdmin()
@@ -171,10 +158,7 @@ namespace Digin_Kompetanse.Controllers
             HttpContext.Session.Remove("Role");
             return RedirectToAction("AdminLogin");
         }
-
-        // -----------------------------
-        // SLETT BEDRIFT
-        // -----------------------------
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteBedrift(int id)
