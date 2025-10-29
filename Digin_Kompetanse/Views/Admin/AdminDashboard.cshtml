@@ -1,23 +1,21 @@
 @model IEnumerable<Digin_Kompetanse.Models.ViewModels.AdminViewModel>
 
 @{
-    ViewData["Title"] = "Administrasjonspanel";
-    var fagomrader = ViewBag.Fagomrader as List<string> ?? new List<string>();
-    var kompetanser = ViewBag.Kompetanser as List<string> ?? new List<string>();
+ViewData["Title"] = "Administrasjonspanel";
+var fagomrader = ViewBag.Fagomrader as List<string> ?? new List<string>();
+var kompetanser = ViewBag.Kompetanser as List<string> ?? new List<string>();
 
-    var valgtFagomrade = Context.Request.Query["fagomrade"].ToString();
-    var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
+var valgtFagomrade = Context.Request.Query["fagomrade"].ToString();
+var valgtKompetanse = Context.Request.Query["kompetanse"].ToString();
+var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
 }
 
 <div class="admin-dashboard">
     <h2>@ViewData["Title"]</h2>
 
-    <!-- Filterboks -->
     <div class="step">
-        <h5><strong>Filtrer innsendinger</strong></h5>
-
         <form method="get" asp-action="AdminDashboard">
-            <div class="filter-row">
+            <div class="filter-bar">
                 <!-- Fagområde -->
                 <div>
                     <label for="fagomrade" class="form-label fw-semibold mb-1">Fagområde</label>
@@ -25,14 +23,7 @@
                         <option value="">Alle</option>
                         @foreach (var fag in fagomrader)
                         {
-                            if (valgtFagomrade == fag)
-                            {
-                                <option value="@fag" selected>@fag</option>
-                            }
-                            else
-                            {
-                                <option value="@fag">@fag</option>
-                            }
+                        <option value="@fag" selected="@(valgtFagomrade == fag)">@fag</option>
                         }
                     </select>
                 </div>
@@ -44,38 +35,59 @@
                         <option value="">Alle</option>
                         @foreach (var komp in kompetanser)
                         {
-                            if (valgtKompetanse == komp)
-                            {
-                                <option value="@komp" selected>@komp</option>
-                            }
-                            else
-                            {
-                                <option value="@komp">@komp</option>
-                            }
+                        <option value="@komp" selected="@(valgtKompetanse == komp)">@komp</option>
                         }
                     </select>
                 </div>
 
-                <!-- Knapper -->
-                <div class="d-flex align-items-end" style="gap: 0.75rem;">
-                    <button type="submit" class="btn btn-digin btn-sm d-flex align-items-center px-3">
+                <!-- Underkompetanse -->
+                <div>
+                    <label for="underkompetanse" class="form-label fw-semibold mb-1">Underkompetanse</label>
+                    <select id="underkompetanse" name="underkompetanse" class="form-select form-select-sm">
+                        <option value="">Alle</option>
+                        @foreach (var under in ViewBag.Underkompetanser as List<string> ?? new List<string>())
+                        {
+                        <option value="@under" selected="@(valgtUnder == under)">@under</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Filtrer -->
+         
+                <div>
+                    <label class="form-label invisible">Filtrer</label>
+                    <button type="submit"
+                            class="btn btn-digin btn-sm filter-btn-filtrer d-flex align-items-center justify-content-center">
                         <i class="bi bi-search me-1"></i> Filtrer
                     </button>
-                    <a asp-action="AdminDashboard" class="btn btn-outline-digin btn-sm d-flex align-items-center px-3">
+                </div>
+
+                <!-- Tøm -->
+                <div>
+                    <label class="form-label invisible">Tøm</label>
+                    <a asp-action="AdminDashboard"
+                       class="btn btn-outline-digin btn-sm filter-btn-tom d-flex align-items-center justify-content-center">
                         <i class="bi bi-x-circle me-1"></i> Tøm
                     </a>
+                </div>
+
+                <!-- Eksporter -->
+                <div>
+                    <label class="form-label invisible">Eksporter</label>
                     <a asp-action="ExportCsv"
                        asp-controller="Admin"
                        asp-route-fagomrade="@valgtFagomrade"
                        asp-route-kompetanse="@valgtKompetanse"
-                       class="btn btn-success btn-sm d-flex align-items-center px-3">
+                       asp-route-underkompetanse="@valgtUnder"
+                       class="btn btn-success btn-sm filter-btn-eksporter d-flex align-items-center justify-content-center">
                         <i class="bi bi-file-earmark-spreadsheet me-1"></i> Eksporter
                     </a>
-
                 </div>
+
             </div>
         </form>
     </div>
+
 
     <!-- Innsendingstabell -->
     <div class="step">
@@ -83,43 +95,50 @@
 
         <div class="table-responsive">
             <table class="table align-middle text-center mb-0">
-                <thead>
-                    <tr>
-                        <th>Bedrift</th>
-                        <th>E-post</th>
-                        <th>Fagområde</th>
-                        <th>Kompetanse</th>
-                        <th>Handling</th>
-                    </tr>
+                <thead class="table-light">
+                <tr>
+                    <th>Bedrift</th>
+                    <th>E-post</th>
+                    <th>Fagområde</th>
+                    <th>Kompetanse</th>
+                    <th>Underkompetanse</th>
+                    <th>Beskrivelse</th>
+                    <th>Handling</th>
+                </tr>
                 </thead>
                 <tbody>
                 @if (Model?.Any() != true)
                 {
-                    <tr>
-                        <td colspan="5" class="text-muted py-4">Ingen treff på valgt filter.</td>
-                    </tr>
+                <tr>
+                    <td colspan="7" class="text-muted py-4">Ingen treff på valgt filter.</td>
+                </tr>
                 }
                 else
                 {
-                    foreach (var item in Model!)
-                    {
-                        <tr>
-                            <td>@item.BedriftNavn</td>
-                            <td>@item.Epost</td>
-                            <td>@item.Fagområde</td>
-                            <td>@item.KompetanseKategori</td>
-                            <td>
-                                <form asp-action="DeleteBedrift" asp-controller="Admin"
-                                      asp-route-id="@item.BedriftId" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
-                                        Slett bedrift
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
+                foreach (var item in Model!)
+                {
+                <tr>
+                    <td>@item.BedriftNavn</td>
+                    <td>@item.Epost</td>
+                    <td>@item.Fagområde</td>
+                    <td>@item.KompetanseKategori</td>
+                    <td>@(string.IsNullOrEmpty(item.UnderKompetanse) ? "-" : item.UnderKompetanse)</td>
+                    <td>@(string.IsNullOrEmpty(item.Beskrivelse) ? "-" : item.Beskrivelse)</td>
+                    <td>
+                        <form asp-action="DeleteBedrift"
+                              asp-controller="Admin"
+                              asp-route-id="@item.BedriftId"
+                              method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
+                                Slett bedrift
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                }
                 }
                 </tbody>
             </table>

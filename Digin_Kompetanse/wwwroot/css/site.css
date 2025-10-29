@@ -433,7 +433,7 @@ body.admin-dashboard {
 
 .admin-dashboard .step h5 {
     color: #009FE3;
-    font-weight: 600;
+    font-weight: 400;
     margin-bottom: 1rem;
 }
 
@@ -458,7 +458,7 @@ body.admin-dashboard {
     border: none;
     color: #fff;
     border-radius: 6px;
-    font-weight: 500;
+    font-weight: 400;
     transition: background-color 0.2s ease;
     height: 36px;
 }
@@ -495,7 +495,7 @@ body.admin-dashboard {
 
 .admin-dashboard th {
     color: #009FE3;
-    font-weight: 600;
+    font-weight: 400;
     padding: 1rem;
 }
 
@@ -521,12 +521,12 @@ body.admin-dashboard {
     color: #fff;
 }
 
-/* ========== ADMIN-INFORMASJONSBAR ========== */
+/*ADMIN-INFORMASJONSBAR*/
 .admin-banner {
-    background-color: #009FE3; /* Digin blå */
+    background-color: #009FE3; 
     color: white;
     text-align: center;
-    font-weight: 500;
+    font-weight: 400;
     font-family: "DM Sans", sans-serif;
     padding: 10px 0;
     font-size: 16px;
@@ -535,48 +535,69 @@ body.admin-dashboard {
     z-index: 10;
 }
 
-/* === CSV-knapp (grønn, men tilpasset Digin-stil) === */
-.btn-csv {
-    background-color: #34A853;
-    color: #fff;
-    border: none;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn-csv:hover {
-    background-color: #2c8e45;
-    color: #fff;
-}
-
-/* === Jevn størrelse på alle knapper i filterseksjonen === */
-.filter-row .btn {
-    height: 36px;
-    font-size: 0.9rem;
-    padding: 0 0.9rem;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* === CSV-knapp tilpasset høyde og farge === */
-.btn-csv {
-    background-color: #2f855a; /* Dempet grønn */
-    color: #fff;
-    border: none;
-    height: 36px;
-    font-size: 0.9rem;
-    padding: 0 0.9rem;
-    transition: all 0.15s ease-in-out;
-}
-
-.btn-csv:hover {
-    background-color: #276749;
-    color: #fff;
-}
-
 /* Ikon og tekst spacing */
 .btn-csv i {
     margin-right: 6px;
     font-size: 1rem;
 }
+
+/* --- Kompakt filterboks --- */
+.admin-dashboard .step {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 1rem 1.5rem; /* Lavere høyde (tidligere 2rem 3rem) */
+    margin-bottom: 1.5rem;
+    max-width: 1800px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.filter-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    align-items: end;
+}
+
+.filter-bar div {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-bar .form-select,
+.filter-bar .btn {
+    height: calc(2.4rem + 2px);
+    font-weight: 400;
+}
+
+@media (max-width: 1200px) {
+    .filter-bar {
+        grid-template-columns: 1fr 1fr; 
+    }
+}
+
+.filter-row > div {
+    flex: 1 1 0;
+    min-width: 200px;
+}
+
+/* KNAPP 1: Filtrer */
+.filter-btn-filtrer {
+    width: 115px;        
+    margin-right: 0px;  
+}
+
+/* KNAPP 2: */
+.filter-btn-tom {
+    width: 115px;
+    margin-right: 0px;  
+}
+
+/* KNAPP 3: Eksporter */
+.filter-btn-eksporter {
+    width: 115px; 
+    margin-right: 0;
+}
+
