@@ -61,8 +61,8 @@ public class KompetanseContext : DbContext
                 .HasMaxLength(45)
                 .HasColumnName("fagomrade_navn");
 
-            entity.HasMany(d => d.Kompetanses)
-                  .WithMany(p => p.Fagområdes)
+            entity.HasMany(d => d.Kompetanser)
+                  .WithMany(p => p.Fagområder)
                   .UsingEntity<Dictionary<string, object>>(
                       "fagomrade_has_kompetanse",
                       r => r.HasOne<Kompetanse>().WithMany()
@@ -115,7 +115,7 @@ public class KompetanseContext : DbContext
                 .HasColumnName("underkompetanse_navn");
 
             entity.HasOne(d => d.Kompetanse)
-                .WithMany(p => p.UnderKompetanses)
+                .WithMany(p => p.UnderKompetanser)
                 .HasForeignKey(d => d.KompetanseId)
                 .HasConstraintName("under_kompetanse_kompetanse_id_fkey");
         });
