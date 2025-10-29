@@ -19,7 +19,6 @@ namespace Digin_Kompetanse.Controllers
             _logger = logger;
         }
         
-        // LOGIN
         [HttpGet]
         public IActionResult AdminLogin() => View("AdminLogin");
 
@@ -40,9 +39,7 @@ namespace Digin_Kompetanse.Controllers
             ViewBag.Error = "Feil e-post eller passord.";
             return View();
         }
-
         
-        // DASHBOARD
         [HttpGet]
         public IActionResult AdminDashboard(string? fagomrade, string? kompetanse)
         {
@@ -112,20 +109,8 @@ namespace Digin_Kompetanse.Controllers
             }
         }
         
-        // CSV EKSPORT
-       [HttpGet]
-public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse, string? underkompetanse)
-{
-    if (HttpContext.Session.GetString("Role") != "Admin")
-        return RedirectToAction("AdminLogin");
-
-    var query = _context.BedriftKompetanse
-        .Include(bk => bk.Bedrift)
-        .Include(bk => bk.Fagområde)
-        .Include(bk => bk.Kompetanse)
-        .Include(bk => bk.UnderKompetanse)
-        .AsNoTracking()
-        .Select(bk => new AdminViewModel
+        [HttpGet]
+        public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse)
         {
             BedriftId = bk.BedriftId,
             BedriftNavn = bk.Bedrift!.BedriftNavn,
@@ -166,18 +151,16 @@ public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse
         string under = item.UnderKompetanse?.Replace(";", ",") ?? "";
         string beskrivelse = item.Beskrivelse?.Replace(";", ",") ?? "";
 
-        sb.AppendLine($"\"{bedrift}\";\"{epost}\";\"{fag}\";\"{komp}\";\"{under}\";\"{beskrivelse}\"");
-    }
+                sb.AppendLine($"{bedrift};{epost};{fag};{komp}");
+            }
+            
+            var bytes = Encoding.UTF8.GetPreamble()
+                .Concat(Encoding.UTF8.GetBytes(sb.ToString()))
+                .ToArray();
 
-    var bytes = Encoding.UTF8.GetPreamble()
-        .Concat(Encoding.UTF8.GetBytes(sb.ToString()))
-        .ToArray();
-
-    return File(bytes, "text/csv; charset=utf-8", "innsendinger.csv");
-}
-
+            return File(bytes, "text/csv", "innsendinger.csv");
+        }
         
-        // LOGOUT
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult LogoutAdmin()
@@ -187,7 +170,6 @@ public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse
             return RedirectToAction("AdminLogin");
         }
         
-        // SLETT BEDRIFT
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteBedrift(int id)
