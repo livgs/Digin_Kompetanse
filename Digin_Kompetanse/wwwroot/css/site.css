@@ -386,12 +386,106 @@ select[multiple] {
 }
 
 /* Admin login*/
-.center-adm-login {
+
+body {
+    background-color: #f8f9fa;
+    font-family: "DM Sans", sans-serif;
+}
+
+.admin-login-page {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 10px; 
+}
+
+/* Selve boksen */
+.center-adm-login {
+    background-color: #f9f9f9; 
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 40px 50px;
+    width: 420px; 
+    text-align: center;
+}
+
+/* Tittel */
+.center-adm-login h2 {
+    color: #0098D1;
+    font-weight: 600;
+    margin-bottom: 28px;
+}
+
+/* Skjema */
+.center-adm-login form {
+    display: flex;
     flex-direction: column;
+    align-items: center;
     width: 100%;
+}
+
+/* Label */
+.center-adm-login label {
+    color: #0098D1;
+    font-weight: 600;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+/* Inputfelt */
+.center-adm-login .form-control {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #0098D1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    height: 44px;
+    font-size: 16px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
+/* Knapp */
+.center-adm-login .custom-btn {
+    background-color: #0098D1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    height: 46px;
+    width: 100%;
+    font-weight: 600;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.center-adm-login .custom-btn:hover {
+    background-color: #0087b8;
+}
+
+/* Feilmelding */
+.center-adm-login .alert-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border-radius: 6px;
+    border: none;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Mobil */
+@media (max-width: 576px) {
+    .center-adm-login {
+        width: 90%;
+        padding: 30px 25px;
+    }
+}
+
+.center-adm-login {
+    margin-bottom: 100px;
 }
 
 /* Grunnleggende stil for navigasjonslenker */
@@ -630,106 +724,4 @@ body.admin-dashboard {
     margin-right: 0;
 }
 
-/*  ADMIN LOGIN */
 
-body {
-    background-color: #f8f9fa;
-    font-family: "DM Sans", sans-serif;
-}
-
-.admin-login-page {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 10px; /* juster avstanden fra navbar */
-}
-
-/* Selve boksen */
-.center-adm-login {
-    background-color: #f9f9f9; /* lik step */
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    padding: 40px 50px;
-    width: 420px; /* fast og balansert bredde */
-    text-align: center;
-}
-
-/* Tittel */
-.center-adm-login h2 {
-    color: #0098D1;
-    font-weight: 600;
-    margin-bottom: 28px;
-}
-
-/* Skjema */
-.center-adm-login form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-/* Label */
-.center-adm-login label {
-    color: #0098D1;
-    font-weight: 600;
-    width: 100%;
-    text-align: left;
-    margin-bottom: 5px;
-}
-
-/* Inputfelt */
-.center-adm-login .form-control {
-    width: 100%;
-    background-color: #ffffff;
-    border: 1px solid #0098D1;
-    border-radius: 6px;
-    padding: 10px 14px;
-    height: 44px;
-    font-size: 16px;
-    margin-bottom: 16px;
-    box-sizing: border-box;
-}
-
-/* Knapp */
-.center-adm-login .custom-btn {
-    background-color: #0098D1;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px;
-    height: 46px;
-    width: 100%;
-    font-weight: 600;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.center-adm-login .custom-btn:hover {
-    background-color: #0087b8;
-}
-
-/* Feilmelding */
-.center-adm-login .alert-danger {
-    background-color: #dc3545;
-    color: #fff;
-    border-radius: 6px;
-    border: none;
-    padding: 10px;
-    text-align: center;
-    width: 100%;
-    margin-bottom: 15px;
-}
-
-/* Mobil */
-@media (max-width: 576px) {
-    .center-adm-login {
-        width: 90%;
-        padding: 30px 25px;
-    }
-}
-
-/* Ekstra luft mellom login-boks og footer */
-.center-adm-login {
-    margin-bottom: 100px; /* gir tydelig avstand fra footeren */
-}
