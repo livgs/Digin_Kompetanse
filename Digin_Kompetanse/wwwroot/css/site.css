@@ -15,6 +15,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: #f8f9fa;
+    font-family: "DM Sans", sans-serif;
 }
 
 /* Hvis admin */
@@ -121,11 +123,13 @@ p {
 }
 
 form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;        
+    max-width: 100%;     
+    box-sizing: border-box;
 }
 
 .form-container {
@@ -169,61 +173,71 @@ form input, form textarea, form button, form select {
   padding: 10px 20px;
 }
 
-
-.navbar-brand {
-  padding-right: 0;
-}
-
 .navbar-nav {
     display: flex;
     align-items: center;
-    gap: 100px; /* avstand mellom lenker */
+    gap: 60px; /* avstand mellom lenker */
     padding-left: 0;
-    margin-left: 30px;
+    margin-left: 50px;
     list-style: none;
 }
 
-.nav-link {
+.navbar .nav-link {
   font-family: "Mulish", sans-serif;
   font-weight: 400;
   font-size: 20px;
-  flex: unset; /* fjerner flex:1 som lager ulik spacing */
+  flex: unset; 
   text-decoration: none;
-  text-align: center; /* sentrerer teksten */
+  text-align: center; 
   position: relative;
-  transition: color 0.3s;
-  margin-right: 0; /* fjern ekstra margin */
-  margin-top: 0;   /* fjern ekstra toppmargin */
+  transition: color 0.2s ease-in-out;
+  margin-right: 0;
+  margin-top: 0;  
+  color: #212529;
+  padding-bottom: 4px;
 }
 
 /* Hover effekt */
-.nav-link::after {
+.navbar .nav-link::after {
   content: "";
   position: absolute;
   left: 0;
   bottom: 0;
   width: 0;
   height: 2px;
-  background-color: black;
-  transition: width 0.3s ease;
+  background-color: #0098D1;
+  transition: width 0.25s ease-in-out;
+  border-radius: 1px;
 }
 
-.nav-link:hover {
-    color: #0098D1;
-}
+.navbar .nav-link:hover {
+    color: #212529;}
 
-.nav-link:hover::after {
+.navbar .nav-link:hover::after {
     width: 100%;
 }
 
-.nav-link.active {
+.navbar .nav-link.active {
     font-weight: 700;
     color: #0098D1;
 }
 
-.logout-item {
- margin-left: auto;   
+/* Understrek aktiv side i navbar */
+.navbar .nav-link.active-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #0098D1; /* blå underline */
+    border-radius: 1px;
 }
+
+.navbar .nav-link:hover::after {
+    width: 100%;
+}
+
 
 /* Hjemside */
 
@@ -248,7 +262,6 @@ form input, form textarea, form button, form select {
   margin: 0 auto; 
   display: block;
 }
-
 
 .btn-submit:hover {
   background-color: #0098D1; 
@@ -328,7 +341,7 @@ select[multiple] {
 .step {
     width: 600px;
     text-align: left;
-    background-color: #f9f9f9; 
+    background-color: #ffffff; 
     padding: 20px 25px;         
     border-radius: 8px;        
     box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
@@ -349,7 +362,7 @@ select[multiple] {
 
 /* Generelle knapper */
 .custom-btn {
-    background-color: #0098D1; /* blå */
+    background-color: #0098D1; 
     color: white;
     border: none;
 }
@@ -387,11 +400,6 @@ select[multiple] {
 
 /* Admin login*/
 
-body {
-    background-color: #f8f9fa;
-    font-family: "DM Sans", sans-serif;
-}
-
 .admin-login-page {
     display: flex;
     justify-content: center;
@@ -402,7 +410,7 @@ body {
 
 /* Selve boksen */
 .center-adm-login {
-    background-color: #f9f9f9; 
+    background-color: #ffffff; 
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     padding: 40px 50px;
@@ -488,47 +496,10 @@ body {
     margin-bottom: 100px;
 }
 
-/* Grunnleggende stil for navigasjonslenker */
-.navbar .nav-link {
-    position: relative;
-    color: #212529;
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
-    padding-bottom: 4px;
-}
-
-/* Blå strek under lenken ved hover */
-.navbar .nav-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 2px;
-    background-color: #0098D1; /* Digin blå */
-    transition: width 0.25s ease-in-out;
-    border-radius: 1px;
-}
-
-/* Utvider streken når du holder musen over */
-.navbar .nav-link:hover::after {
-    width: 100%;
-}
-
-/* Aktiv side beholder streken */
-.navbar .nav-link.active-link::after {
-    width: 100%;
-}
-
-/* Ikke endre tekstfarge ved hover */
-.navbar .nav-link:hover {
-    color: #212529;
-}
-
 /* Admin dashboard */ 
 body.admin-dashboard {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #fff;
+    background-color: #ffffff;
     color: #222;
 }
 
@@ -543,7 +514,7 @@ body.admin-dashboard {
 
 /* Bokser / seksjoner */
 .admin-dashboard .step {
-    background-color: #f9f9f9; 
+    background-color: #ffffff; 
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
     padding: 2rem 3rem;
@@ -572,7 +543,10 @@ body.admin-dashboard {
 /* Nedtrekksmenyer */
 .admin-dashboard .form-select {
     border-radius: 8px;
-    width: 260px;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Digin-knapper */
@@ -601,6 +575,12 @@ body.admin-dashboard {
 .btn-outline-digin:hover {
     background-color: #009FE3;
     color: #fff;
+}
+
+.btn-outline-danger {
+    background-color: white;
+    color: #dc3545;
+    border-color: #dc3545;
 }
 
 /* Tabell */
@@ -654,7 +634,7 @@ body.admin-dashboard {
     padding: 10px 0;
     font-size: 16px;
     letter-spacing: 0.3px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Myk skygge  */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     z-index: 10;
 }
 
@@ -666,10 +646,10 @@ body.admin-dashboard {
 
 /* --- Kompakt filterboks --- */
 .admin-dashboard .step {
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    padding: 1rem 1.5rem; /* Lavere høyde (tidligere 2rem 3rem) */
+    padding: 2rem 3rem; 
     margin-bottom: 1.5rem;
     max-width: 1800px;
     width: 100%;
@@ -678,26 +658,34 @@ body.admin-dashboard {
 }
 
 .filter-bar {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    display: flex;
     gap: 1rem;
-    align-items: end;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    width: 100%;
 }
 
-.filter-bar div {
-    display: flex;
-    flex-direction: column;
+.filter-bar > div {
+    flex: 1 1 0;         
+    min-width: 0;    
 }
 
 .filter-bar .form-select,
 .filter-bar .btn {
-    height: calc(2.4rem + 2px);
-    font-weight: 400;
+    width: 100%;
+    height: 2.5rem;
+    font-weight: 500;
 }
 
-@media (max-width: 1200px) {
-    .filter-bar {
-        grid-template-columns: 1fr 1fr; 
+@media (max-width: 80vw) {
+    .filter-bar > div {
+        flex: 1 1 40%;
+    }
+}
+
+@media (max-width: 50vw) {
+    .filter-bar > div {
+        flex: 1 1 100%;
     }
 }
 
@@ -708,19 +696,19 @@ body.admin-dashboard {
 
 /* KNAPP 1: Filtrer */
 .filter-btn-filtrer {
-    width: 115px;        
-    margin-right: 0px;  
+    width: 100px;        
+    margin-right: 0;  
 }
 
 /* KNAPP 2: */
 .filter-btn-tom {
-    width: 115px;
-    margin-right: 0px;  
+    width: 100px;
+    margin-right: 0;  
 }
 
 /* KNAPP 3: Eksporter */
 .filter-btn-eksporter {
-    width: 115px; 
+    width: 100px; 
     margin-right: 0;
 }
 
