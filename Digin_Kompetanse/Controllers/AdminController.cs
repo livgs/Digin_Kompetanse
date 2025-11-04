@@ -114,7 +114,7 @@ namespace Digin_Kompetanse.Controllers
             }
         }
 
-        // === EXPORT CSV ===
+        // EXPORT CSV 
         [HttpGet]
         public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse, string? underkompetanse)
         {
@@ -180,7 +180,7 @@ namespace Digin_Kompetanse.Controllers
             }
         }
 
-        // === LOGOUT ===
+        // LOGOUT 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult LogoutAdmin()
@@ -189,7 +189,7 @@ namespace Digin_Kompetanse.Controllers
             return RedirectToAction("AdminLogin");
         }
 
-        // === DELETE BEDRIFT ===
+        // DELETE BEDRIFT
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteBedrift(int id)

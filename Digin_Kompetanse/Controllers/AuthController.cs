@@ -149,8 +149,8 @@ public class AuthController : Controller
         if (role != "Bedrift" || bedriftId == null)
         {
             TempData["Message"] = "Ingen bedrift er logget inn.";
-            TempData["MessageType"] = "warning"; // kan brukes for farge på alert
-            return RedirectToAction("Index", "Home"); // send til ønsket side
+            TempData["MessageType"] = "warning"; 
+            return RedirectToAction("Index", "Home"); 
         }
 
         HttpContext.Session.Remove("BedriftId");
@@ -162,7 +162,7 @@ public class AuthController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    // — helpers (maskering) —
+    // helpers
     private static string MaskEmail(string? email)
     {
         if (string.IsNullOrWhiteSpace(email)) return "";

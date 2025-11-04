@@ -2,7 +2,6 @@ using Digin_Kompetanse.data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Digin_Kompetanse.Controllers;
 
 [Route("fagomrade")]
@@ -14,14 +13,16 @@ public class FagområdeController : Controller
     {
         _context = context;
     }
-
     
     [HttpGet("")]
     public async Task<IActionResult> GetFagområde()
     {
         var fagomrader = await _context.Fagområde
-            .Include(f => f.Kompetanser)
+            .Select(f => f.FagområdeNavn)
+            .Distinct()
             .ToListAsync();
+
         return Json(fagomrader);
     }
+
 }

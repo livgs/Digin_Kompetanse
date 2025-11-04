@@ -69,6 +69,18 @@
                                     </td>
                                     <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
                                     <td>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary me-1 edit-btn"
+                                                data-id="@item.Id">
+                                            Rediger
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success me-1 save-btn d-none"
+                                                data-id="@item.Id">
+                                            Lagre
+                                        </button>
+
                                         <form asp-action="Delete"
                                               asp-controller="Home"
                                               asp-route-id="@item.Id"
@@ -76,8 +88,7 @@
                                               class="d-inline">
                                             @Html.AntiForgeryToken()
                                             <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger"
-                                                    onclick="return confirm('Slette denne kompetansen?');">
+                                                    class="btn btn-sm btn-outline-danger">
                                                 Slett
                                             </button>
                                         </form>
@@ -91,3 +102,126 @@
         }
     }
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const table = document.querySelector("table");
+
+        table.addEventListener("click", async (e) => {
+            const editBtn = e.target.closest(".edit-btn");
+            const saveBtn = e.target.closest(".save-btn");
+
+            // === START REDIGERING ===
+            if (editBtn) {
+                const row = editBtn.closest("tr");
+                editBtn.classList.add("d-none");
+                row.querySelector(".save-btn").classList.remove("d-none");
+
+                const id = editBtn.dataset.id;
+                const cells = row.querySelectorAll("td");
+
+                const fagomradeVal = cells[0].textContent.trim();
+                const kompetanseVal = cells[1].textContent.trim();
+                const underVal = cells[2].textContent.trim();
+                const beskrivelseVal = cells[3].textContent.trim();
+
+                // Hent fagområder
+    
+             const fagResponse = await fetch('/fagomrade');
+
+                const fagomrader = await fagResponse.json();
+
+                // Lag dropdown for fagområde
+                const fagSelect = document.createElement("select");
+                fagSelect.classList.add("form-select", "form-select-sm");
+                fagSelect.innerHTML = fagomrader.map(f =>
+                    `<option value="${f}" ${f === fagomradeVal ? 'selected' : ''}>${f}</option>`).join('');
+
+                // Sett cellen til select
+                cells[0].innerHTML = "";
+                cells[0].appendChild(fagSelect);
+
+                // Kompetanse dropdown (lastes når fagområde endres)
+                const kompSelect = document.createElement("select");
+                kompSelect.classList.add("form-select", "form-select-sm");
+                cells[1].innerHTML = "";
+                cells[1].appendChild(kompSelect);
+
+                // Underkompetanse dropdown
+                const underSelect = document.createElement("select");
+                underSelect.classList.add("form-select", "form-select-sm");
+                cells[2].innerHTML = "";
+                cells[2].appendChild(underSelect);
+
+                // Fyll inn kompetanser + underkompetanser initialt
+                async function loadKompetanser(fag) {
+                    const res = await fetch(`/kompetanse/byFagomrade?fagomrade=${encodeURIComponent(fag)}`);
+                    const kompetanser = await res.json();
+                    kompSelect.innerHTML = kompetanser.map(k =>
+                        `<option value="${k}" ${k === kompetanseVal ? 'selected' : ''}>${k}</option>`).join('');
+                    await loadUnderkompetanser(kompSelect.value);
+                }
+
+
+                async function loadUnderkompetanser(kompetanse) {
+                    const res = await fetch(`/underkompetanse/byKompetanse?kompetanse=${encodeURIComponent(kompetanse)}`);
+                    const underkompetanser = await res.json();
+                    underSelect.innerHTML = underkompetanser.map(u =>
+                        `<option value="${u}" ${u === underVal ? 'selected' : ''}>${u}</option>`).join('');
+                }
+
+                // Når fagområde endres → last nye kompetanser
+                fagSelect.addEventListener("change", async () => {
+                    await loadKompetanser(fagSelect.value);
+                });
+
+                // Når kompetanse endres → last nye underkompetanser
+                kompSelect.addEventListener("change", async () => {
+                    await loadUnderkompetanser(kompSelect.value);
+                });
+
+                // Last første sett
+                await loadKompetanser(fagSelect.value);
+
+                // Beskrivelse som textarea
+                cells[3].innerHTML = `<textarea class="form-control form-control-sm">${beskrivelseVal}</textarea>`;
+            }
+
+            // === LAGRE ENDRINGER ===
+            if (saveBtn) {
+                const row = saveBtn.closest("tr");
+                const id = saveBtn.getAttribute("data-id");
+                const cells = row.querySelectorAll("td");
+
+                const fagomrade = cells[0].querySelector("select").value;
+                const kompetanse = cells[1].querySelector("select").value;
+                const underkompetanse = cells[2].querySelector("select").value;
+                const beskrivelse = cells[3].querySelector("textarea").value;
+
+                const response = await fetch(`/Home/EditInline/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        fagomrade, kompetanse, underkompetanse, beskrivelse
+                    })
+                });
+
+                if (response.ok) {
+                    // Oppdater visningen
+                    cells[0].textContent = fagomrade;
+                    cells[1].textContent = kompetanse;
+                    cells[2].textContent = underkompetanse;
+                    cells[3].textContent = beskrivelse;
+
+                    saveBtn.classList.add("d-none");
+                    row.querySelector(".edit-btn").classList.remove("d-none");
+                } else {
+                    alert("Feil ved lagring!");
+                }
+            }
+        });
+    });
+</script>

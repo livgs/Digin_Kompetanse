@@ -21,12 +21,17 @@ namespace Digin_Kompetanse.Controllers
         {
             var items = _context.Fagområde
                 .AsNoTracking()
+                .ToList() // 
+                .GroupBy(f => f.FagområdeNavn)
+                .Select(g => g.First())
                 .OrderBy(f => f.FagområdeNavn)
                 .Select(f => new { f.FagområdeId, f.FagområdeNavn })
                 .ToList();
 
             return new SelectList(items, "FagområdeId", "FagområdeNavn", selectedId);
         }
+
+
 
         [HttpGet("/auth/login")]
         public IActionResult Login()
@@ -68,8 +73,7 @@ namespace Digin_Kompetanse.Controllers
                 return RedirectToAction("Login", "Auth");
 
             ViewBag.Fagområder = BuildFagomradeSelectList();
-
-            // Start med én tom rad
+            
             var model = new KompetanseRegistreringViewModel();
             model.Rader.Add(new KompetanseRadViewModel());
 
@@ -195,11 +199,8 @@ namespace Digin_Kompetanse.Controllers
 
             return Json(underkompetanser);
         }
-
-        // ---------------------------
+        
         //      OVERSIKT
-        // ---------------------------
-
         [HttpGet]
         public IActionResult Overview()
         {
@@ -233,6 +234,104 @@ namespace Digin_Kompetanse.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        
+        [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> EditInline(int id, [FromBody] EditInlineDto dto)
+{
+    var entry = await _context.BedriftKompetanse
+        .Include(bk => bk.Bedrift)
+        .Include(bk => bk.Fagområde)
+        .Include(bk => bk.Kompetanse)
+        .Include(bk => bk.UnderKompetanse)
+        .FirstOrDefaultAsync(bk => bk.Id == id);
+
+    if (entry == null)
+        return NotFound();
+    
+    var fag = await _context.Fagområde.FirstOrDefaultAsync(f => f.FagområdeNavn == dto.Fagomrade);
+    var komp = await _context.Kompetanse.FirstOrDefaultAsync(k => k.KompetanseKategori == dto.Kompetanse);
+    var under = await _context.UnderKompetanse.FirstOrDefaultAsync(u => u.UnderkompetanseNavn == dto.Underkompetanse);
+
+    if (fag == null || komp == null)
+        return BadRequest("Fagområde eller kompetanse ikke funnet.");
+    
+    bool exists = await _context.BedriftKompetanse.AnyAsync(bk =>
+        bk.Id != id && 
+        bk.BedriftId == entry.BedriftId &&
+        bk.FagområdeId == fag.FagområdeId &&
+        bk.KompetanseId == komp.KompetanseId &&
+        bk.UnderKompetanseId == under!.UnderkompetanseId &&
+        bk.IsActive == true
+    );
+
+    if (exists)
+    {
+        return BadRequest("Denne kombinasjonen finnes allerede for denne bedriften.");
+    }
+    
+    entry.FagområdeId = fag.FagområdeId;
+    entry.KompetanseId = komp.KompetanseId;
+    entry.UnderKompetanseId = under?.UnderkompetanseId; 
+    entry.Beskrivelse = dto.Beskrivelse;
+    entry.ModifiedAt = DateTime.UtcNow;
+    entry.ModifiedByBedriftId = entry.BedriftId;
+
+    try
+    {
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+    catch (DbUpdateException ex)
+    {
+        if (ex.InnerException is Npgsql.PostgresException pgEx && pgEx.SqlState == "23505")
+        {
+            return BadRequest("Denne kombinasjonen finnes allerede for denne bedriften.");
+        }
+
+        throw; 
+    }
+}
+        public class EditInlineDto
+        {
+            public string Fagomrade { get; set; } = "";
+            public string Kompetanse { get; set; } = "";
+            public string Underkompetanse { get; set; } = "";
+            public string Beskrivelse { get; set; } = "";
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetFagomrader()
+        {
+            var fagomrader = await _context.Fagområde
+                .Select(f => f.FagområdeNavn)
+                .Distinct()
+                .ToListAsync();
+
+            return Json(fagomrader);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetKompetanserByFagomrade(string fagomrade)
+        {
+            var kompetanser = await _context.Kompetanse
+                .Where(k => k.Fagområder.Any(f => f.FagområdeNavn == fagomrade))
+                .Select(k => k.KompetanseKategori)
+                .Distinct()
+                .ToListAsync();
+
+            return Json(kompetanser);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUnderkompetanserByKompetanse(string kompetanse)
+        {
+            var underkompetanser = await _context.UnderKompetanse
+                .Where(u => u.Kompetanse.KompetanseKategori == kompetanse)
+                .Select(u => u.UnderkompetanseNavn)
+                .Distinct()
+                .ToListAsync();
+            return Json(underkompetanser);
         }
     }
 }

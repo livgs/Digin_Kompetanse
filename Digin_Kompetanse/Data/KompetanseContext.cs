@@ -132,13 +132,9 @@ public class KompetanseContext : DbContext
                 .HasColumnName("id");
 
             entity.Property(e => e.BedriftId).HasColumnName("bedrift_id");
-
-            // C#-navn FagområdeId → DB-kolonne fagomrade_id
             entity.Property(e => e.FagområdeId).HasColumnName("fagomrade_id");
-
             entity.Property(e => e.KompetanseId).HasColumnName("kompetanse_id");
             entity.Property(e => e.UnderKompetanseId).HasColumnName("underkompetanse_id");
-
             entity.Property(e => e.Beskrivelse)
                 .HasMaxLength(200)
                 .HasColumnName("beskrivelse");
@@ -198,7 +194,7 @@ public class KompetanseContext : DbContext
             entity.HasIndex(e => new { e.BedriftId, e.FagområdeId, e.KompetanseId, e.UnderKompetanseId })
                   .IsUnique()
                   .HasDatabaseName("ux_bedrift_kompetanse_unique_choice_active")
-                  .HasFilter("\"is_active\" = true"); // Postgres-filter
+                  .HasFilter("\"is_active\" = true"); 
         });
         
         modelBuilder.Entity<LoginToken>(e =>
