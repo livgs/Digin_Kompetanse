@@ -18,26 +18,41 @@ services:
       retries: 20
 
   app:
-    image: mcr.microsoft.com/dotnet/sdk:9.0
     container_name: digin_app
+    build:
+      context: .
+      target: dev            
     working_dir: /app
     env_file: .env
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       DOTNET_USE_POLLING_FILE_WATCHER: ${DOTNET_USE_POLLING_FILE_WATCHER}
       DOTNET_WATCH_RESTART_ON_RUDE_EDIT: ${DOTNET_WATCH_RESTART_ON_RUDE_EDIT}
-      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
+  
+      
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "5068:8080"
     volumes:
-      - .:/app
-      - /app/bin
-      - /app/obj
+      - type: bind
+        source: .
+        target: /app
+      - type: volume
+        source: digin_app_bin
+        target: /app/bin
+      - type: volume
+        source: digin_app_obj
+        target: /app/obj
+      - type: volume
+        source: digin_keys
+        target: /keys
     command: ["dotnet","watch","run","--no-launch-profile","--urls","http://0.0.0.0:8080"]
 
 volumes:
   digin_kompetanse_pgdata:
     name: digin_kompetanse_pgdata
+  digin_app_bin:
+  digin_app_obj:
+  digin_keys:

@@ -16,7 +16,7 @@ namespace Digin_Kompetanse.Controllers
         {
             _context = context;
         }
-        
+
         private SelectList BuildFagomradeSelectList(int? selectedId = null)
         {
             var items = _context.Fagområde
@@ -28,20 +28,18 @@ namespace Digin_Kompetanse.Controllers
             return new SelectList(items, "FagområdeId", "FagområdeNavn", selectedId);
         }
 
-        // Viser innloggingssiden (Views/Auth/Login.cshtml)
         [HttpGet("/auth/login")]
         public IActionResult Login()
         {
-            // Hvis allerede innlogget som bedrift → gå til oversikt
             if (HttpContext.Session.GetString("Role") == "Bedrift" &&
                 HttpContext.Session.GetInt32("BedriftId") is not null)
             {
                 return RedirectToAction(nameof(Overview));
             }
-            
+
             return View("~/Views/Auth/Login.cshtml");
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -53,7 +51,7 @@ namespace Digin_Kompetanse.Controllers
                 return RedirectToAction(nameof(Overview));
             }
 
-            _context.BedriftKompetanse.Remove(row); // eller row.IsDeleted = true;
+            _context.BedriftKompetanse.Remove(row);
             _context.SaveChanges();
 
             TempData["Success"] = "Kompetansen ble slettet.";
@@ -63,86 +61,107 @@ namespace Digin_Kompetanse.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            // Sjekk om bedrift er logget inn
             var role = HttpContext.Session.GetString("Role");
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
 
             if (role != "Bedrift" || bedriftId == null)
                 return RedirectToAction("Login", "Auth");
-            
 
-            // Hvis innlogget, vis registreringsskjema
             ViewBag.Fagområder = BuildFagomradeSelectList();
-            return View(new KompetanseRegistreringViewModel());
+
+            // Start med én tom rad
+            var model = new KompetanseRegistreringViewModel();
+            model.Rader.Add(new KompetanseRadViewModel());
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Index(KompetanseRegistreringViewModel model)
         {
-           
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
             if (bedriftId == null)
             {
                 TempData["Message"] = "Du må være logget inn som bedrift for å registrere kompetanse.";
                 TempData["MessageType"] = "warning";
-                return RedirectToAction("Login", "Auth"); //
+                return RedirectToAction("Login", "Auth");
             }
-            
-            ViewBag.Fagområder = BuildFagomradeSelectList(model.FagområdeId);
-            if (!ModelState.IsValid) return View(model);
-            
+
+            ViewBag.Fagområder = BuildFagomradeSelectList();
+
+            var rader = model.Rader?
+                .Where(r => r.FagområdeId.HasValue && r.KompetanseId.HasValue)
+                .ToList() ?? new List<KompetanseRadViewModel>();
+
+            if (!rader.Any())
+            {
+                ModelState.AddModelError(string.Empty, "Du må legge til minst én kompetanse.");
+                return View(model);
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
             var bedrift = _context.Bedrift.FirstOrDefault(b => b.BedriftId == bedriftId.Value);
             if (bedrift == null)
                 return Unauthorized("Innlogget bedrift ikke funnet.");
-            
-            var fagområde = _context.Fagområde
-                .AsNoTracking()
-                .FirstOrDefault(f => f.FagområdeId == model.FagområdeId);
-            if (fagområde == null) return NotFound("Fagområde ikke funnet.");
 
-            if (!model.KompetanseId.HasValue) return BadRequest("Kompetanse må velges.");
-
-            var kompetanse = _context.Kompetanse
-                .AsNoTracking()
-                .FirstOrDefault(k => k.KompetanseId == model.KompetanseId.Value);
-            if (kompetanse == null) return NotFound("Kompetanse ikke funnet.");
-            
-            int? underId = null;
-            if (model.UnderkompetanseId.HasValue)
+            foreach (var rad in rader)
             {
-                var under = _context.UnderKompetanse
+                var fagområde = _context.Fagområde
                     .AsNoTracking()
-                    .FirstOrDefault(uk => uk.UnderkompetanseId == model.UnderkompetanseId.Value
-                                       && uk.KompetanseId == kompetanse.KompetanseId);
-                if (under == null) return BadRequest("Ugyldig underkompetanse for valgt kompetanse.");
-                underId = under.UnderkompetanseId;
-            }
-            
-            var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
-                bk.BedriftId == bedrift.BedriftId &&
-                bk.FagområdeId == fagområde.FagområdeId &&
-                bk.KompetanseId == kompetanse.KompetanseId &&
-                bk.UnderKompetanseId == underId
-            );
+                    .FirstOrDefault(f => f.FagområdeId == rad.FagområdeId);
+                if (fagområde == null)
+                    continue;
 
-            if (eksisterende == null)
-            {
-                var bk = new BedriftKompetanse
+                var kompetanse = _context.Kompetanse
+                    .AsNoTracking()
+                    .FirstOrDefault(k => k.KompetanseId == rad.KompetanseId);
+                if (kompetanse == null)
+                    continue;
+
+                int? underId = null;
+                if (rad.UnderkompetanseId.HasValue)
                 {
-                    BedriftId = bedrift.BedriftId,
-                    FagområdeId = fagområde.FagområdeId,
-                    KompetanseId = kompetanse.KompetanseId,
-                    UnderKompetanseId = underId,
-                    Beskrivelse = model.Beskrivelse,
-                    CreatedAt = DateTime.UtcNow
-                };
+                    var under = _context.UnderKompetanse
+                        .AsNoTracking()
+                        .FirstOrDefault(uk => uk.UnderkompetanseId == rad.UnderkompetanseId.Value
+                                           && uk.KompetanseId == kompetanse.KompetanseId);
+                    if (under == null)
+                        continue;
 
-                _context.BedriftKompetanse.Add(bk);
-            }
-            else
-            {
-                eksisterende.Beskrivelse = model.Beskrivelse;
+                    underId = under.UnderkompetanseId;
+                }
+
+                var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
+                    bk.BedriftId == bedrift.BedriftId &&
+                    bk.FagområdeId == fagområde.FagområdeId &&
+                    bk.KompetanseId == kompetanse.KompetanseId &&
+                    bk.UnderKompetanseId == underId
+                );
+
+                if (eksisterende == null)
+                {
+                    var bk = new BedriftKompetanse
+                    {
+                        BedriftId = bedrift.BedriftId,
+                        FagområdeId = fagområde.FagområdeId,
+                        KompetanseId = kompetanse.KompetanseId,
+                        UnderKompetanseId = underId,
+                        Beskrivelse = rad.Beskrivelse,
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true
+                    };
+
+                    _context.BedriftKompetanse.Add(bk);
+                }
+                else
+                {
+                    eksisterende.Beskrivelse = rad.Beskrivelse;
+                    eksisterende.ModifiedAt = DateTime.UtcNow;
+                    eksisterende.ModifiedByBedriftId = bedrift.BedriftId;
+                }
             }
 
             _context.SaveChanges();
@@ -177,6 +196,10 @@ namespace Digin_Kompetanse.Controllers
             return Json(underkompetanser);
         }
 
+        // ---------------------------
+        //      OVERSIKT
+        // ---------------------------
+
         [HttpGet]
         public IActionResult Overview()
         {
@@ -184,16 +207,16 @@ namespace Digin_Kompetanse.Controllers
             var bedriftId = HttpContext.Session.GetInt32("BedriftId");
             if (role != "Bedrift" || bedriftId is null)
                 return RedirectToAction("Login", "Auth");
-            
+
             var rader = _context.BedriftKompetanse
-                .Where(bk => bk.BedriftId == bedriftId.Value /* && bk.IsActive */)
+                .Where(bk => bk.BedriftId == bedriftId.Value)
                 .Include(bk => bk.Bedrift)
                 .Include(bk => bk.Fagområde)
                 .Include(bk => bk.Kompetanse)
                 .Include(bk => bk.UnderKompetanse)
                 .AsNoTracking()
                 .ToList();
-            
+
             if (rader.Count == 0)
             {
                 TempData["Info"] = "Du har ikke registrert kompetanse ennå. Fyll inn skjemaet først.";
@@ -202,7 +225,7 @@ namespace Digin_Kompetanse.Controllers
 
             return View(rader);
         }
-        
+
         public IActionResult Privacy() => View();
         public IActionResult Help() => View();
 
@@ -211,6 +234,5 @@ namespace Digin_Kompetanse.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        
     }
 }

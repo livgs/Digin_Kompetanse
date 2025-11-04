@@ -1,20 +1,21 @@
-﻿# SDK (for bygg og utvikling)
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dev
 WORKDIR /app
 
-# Kopier alt
+RUN dotnet tool install -g dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
 COPY . ./
 
-# Hvis vi kjører i prod → bygg ferdig appen
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /app
+COPY . ./
 ARG BUILD_MODE=Release
 RUN dotnet restore
 RUN dotnet build -c $BUILD_MODE
 
-# ==========================
-# Runtime (for produksjon)
-# ==========================
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
+ARG BUILD_MODE=Release
 COPY --from=build /app/bin/$BUILD_MODE/net9.0 .
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Digin_Kompetanse.dll"]

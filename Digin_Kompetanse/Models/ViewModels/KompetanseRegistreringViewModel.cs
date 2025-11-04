@@ -4,15 +4,17 @@ namespace Digin_Kompetanse.Models.ViewModels
 {
     public class KompetanseRegistreringViewModel
     {
-        // Fjern kravene til disse (eller fjern dem helt fra modellen)
-        public string? BedriftNavn { get; set; }
-        public string? BedriftEpost { get; set; }
+        // En innsending kan ha flere rader med kompetanse
+        public List<KompetanseRadViewModel> Rader { get; set; } = new();
+    }
 
+    public class KompetanseRadViewModel
+    {
         [Required(ErrorMessage = "Velg et fagområde")]
-        public int? FagområdeId { get; set; }  
+        public int? FagområdeId { get; set; }
 
         [Required(ErrorMessage = "Velg minst én kompetanse")]
-        public int? KompetanseId { get; set; } 
+        public int? KompetanseId { get; set; }
 
         public int? UnderkompetanseId { get; set; }
 

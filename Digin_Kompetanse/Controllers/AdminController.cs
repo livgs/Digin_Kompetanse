@@ -26,6 +26,7 @@ namespace Digin_Kompetanse.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AdminLogin(string email, string password)
         {
+            // Hardkodet adminbruker
             const string hardcodedEmail = "digin@dgn.no";
             const string hardcodedPasswordHash = "$2a$11$TTl31f/y3FAKOR3n0hwq4uJR6Q0u.mamXVDGIcPGmGoJNx0/SiFUO";
 
