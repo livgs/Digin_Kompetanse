@@ -17,8 +17,7 @@ namespace Digin_Kompetanse.Controllers
             _context = context;
             _logger = logger;
         }
-
-        // === LOGIN ===
+        
         [HttpGet]
         public IActionResult AdminLogin() => View("AdminLogin");
 
@@ -40,8 +39,7 @@ namespace Digin_Kompetanse.Controllers
             ViewBag.Error = "Feil e-post eller passord.";
             return View();
         }
-
-        // === DASHBOARD ===
+        
         [HttpGet]
         public IActionResult AdminDashboard(string? fagomrade, string? kompetanse, string? underkompetanse)
         {
@@ -111,8 +109,7 @@ namespace Digin_Kompetanse.Controllers
                 return View(new List<AdminViewModel>());
             }
         }
-
-        // === EXPORT CSV ===
+        
         [HttpGet]
         public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse, string? underkompetanse)
         {
@@ -174,8 +171,7 @@ namespace Digin_Kompetanse.Controllers
                 return RedirectToAction(nameof(AdminDashboard));
             }
         }
-
-        // === LOGOUT ===
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult LogoutAdmin()
@@ -183,8 +179,7 @@ namespace Digin_Kompetanse.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("AdminLogin");
         }
-
-        // === DELETE BEDRIFT ===
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteBedrift(int id)
