@@ -23,7 +23,7 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         <option value="">Alle</option>
                         @foreach (var fag in fagomrader)
                         {
-                        <option value="@fag" selected="@(valgtFagomrade == fag)">@fag</option>
+                            <option value="@fag" selected="@(valgtFagomrade == fag)">@fag</option>
                         }
                     </select>
                 </div>
@@ -35,7 +35,7 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         <option value="">Alle</option>
                         @foreach (var komp in kompetanser)
                         {
-                        <option value="@komp" selected="@(valgtKompetanse == komp)">@komp</option>
+                            <option value="@komp" selected="@(valgtKompetanse == komp)">@komp</option>
                         }
                     </select>
                 </div>
@@ -47,7 +47,7 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         <option value="">Alle</option>
                         @foreach (var under in ViewBag.Underkompetanser as List<string> ?? new List<string>())
                         {
-                        <option value="@under" selected="@(valgtUnder == under)">@under</option>
+                            <option value="@under" selected="@(valgtUnder == under)">@under</option>
                         }
                     </select>
                 </div>
@@ -88,6 +88,7 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
         </form>
     </div>
 
+    
 
     <!-- Innsendingstabell -->
     <div class="step">
@@ -109,39 +110,89 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                 <tbody>
                 @if (Model?.Any() != true)
                 {
-                <tr>
-                    <td colspan="7" class="text-muted py-4">Ingen treff på valgt filter.</td>
-                </tr>
+                    <tr>
+                        <td colspan="7" class="text-muted py-4">Ingen treff på valgt filter.</td>
+                    </tr>
                 }
                 else
                 {
-                foreach (var item in Model!)
-                {
-                <tr>
-                    <td>@item.BedriftNavn</td>
-                    <td>@item.Epost</td>
-                    <td>@item.Fagområde</td>
-                    <td>@item.KompetanseKategori</td>
-                    <td>@(string.IsNullOrEmpty(item.UnderKompetanse) ? "-" : item.UnderKompetanse)</td>
-                    <td>@(string.IsNullOrEmpty(item.Beskrivelse) ? "-" : item.Beskrivelse)</td>
-                    <td>
-                        <form asp-action="DeleteBedrift"
-                              asp-controller="Admin"
-                              asp-route-id="@item.BedriftId"
-                              method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit"
-                                    class="btn btn-sm btn-outline-danger"
-                                    onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
-                                Slett bedrift
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                }
+                    foreach (var item in Model!)
+                    {
+                        <tr>
+                            <td>@item.BedriftNavn</td>
+                            <td>@item.Epost</td>
+                            <td>@item.Fagområde</td>
+                            <td>@item.KompetanseKategori</td>
+                            <td>@(string.IsNullOrEmpty(item.UnderKompetanse) ? "-" : item.UnderKompetanse)</td>
+                            <td>@(string.IsNullOrEmpty(item.Beskrivelse) ? "-" : item.Beskrivelse)</td>
+                            <td>
+                                <form asp-action="DeleteBedrift"
+                                      asp-controller="Admin"
+                                      asp-route-id="@item.BedriftId"
+                                      method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
+                                        Slett bedrift
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
                 }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fagSelect = document.getElementById("fagomrade");
+        const kompSelect = document.getElementById("kompetanse");
+        const underSelect = document.getElementById("underkompetanse");
+
+        // Hent kompetanser når fagområde endres
+        fagSelect.addEventListener("change", function () {
+            const selectedFag = this.value;
+            kompSelect.innerHTML = '<option value="">Alle</option>';
+            underSelect.innerHTML = '<option value="">Alle</option>'; // nullstill
+
+            if (!selectedFag) return;
+
+            fetch(`/Admin/GetKompetanser?fagomrade=${encodeURIComponent(selectedFag)}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(k => {
+                        const option = document.createElement("option");
+                        option.value = k;
+                        option.textContent = k;
+                        kompSelect.appendChild(option);
+                    });
+                });
+        });
+
+        // Hent underkompetanser når kompetanse endres
+        kompSelect.addEventListener("change", function () {
+            const selectedKomp = this.value;
+            underSelect.innerHTML = '<option value="">Alle</option>';
+
+            if (!selectedKomp) return;
+
+            fetch(`/Admin/GetUnderkompetanser?kompetanse=${encodeURIComponent(selectedKomp)}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(u => {
+                        const option = document.createElement("option");
+                        option.value = u;
+                        option.textContent = u;
+                        underSelect.appendChild(option);
+                    });
+                });
+        });
+    });
+</script>
+}
+

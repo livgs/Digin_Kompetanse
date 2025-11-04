@@ -63,7 +63,9 @@ namespace Digin_Kompetanse.Controllers
                         Epost = bk.Bedrift != null ? bk.Bedrift.BedriftEpost : "-",
                         Fagområde = bk.Fagområde != null ? bk.Fagområde.FagområdeNavn ?? "-" : "-",
                         KompetanseKategori = bk.Kompetanse != null ? bk.Kompetanse.KompetanseKategori ?? "-" : "-",
-                        UnderKompetanse = bk.UnderKompetanse != null ? bk.UnderKompetanse.UnderkompetanseNavn ?? "-" : "-",
+                        UnderKompetanse = bk.UnderKompetanse != null
+                            ? bk.UnderKompetanse.UnderkompetanseNavn ?? "-"
+                            : "-",
                         Beskrivelse = string.IsNullOrWhiteSpace(bk.Beskrivelse) ? "-" : bk.Beskrivelse
                     })
                     .AsQueryable();
@@ -133,7 +135,9 @@ namespace Digin_Kompetanse.Controllers
                         Epost = bk.Bedrift != null ? bk.Bedrift.BedriftEpost : "-",
                         Fagområde = bk.Fagområde != null ? bk.Fagområde.FagområdeNavn ?? "-" : "-",
                         KompetanseKategori = bk.Kompetanse != null ? bk.Kompetanse.KompetanseKategori ?? "-" : "-",
-                        UnderKompetanse = bk.UnderKompetanse != null ? bk.UnderKompetanse.UnderkompetanseNavn ?? "-" : "-",
+                        UnderKompetanse = bk.UnderKompetanse != null
+                            ? bk.UnderKompetanse.UnderkompetanseNavn ?? "-"
+                            : "-",
                         Beskrivelse = string.IsNullOrWhiteSpace(bk.Beskrivelse) ? "-" : bk.Beskrivelse
                     })
                     .AsQueryable();
@@ -158,7 +162,8 @@ namespace Digin_Kompetanse.Controllers
 
                 foreach (var item in data)
                 {
-                    sb.AppendLine($"{item.BedriftNavn};{item.Epost};{item.Fagområde};{item.KompetanseKategori};{item.UnderKompetanse};{item.Beskrivelse}");
+                    sb.AppendLine(
+                        $"{item.BedriftNavn};{item.Epost};{item.Fagområde};{item.KompetanseKategori};{item.UnderKompetanse};{item.Beskrivelse}");
                 }
 
                 var bytes = Encoding.UTF8.GetPreamble()
