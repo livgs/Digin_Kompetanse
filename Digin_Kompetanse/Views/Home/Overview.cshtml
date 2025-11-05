@@ -10,9 +10,13 @@ var rader = Model
 .ToList();
 
 var grupper = rader
-.GroupBy(bk => bk.Bedrift?.BedriftNavn ?? "(Ukjent bedrift)")
-.OrderBy(g => g.Key)
-.ToList();
+    .GroupBy(bk => new { 
+        Navn = bk.Bedrift?.BedriftNavn ?? "(Ukjent bedrift)",
+        Epost = bk.Bedrift?.BedriftEpost ?? "(Ukjent epost)"
+    })
+    .OrderBy(g => g.Key.Navn)
+    .ThenBy(g => g.Key.Epost)
+    .ToList();
 }
 
 <div class="container mt-5">
@@ -26,16 +30,13 @@ var grupper = rader
     {
     foreach (var bedriftGruppe in grupper)
     {
-    var bedriftNavn = bedriftGruppe.Key;
-    var bedrift = bedriftGruppe.FirstOrDefault()?.Bedrift;
+        var navn = bedriftGruppe.Key.Navn;
+        var epost = bedriftGruppe.Key.Epost;
 
     <div class="mb-5">
         <h4 class="text-secondary border-bottom pb-2">
-            @bedriftNavn
-            @if (!string.IsNullOrWhiteSpace(bedrift?.BedriftEpost))
-            {
-            <small class="text-muted">(@bedrift.BedriftEpost)</small>
-            }
+            @navn
+            <small class="text-muted">(@epost)</small>
         </h4>
 
         <div class="table-responsive">
@@ -93,7 +94,8 @@ var grupper = rader
                             @Html.AntiForgeryToken()
                             <button type="submit"
                                     class="btn btn-delete btn-sm"
-                                    title="Slett">
+                                    title="Slett"
+                                    onclick="return confirm('Er du sikker på at du vil slette denne kompetansen? Denne handlingen kan ikke angres.');">
                                 <i class="bi bi-trash-fill"></i>
                             </button>
                         </form>

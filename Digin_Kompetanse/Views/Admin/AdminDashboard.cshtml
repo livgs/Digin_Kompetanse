@@ -93,20 +93,46 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
     <!-- Innsendingstabell -->
     <div class="step">
         <h5 class="center"><strong>Innsendinger</strong></h5>
-        
-        @if (Model?.Any() != true)
+
+        @{
+            var grupper = Model!
+                .GroupBy(m => new {
+                    Navn = m.BedriftNavn ?? "(Ukjent bedrift)",
+                    Epost = m.Epost ?? "(Ukjent epost)"
+                })
+                .OrderBy(g => g.Key.Navn)
+                .ThenBy(g => g.Key.Epost)
+                .ToList();
+        }
+
+        @if (!grupper.Any())
         {
-            <!-- Ingen innsendinger -->
             <div class="text-muted py-4">Ingen treff på valgt filter.</div>
         }
         else
         {
-            @foreach (var item in Model!)
+            foreach (var gruppe in grupper)
             {
-                <!-- Bedrift og e-post utenfor tabellen -->
-                <p class="mt-4 mb-1" style="color: #555;">@item.BedriftNavn: @item.Epost</p>
+                var navn = gruppe.Key.Navn;
+                var epost = gruppe.Key.Epost;
 
-                <div class="table-responsive mb-4">
+                <!-- Bedrift og e-post som tekst over tabellen -->
+                <div class="admin-div">
+                    <p style="color: #555;" class="mb-0">@navn: @epost</p>
+                    <form asp-action="DeleteBedrift"
+                          asp-controller="Admin"
+                          asp-route-id="@gruppe.First().BedriftId"
+                          method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-danger admin-delete"
+                                onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
+                            Slett bedrift
+                        </button>
+                    </form>
+                </div>
+                    
+                <div class="table-responsive">
                     <table class="table table-striped align-middle text-center mb-0">
                         <thead class="table-light">
                         <tr>
@@ -114,29 +140,18 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                             <th>Kompetanse</th>
                             <th>Underkompetanse</th>
                             <th>Beskrivelse</th>
-                            <th>Handling</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>@item.Fagområde</td>
-                            <td>@item.KompetanseKategori</td>
-                            <td>@(string.IsNullOrEmpty(item.UnderKompetanse) ? "-" : item.UnderKompetanse)</td>
-                            <td>@(string.IsNullOrEmpty(item.Beskrivelse) ? "-" : item.Beskrivelse)</td>
-                            <td>
-                                <form asp-action="DeleteBedrift"
-                                      asp-controller="Admin"
-                                      asp-route-id="@item.BedriftId"
-                                      method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit"
-                                            class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Slette denne bedriften og alle tilknyttede kompetanser?');">
-                                        Slett bedrift
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                        @foreach (var item in gruppe)
+                        {
+                            <tr>
+                                <td>@item.Fagområde</td>
+                                <td>@item.KompetanseKategori</td>
+                                <td>@(string.IsNullOrEmpty(item.UnderKompetanse) ? "-" : item.UnderKompetanse)</td>
+                                <td>@(string.IsNullOrEmpty(item.Beskrivelse) ? "-" : item.Beskrivelse)</td>
+                            </tr>
+                        }
                         </tbody>
                     </table>
                 </div>

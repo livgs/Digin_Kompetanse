@@ -625,7 +625,35 @@ body.admin-dashboard {
     color: #888;
 }
 
+.table-responsive {
+    margin-bottom: 3rem;
+}
+
 /* Slett-knapp */
+.admin-div {
+    position: relative;
+    margin-bottom: 0.3rem;
+    padding-right: 20px; 
+}
+
+/* Slett-knappen */
+.admin-delete {
+    position: absolute;
+    right: 0;             
+    top: 30%;             
+    transform: translateY(-50%); 
+    height: auto;
+    width: auto;
+    min-width: unset;
+}
+
+.admin-outline-danger {
+    padding: 0.25rem 0.5rem; /* mindre knapp */
+    font-size: 0.75rem;       /* mindre tekst */
+    height: auto;             /* tilpass høyden */
+}
+
+
 .btn-outline-danger {
     border: 1px solid #dc3545;
     color: #dc3545;
@@ -664,7 +692,7 @@ body.admin-dashboard {
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     padding: 2rem 3rem; 
-    margin-bottom: 1.5rem;
+    margin-bottom: 3rem;
     max-width: 1800px;
     width: 100%;
     margin-left: auto;
