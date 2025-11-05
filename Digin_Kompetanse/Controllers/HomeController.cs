@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using Npgsql;
 
 namespace Digin_Kompetanse.Controllers
 {
@@ -21,9 +22,6 @@ namespace Digin_Kompetanse.Controllers
         {
             var items = _context.Fagområde
                 .AsNoTracking()
-                .ToList() // 
-                .GroupBy(f => f.FagområdeNavn)
-                .Select(g => g.First())
                 .OrderBy(f => f.FagområdeNavn)
                 .Select(f => new { f.FagområdeId, f.FagområdeNavn })
                 .ToList();
@@ -32,7 +30,7 @@ namespace Digin_Kompetanse.Controllers
         }
 
 
-
+        // === LOGIN (bedrift) ===
         [HttpGet("/auth/login")]
         public IActionResult Login()
         {
@@ -45,6 +43,7 @@ namespace Digin_Kompetanse.Controllers
             return View("~/Views/Auth/Login.cshtml");
         }
 
+        // === SLETT ENKELT-KOMPETANSERAD ===
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -63,6 +62,7 @@ namespace Digin_Kompetanse.Controllers
             return RedirectToAction(nameof(Overview));
         }
 
+        // === REGISTRERING – GET ===
         [HttpGet]
         public IActionResult Index()
         {
@@ -73,7 +73,7 @@ namespace Digin_Kompetanse.Controllers
                 return RedirectToAction("Login", "Auth");
 
             ViewBag.Fagområder = BuildFagomradeSelectList();
-            
+
             var model = new KompetanseRegistreringViewModel();
             model.Rader.Add(new KompetanseRadViewModel());
 
@@ -94,6 +94,7 @@ namespace Digin_Kompetanse.Controllers
 
             ViewBag.Fagområder = BuildFagomradeSelectList();
 
+            // Filtrer bort tomme rader
             var rader = model.Rader?
                 .Where(r => r.FagområdeId.HasValue && r.KompetanseId.HasValue)
                 .ToList() ?? new List<KompetanseRadViewModel>();
@@ -125,46 +126,60 @@ namespace Digin_Kompetanse.Controllers
                 if (kompetanse == null)
                     continue;
 
-                int? underId = null;
-                if (rad.UnderkompetanseId.HasValue)
+                // Finn hvilke underkompetanser som er valgt (eller ingen)
+                IEnumerable<int?> underIds;
+                if (rad.UnderkompetanseId != null && rad.UnderkompetanseId.Any())
                 {
-                    var under = _context.UnderKompetanse
-                        .AsNoTracking()
-                        .FirstOrDefault(uk => uk.UnderkompetanseId == rad.UnderkompetanseId.Value
-                                           && uk.KompetanseId == kompetanse.KompetanseId);
-                    if (under == null)
-                        continue;
-
-                    underId = under.UnderkompetanseId;
-                }
-
-                var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
-                    bk.BedriftId == bedrift.BedriftId &&
-                    bk.FagområdeId == fagområde.FagområdeId &&
-                    bk.KompetanseId == kompetanse.KompetanseId &&
-                    bk.UnderKompetanseId == underId
-                );
-
-                if (eksisterende == null)
-                {
-                    var bk = new BedriftKompetanse
-                    {
-                        BedriftId = bedrift.BedriftId,
-                        FagområdeId = fagområde.FagområdeId,
-                        KompetanseId = kompetanse.KompetanseId,
-                        UnderKompetanseId = underId,
-                        Beskrivelse = rad.Beskrivelse,
-                        CreatedAt = DateTime.UtcNow,
-                        IsActive = true
-                    };
-
-                    _context.BedriftKompetanse.Add(bk);
+                    underIds = rad.UnderkompetanseId
+                        .Distinct()
+                        .Select(id => (int?)id);
                 }
                 else
                 {
-                    eksisterende.Beskrivelse = rad.Beskrivelse;
-                    eksisterende.ModifiedAt = DateTime.UtcNow;
-                    eksisterende.ModifiedByBedriftId = bedrift.BedriftId;
+                    // Ingen underkompetanse valgt → lag en rad med null (kun hovedkompetanse)
+                    underIds = new int?[] { null };
+                }
+
+                foreach (var underId in underIds)
+                {
+                    if (underId.HasValue)
+                    {
+                        var under = _context.UnderKompetanse
+                            .AsNoTracking()
+                            .FirstOrDefault(uk => uk.UnderkompetanseId == underId.Value
+                                               && uk.KompetanseId == kompetanse.KompetanseId);
+                        if (under == null)
+                            continue; // ugyldig kobling → hopp over
+                    }
+
+                    var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
+                        bk.BedriftId == bedrift.BedriftId &&
+                        bk.FagområdeId == fagområde.FagområdeId &&
+                        bk.KompetanseId == kompetanse.KompetanseId &&
+                        bk.UnderKompetanseId == underId
+                    );
+
+                    if (eksisterende == null)
+                    {
+                        var bk = new BedriftKompetanse
+                        {
+                            BedriftId = bedrift.BedriftId,
+                            FagområdeId = fagområde.FagområdeId,
+                            KompetanseId = kompetanse.KompetanseId,
+                            UnderKompetanseId = underId,
+                            Beskrivelse = rad.Beskrivelse,
+                            CreatedAt = DateTime.UtcNow,
+                            IsActive = true
+                        };
+
+                        _context.BedriftKompetanse.Add(bk);
+                    }
+                    else
+                    {
+                        eksisterende.Beskrivelse = rad.Beskrivelse;
+                        eksisterende.ModifiedAt = DateTime.UtcNow;
+                        eksisterende.ModifiedByBedriftId = bedrift.BedriftId;
+                    }
                 }
             }
 
@@ -172,21 +187,58 @@ namespace Digin_Kompetanse.Controllers
             return RedirectToAction(nameof(Overview));
         }
 
+
+        private void LagreEllerOppdater(int bedriftId, int fagId, int kompId, int? underId, string? beskrivelse)
+        {
+            var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
+                bk.BedriftId == bedriftId &&
+                bk.FagområdeId == fagId &&
+                bk.KompetanseId == kompId &&
+                bk.UnderKompetanseId == underId
+            );
+
+            if (eksisterende == null)
+            {
+                var bk = new BedriftKompetanse
+                {
+                    BedriftId = bedriftId,
+                    FagområdeId = fagId,
+                    KompetanseId = kompId,
+                    UnderKompetanseId = underId,
+                    Beskrivelse = beskrivelse,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
+                _context.BedriftKompetanse.Add(bk);
+            }
+            else
+            {
+                eksisterende.Beskrivelse = beskrivelse;
+                eksisterende.ModifiedAt = DateTime.UtcNow;
+                eksisterende.ModifiedByBedriftId = bedriftId;
+            }
+        }
+
+        // === AJAX: hent kompetanser for fagområde ===
         [HttpGet]
         public JsonResult GetKompetanser(int fagområdeId)
         {
-            var kompetanser = _context.Fagområde
+            var kompetanser = _context.Kompetanse
                 .AsNoTracking()
-                .Include(f => f.Kompetanser)
-                .Where(f => f.FagområdeId == fagområdeId)
-                .SelectMany(f => f.Kompetanser)
+                .Where(k => k.Fagområder.Any(f => f.FagområdeId == fagområdeId))
                 .OrderBy(k => k.KompetanseKategori)
-                .Select(k => new { k.KompetanseId, k.KompetanseKategori })
+                .Select(k => new
+                {
+                    k.KompetanseId,
+                    k.KompetanseKategori
+                })
                 .ToList();
 
             return Json(kompetanser);
         }
 
+
+        // === AJAX: hent underkompetanser for kompetanse ===
         [HttpGet]
         public JsonResult GetUnderkompetanser(int kompetanseId)
         {
@@ -199,8 +251,8 @@ namespace Digin_Kompetanse.Controllers
 
             return Json(underkompetanser);
         }
-        
-        //      OVERSIKT
+
+        // === OVERSIKT FOR BEDRIFT ===
         [HttpGet]
         public IActionResult Overview()
         {
@@ -233,66 +285,70 @@ namespace Digin_Kompetanse.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
-        
+
+        // === INLINE-REDIGERING AV ENKELT-POST (brukes fra admin-siden) ===
         [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> EditInline(int id, [FromBody] EditInlineDto dto)
-{
-    var entry = await _context.BedriftKompetanse
-        .Include(bk => bk.Bedrift)
-        .Include(bk => bk.Fagområde)
-        .Include(bk => bk.Kompetanse)
-        .Include(bk => bk.UnderKompetanse)
-        .FirstOrDefaultAsync(bk => bk.Id == id);
-
-    if (entry == null)
-        return NotFound();
-    
-    var fag = await _context.Fagområde.FirstOrDefaultAsync(f => f.FagområdeNavn == dto.Fagomrade);
-    var komp = await _context.Kompetanse.FirstOrDefaultAsync(k => k.KompetanseKategori == dto.Kompetanse);
-    var under = await _context.UnderKompetanse.FirstOrDefaultAsync(u => u.UnderkompetanseNavn == dto.Underkompetanse);
-
-    if (fag == null || komp == null)
-        return BadRequest("Fagområde eller kompetanse ikke funnet.");
-    
-    bool exists = await _context.BedriftKompetanse.AnyAsync(bk =>
-        bk.Id != id && 
-        bk.BedriftId == entry.BedriftId &&
-        bk.FagområdeId == fag.FagområdeId &&
-        bk.KompetanseId == komp.KompetanseId &&
-        bk.UnderKompetanseId == under!.UnderkompetanseId &&
-        bk.IsActive == true
-    );
-
-    if (exists)
-    {
-        return BadRequest("Denne kombinasjonen finnes allerede for denne bedriften.");
-    }
-    
-    entry.FagområdeId = fag.FagområdeId;
-    entry.KompetanseId = komp.KompetanseId;
-    entry.UnderKompetanseId = under?.UnderkompetanseId; 
-    entry.Beskrivelse = dto.Beskrivelse;
-    entry.ModifiedAt = DateTime.UtcNow;
-    entry.ModifiedByBedriftId = entry.BedriftId;
-
-    try
-    {
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-    catch (DbUpdateException ex)
-    {
-        if (ex.InnerException is Npgsql.PostgresException pgEx && pgEx.SqlState == "23505")
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditInline(int id, [FromBody] EditInlineDto dto)
         {
-            return BadRequest("Denne kombinasjonen finnes allerede for denne bedriften.");
+            var entry = await _context.BedriftKompetanse
+                .Include(bk => bk.Bedrift)
+                .Include(bk => bk.Fagområde)
+                .Include(bk => bk.Kompetanse)
+                .Include(bk => bk.UnderKompetanse)
+                .FirstOrDefaultAsync(bk => bk.Id == id);
+
+            if (entry == null)
+                return NotFound();
+
+            var fag = await _context.Fagområde.FirstOrDefaultAsync(f => f.FagområdeNavn == dto.Fagomrade);
+            var komp = await _context.Kompetanse.FirstOrDefaultAsync(k => k.KompetanseKategori == dto.Kompetanse);
+            var under = string.IsNullOrWhiteSpace(dto.Underkompetanse)
+                ? null
+                : await _context.UnderKompetanse.FirstOrDefaultAsync(u => u.UnderkompetanseNavn == dto.Underkompetanse);
+
+            if (fag == null || komp == null)
+                return BadRequest("Fagområde eller kompetanse ikke funnet.");
+
+            var underIdWanted = under == null ? (int?)null : under.UnderkompetanseId;
+
+            bool exists = await _context.BedriftKompetanse.AnyAsync(bk =>
+                bk.Id != id &&
+                bk.BedriftId == entry.BedriftId &&
+                bk.FagområdeId == fag.FagområdeId &&
+                bk.KompetanseId == komp.KompetanseId &&
+                bk.UnderKompetanseId == underIdWanted &&
+                bk.IsActive == true
+            );
+
+            if (exists)
+            {
+                return BadRequest("Denne kombinasjonen finnes allerede for denne bedriften.");
+            }
+
+            entry.FagområdeId = fag.FagområdeId;
+            entry.KompetanseId = komp.KompetanseId;
+            entry.UnderKompetanseId = underIdWanted;
+            entry.Beskrivelse = dto.Beskrivelse;
+            entry.ModifiedAt = DateTime.UtcNow;
+            entry.ModifiedByBedriftId = entry.BedriftId;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
+            {
+                return BadRequest("Denne kombinasjonen finnes allerede for denne bedriften.");
+            }
         }
 
-        throw; 
-    }
-}
         public class EditInlineDto
         {
             public string Fagomrade { get; set; } = "";
@@ -300,6 +356,8 @@ public async Task<IActionResult> EditInline(int id, [FromBody] EditInlineDto dto
             public string Underkompetanse { get; set; } = "";
             public string Beskrivelse { get; set; } = "";
         }
+
+        // === AJAX for admin-filter (tekst-basert) ===
         [HttpGet]
         public async Task<IActionResult> GetFagomrader()
         {
@@ -331,6 +389,7 @@ public async Task<IActionResult> EditInline(int id, [FromBody] EditInlineDto dto
                 .Select(u => u.UnderkompetanseNavn)
                 .Distinct()
                 .ToListAsync();
+
             return Json(underkompetanser);
         }
     }

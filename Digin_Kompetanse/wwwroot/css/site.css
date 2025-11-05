@@ -21,17 +21,17 @@ body {
 
 /* Hvis admin */
 body.role-admin .navbar .nav-link {
-    margin-right: 0;
+    margin-right: 0.8rem;
 }
 
 /* Hvis bedrift */
 body.role-bedrift .navbar .nav-link {
-    margin-right: 0;
+    margin-right: 1rem;
 }
 
 /* Hvis gjest */
 body.role-guest .navbar .nav-link {
-    margin-right: 0;
+    margin-right: 0.8rem;
 }
 
 main {
@@ -113,10 +113,6 @@ p {
     font-size: 16px;
 }
 
-.center {
-    text-align: center;
-}
-
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -137,20 +133,26 @@ form {
 }
 
 .form-container {
-    max-width: 400px;
+    max-width: 700px;   
+    width: 100%;        
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px 30px; 
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch; 
     background-color: #fff;
 }
+
 
 .form-group {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-bottom: 16px;
+}
+
+.kompetanse-row.card {
+    width: 100%;
 }
 
 form input, form textarea, form button, form select {
@@ -179,12 +181,11 @@ form input, form textarea, form button, form select {
 
 .navbar-nav {
     display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start; /* fortsatt starter fra venstre */
-    gap: 5rem; /* større mellomrom mellom lenkene */
-    margin: 0;
+    align-items: center;
+    gap: 60px; /* avstand mellom lenker */
+    padding-left: 0;
+    margin-left: 50px;
     list-style: none;
-    width: 100%;
 }
 
 .navbar .nav-link {
@@ -243,16 +244,72 @@ form input, form textarea, form button, form select {
     width: 100%;
 }
 
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-check {
+    display: inline-flex;
+    align-items: center;
+}
+
+.tag-check-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tag-check-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    border: 1.5px solid #0098D1;
+    background-color: #ffffff;
+    color: #222;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+}
+
+.tag-check-label::before {
+    content: "+";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    border: 1px solid #0098D1;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.tag-check-input:checked + .tag-check-label {
+    background-color: #0098D1;
+    border-color: #0098D1;
+    color: #ffffff;
+}
+
+.tag-check-input:checked + .tag-check-label::before {
+    content: "✓";
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.tag-check-input:focus + .tag-check-label {
+    box-shadow: 0 0 0 2px rgba(0, 152, 209, 0.3);
+}
+
+
 
 /* Hjemside */
 
 /*plassering av kompetanse elementer */
-
-.kompetanse-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
 
 .kompetanse-group {
     display: flex;
@@ -425,11 +482,8 @@ select[multiple] {
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     padding: 40px 50px;
-    width: 110%;
+    width: 420px;
     text-align: center;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 /* Tittel */
@@ -697,6 +751,21 @@ body.admin-dashboard {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
+}
+
+.kompetanse-row.card {
+    border-radius: 12px;
+    border-color: #e5edf5;
+}
+
+.kompetanse-row .form-label {
+    font-weight: 600;
+}
+
+.kompetanse-row .form-control,
+.kompetanse-row .form-select {
+    background-color: #f8fafc;
+    border-radius: 8px;
 }
 
 .filter-bar {

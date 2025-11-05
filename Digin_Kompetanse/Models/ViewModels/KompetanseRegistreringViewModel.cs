@@ -15,8 +15,8 @@ namespace Digin_Kompetanse.Models.ViewModels
 
         [Required(ErrorMessage = "Velg minst én kompetanse")]
         public int? KompetanseId { get; set; }
-
-        public int? UnderkompetanseId { get; set; }
+        
+        public List<int> UnderkompetanseId { get; set; } = new();
 
         [StringLength(500, ErrorMessage = "Beskrivelse kan maks være 500 tegn")]
         public string? Beskrivelse { get; set; }
