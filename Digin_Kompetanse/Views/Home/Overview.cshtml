@@ -1,17 +1,18 @@
 @model IEnumerable<Digin_Kompetanse.Models.BedriftKompetanse>
+
 @{
-    ViewData["Title"] = "Kompetanseoversikt";
+ViewData["Title"] = "Kompetanseoversikt";
 
-    var rader = Model
-        .OrderBy(bk => bk.Bedrift?.BedriftNavn)
-        .ThenBy(bk => bk.Fagområde?.FagområdeNavn)
-        .ThenBy(bk => bk.Kompetanse?.KompetanseKategori)
-        .ToList();
+var rader = Model
+.OrderBy(bk => bk.Bedrift?.BedriftNavn)
+.ThenBy(bk => bk.Fagområde?.FagområdeNavn)
+.ThenBy(bk => bk.Kompetanse?.KompetanseKategori)
+.ToList();
 
-    var grupper = rader
-        .GroupBy(bk => bk.Bedrift?.BedriftNavn ?? "(Ukjent bedrift)")
-        .OrderBy(g => g.Key)
-        .ToList();
+var grupper = rader
+.GroupBy(bk => bk.Bedrift?.BedriftNavn ?? "(Ukjent bedrift)")
+.OrderBy(g => g.Key)
+.ToList();
 }
 
 <div class="container mt-5">
@@ -19,87 +20,91 @@
 
     @if (!grupper.Any())
     {
-        <p class="text-muted">Ingen innsendte kompetanser ennå.</p>
+    <p class="text-muted">Ingen innsendte kompetanser ennå.</p>
     }
     else
     {
-        foreach (var bedriftGruppe in grupper)
-        {
-            var bedriftNavn = bedriftGruppe.Key;
-            var bedrift = bedriftGruppe.FirstOrDefault()?.Bedrift;
+    foreach (var bedriftGruppe in grupper)
+    {
+    var bedriftNavn = bedriftGruppe.Key;
+    var bedrift = bedriftGruppe.FirstOrDefault()?.Bedrift;
 
-            <div class="mb-5">
-                <h4 class="text-secondary border-bottom pb-2">
-                    @bedriftNavn
-                    @if (!string.IsNullOrWhiteSpace(bedrift?.BedriftEpost))
-                    {
-                        <small class="text-muted">(@bedrift.BedriftEpost)</small>
-                    }
-                </h4>
+    <div class="mb-5">
+        <h4 class="text-secondary border-bottom pb-2">
+            @bedriftNavn
+            @if (!string.IsNullOrWhiteSpace(bedrift?.BedriftEpost))
+            {
+            <small class="text-muted">(@bedrift.BedriftEpost)</small>
+            }
+        </h4>
 
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col" style="width:20%">Fagområde</th>
-                                <th scope="col" style="width:20%">Kompetanse</th>
-                                <th scope="col" style="width:20%">Underkompetanse</th>
-                                <th scope="col" style="width:22%">Beskrivelse</th>
-                                <th scope="col" style="width:10%">Dato</th>
-                                <th scope="col" style="width:8%">Handling</th>   @* NY KOLONNE *@
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in bedriftGruppe)
-                            {
-                                <tr>
-                                    <td>@(item.Fagområde?.FagområdeNavn ?? "—")</td>
-                                    <td>@(item.Kompetanse?.KompetanseKategori ?? "—")</td>
-                                    <td>@(item.UnderKompetanse?.UnderkompetanseNavn ?? "Ingen")</td>
-                                    <td>
-                                        @{
-                                            var text = string.IsNullOrWhiteSpace(item.Beskrivelse) ? "—" : item.Beskrivelse!;
-                                            var shortText = text.Length > 120 ? text[..120] + "…" : text;
-                                        }
-                                        <span class="d-inline-block text-truncate"
-                                              style="max-width: 420px"
-                                              title="@text">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col" style="width:20%">Fagområde</th>
+                    <th scope="col" style="width:20%">Kompetanse</th>
+                    <th scope="col" style="width:20%">Underkompetanse</th>
+                    <th scope="col" style="width:22%">Beskrivelse</th>
+                    <th scope="col" style="width:10%">Dato</th>
+                    <th scope="col" style="width:8%">Handling</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in bedriftGruppe)
+                {
+                <tr>
+                    <td>@(item.Fagområde?.FagområdeNavn ?? "—")</td>
+                    <td>@(item.Kompetanse?.KompetanseKategori ?? "—")</td>
+                    <td>@(item.UnderKompetanse?.UnderkompetanseNavn ?? "Ingen")</td>
+                    <td>
+                        @{
+                        var text = string.IsNullOrWhiteSpace(item.Beskrivelse) ? "—" : item.Beskrivelse!;
+                        var shortText = text.Length > 120 ? text[..120] + "…" : text;
+                        }
+                        <span class="d-inline-block text-truncate"
+                              style="max-width: 420px"
+                              title="@text">
                                             @shortText
                                         </span>
-                                    </td>
-                                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
-                                    <td>
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-primary me-1 edit-btn"
-                                                data-id="@item.Id">
-                                            Rediger
-                                        </button>
+                    </td>
+                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                    <td>
+                        <!-- === OPPDATERT HANDLINGS-KOLONNE === -->
+                        <button type="button"
+                                class="btn btn-edit btn-sm me-1 edit-btn"
+                                title="Rediger"
+                                data-id="@item.Id">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
 
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-success me-1 save-btn d-none"
-                                                data-id="@item.Id">
-                                            Lagre
-                                        </button>
+                        <button type="button"
+                                class="btn btn-save btn-sm me-1 save-btn d-none"
+                                title="Lagre"
+                                data-id="@item.Id">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
 
-                                        <form asp-action="Delete"
-                                              asp-controller="Home"
-                                              asp-route-id="@item.Id"
-                                              method="post"
-                                              class="d-inline">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger">
-                                                Slett
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        }
+                        <form asp-action="Delete"
+                              asp-controller="Home"
+                              asp-route-id="@item.Id"
+                              method="post"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit"
+                                    class="btn btn-delete btn-sm"
+                                    title="Slett">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
     }
 </div>
 
@@ -126,9 +131,7 @@
                 const beskrivelseVal = cells[3].textContent.trim();
 
                 // Hent fagområder
-    
-             const fagResponse = await fetch('/fagomrade');
-
+                const fagResponse = await fetch('/fagomrade');
                 const fagomrader = await fagResponse.json();
 
                 // Lag dropdown for fagområde
@@ -137,11 +140,10 @@
                 fagSelect.innerHTML = fagomrader.map(f =>
                     `<option value="${f}" ${f === fagomradeVal ? 'selected' : ''}>${f}</option>`).join('');
 
-                // Sett cellen til select
                 cells[0].innerHTML = "";
                 cells[0].appendChild(fagSelect);
 
-                // Kompetanse dropdown (lastes når fagområde endres)
+                // Kompetanse dropdown
                 const kompSelect = document.createElement("select");
                 kompSelect.classList.add("form-select", "form-select-sm");
                 cells[1].innerHTML = "";
@@ -153,7 +155,6 @@
                 cells[2].innerHTML = "";
                 cells[2].appendChild(underSelect);
 
-                // Fyll inn kompetanser + underkompetanser initialt
                 async function loadKompetanser(fag) {
                     const res = await fetch(`/kompetanse/byFagomrade?fagomrade=${encodeURIComponent(fag)}`);
                     const kompetanser = await res.json();
@@ -162,7 +163,6 @@
                     await loadUnderkompetanser(kompSelect.value);
                 }
 
-
                 async function loadUnderkompetanser(kompetanse) {
                     const res = await fetch(`/underkompetanse/byKompetanse?kompetanse=${encodeURIComponent(kompetanse)}`);
                     const underkompetanser = await res.json();
@@ -170,20 +170,16 @@
                         `<option value="${u}" ${u === underVal ? 'selected' : ''}>${u}</option>`).join('');
                 }
 
-                // Når fagområde endres → last nye kompetanser
                 fagSelect.addEventListener("change", async () => {
                     await loadKompetanser(fagSelect.value);
                 });
 
-                // Når kompetanse endres → last nye underkompetanser
                 kompSelect.addEventListener("change", async () => {
                     await loadUnderkompetanser(kompSelect.value);
                 });
 
-                // Last første sett
                 await loadKompetanser(fagSelect.value);
 
-                // Beskrivelse som textarea
                 cells[3].innerHTML = `<textarea class="form-control form-control-sm">${beskrivelseVal}</textarea>`;
             }
 
@@ -210,7 +206,6 @@
                 });
 
                 if (response.ok) {
-                    // Oppdater visningen
                     cells[0].textContent = fagomrade;
                     cells[1].textContent = kompetanse;
                     cells[2].textContent = underkompetanse;

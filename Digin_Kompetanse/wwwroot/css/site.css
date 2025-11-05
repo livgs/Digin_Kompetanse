@@ -712,4 +712,70 @@ body.admin-dashboard {
     margin-right: 0;
 }
 
+/* KNAPP 4, 5 og 6: Rediger, lagre og slett */
+.btn-edit,
+.btn-save,
+.btn-delete {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+    margin: 0 3px;
+}
 
+.btn-edit {
+    background-color: #009FE3;
+}
+.btn-edit:hover {
+    background-color: #005ecb;
+}
+
+.btn-save {
+    background-color: #28a745;
+}
+.btn-save:hover {
+    background-color: #218838;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+}
+.btn-delete:hover {
+    background-color: #b02a37;
+}
+
+.btn i {
+    font-size: 1.2rem;
+}
+
+td .btn {
+    margin-right: 4px;
+    margin-left: 0;
+}
+
+.btn:focus,
+.btn:active {
+    outline: none;
+    box-shadow: none;
+    transform: none;
+}
+
+td:last-child {
+    text-align: center;
+    vertical-align: middle;
+}
+
+td .btn {
+    margin: 3px;
+}
+
+td .btn i {
+    vertical-align: middle;
+}
