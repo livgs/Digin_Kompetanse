@@ -21,17 +21,17 @@ body {
 
 /* Hvis admin */
 body.role-admin .navbar .nav-link {
-    margin-right: 0.8rem;
+    margin-right: 0;
 }
 
 /* Hvis bedrift */
 body.role-bedrift .navbar .nav-link {
-    margin-right: 1rem;
+    margin-right: 0;
 }
 
 /* Hvis gjest */
 body.role-guest .navbar .nav-link {
-    margin-right: 0.8rem;
+    margin-right: 0;
 }
 
 main {
@@ -113,6 +113,10 @@ p {
     font-size: 16px;
 }
 
+.center {
+    text-align: center;
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -175,11 +179,12 @@ form input, form textarea, form button, form select {
 
 .navbar-nav {
     display: flex;
-    align-items: center;
-    gap: 60px; /* avstand mellom lenker */
-    padding-left: 0;
-    margin-left: 50px;
+    flex-wrap: nowrap;
+    justify-content: flex-start; /* fortsatt starter fra venstre */
+    gap: 5rem; /* større mellomrom mellom lenkene */
+    margin: 0;
     list-style: none;
+    width: 100%;
 }
 
 .navbar .nav-link {
@@ -242,6 +247,12 @@ form input, form textarea, form button, form select {
 /* Hjemside */
 
 /*plassering av kompetanse elementer */
+
+.kompetanse-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
 
 .kompetanse-group {
     display: flex;
@@ -414,8 +425,11 @@ select[multiple] {
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     padding: 40px 50px;
-    width: 420px;
+    width: 110%;
     text-align: center;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* Tittel */

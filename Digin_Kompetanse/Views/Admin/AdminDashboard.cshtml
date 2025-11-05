@@ -92,35 +92,33 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
 
     <!-- Innsendingstabell -->
     <div class="step">
-        <h5><strong>Innsendinger</strong></h5>
+        <h5 class="center"><strong>Innsendinger</strong></h5>
+        
+        @if (Model?.Any() != true)
+        {
+            <!-- Ingen innsendinger -->
+            <div class="text-muted py-4">Ingen treff på valgt filter.</div>
+        }
+        else
+        {
+            @foreach (var item in Model!)
+            {
+                <!-- Bedrift og e-post utenfor tabellen -->
+                <p class="mt-4 mb-1" style="color: #555;">@item.BedriftNavn: @item.Epost</p>
 
-        <div class="table-responsive">
-            <table class="table table-striped align-middle text-center mb-0">
-                <thead class="table-light">
-                <tr>
-                    <th>Bedrift</th>
-                    <th>E-post</th>
-                    <th>Fagområde</th>
-                    <th>Kompetanse</th>
-                    <th>Underkompetanse</th>
-                    <th>Beskrivelse</th>
-                    <th>Handling</th>
-                </tr>
-                </thead>
-                <tbody>
-                @if (Model?.Any() != true)
-                {
-                    <tr>
-                        <td colspan="7" class="text-muted py-4">Ingen treff på valgt filter.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var item in Model!)
-                    {
+                <div class="table-responsive mb-4">
+                    <table class="table table-striped align-middle text-center mb-0">
+                        <thead class="table-light">
                         <tr>
-                            <td>@item.BedriftNavn</td>
-                            <td>@item.Epost</td>
+                            <th>Fagområde</th>
+                            <th>Kompetanse</th>
+                            <th>Underkompetanse</th>
+                            <th>Beskrivelse</th>
+                            <th>Handling</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
                             <td>@item.Fagområde</td>
                             <td>@item.KompetanseKategori</td>
                             <td>@(string.IsNullOrEmpty(item.UnderKompetanse) ? "-" : item.UnderKompetanse)</td>
@@ -139,11 +137,11 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                                 </form>
                             </td>
                         </tr>
-                    }
-                }
-                </tbody>
-            </table>
-        </div>
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
     </div>
 </div>
 
