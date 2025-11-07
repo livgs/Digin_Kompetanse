@@ -24,15 +24,9 @@
         {
             <div class="kompetanse-row card shadow-sm mb-4" data-index="@i">
                 <div class="card-body">
-
-                    <!-- Fagområde -->
                     <div class="mb-3">
-                        <label asp-for="Rader[i].FagområdeId" class="form-label fw-semibold">
-                            Fagområde
-                        </label>
-                        <select asp-for="Rader[i].FagområdeId"
-                                asp-items="@(ViewBag.Fagområder as SelectList)"
-                                class="form-select js-fagomrade">
+                        <label asp-for="Rader[i].FagområdeId" class="form-label fw-semibold">Fagområde</label>
+                        <select asp-for="Rader[i].FagområdeId" asp-items="@(ViewBag.Fagområder as SelectList)" class="form-select js-fagomrade">
                             <option value="">Velg fagområde</option>
                         </select>
                         <span asp-validation-for="Rader[i].FagområdeId" class="text-danger"></span>
@@ -49,8 +43,7 @@
                         </select>
                         <span asp-validation-for="Rader[i].KompetanseId" class="text-danger"></span>
                     </div>
-
-                    <!-- Underkompetanse (chips / sjekkbokser, flervalg) -->
+                    
                     <div class="mb-3 underkompetanse-group d-none">
                         <label class="form-label fw-semibold">
                             Underkompetanse (valgfritt)
@@ -59,20 +52,15 @@
                             <p class="text-muted mb-0">Velg kompetanse først</p>
                         </div>
                     </div>
-
-                    <!-- Beskrivelse -->
+                    
                     <div class="mb-3">
                         <label asp-for="Rader[i].Beskrivelse" class="form-label fw-semibold">
                             Beskrivelse
                         </label>
-                        <textarea asp-for="Rader[i].Beskrivelse"
-                                  rows="2"
-                                  class="form-control"
-                                  placeholder="Beskrivelse (valgfritt)"></textarea>
+                        <textarea asp-for="Rader[i].Beskrivelse" rows="2" class="form-control" placeholder="Beskrivelse (valgfritt)"></textarea>
                         <span asp-validation-for="Rader[i].Beskrivelse" class="text-danger"></span>
                     </div>
-
-                    <!-- Fjern-knapp -->
+                    
                     <div class="text-end">
                         <button type="button"
                                 class="btn btn-outline-danger btn-sm js-remove-row">
@@ -99,184 +87,7 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        const getKompetanserUrl = '@Url.Action("GetKompetanser", "Home")';
-        const getUnderkompetanserUrl = '@Url.Action("GetUnderkompetanser", "Home")';
-
-        // --- Legg til rad ---
-        let rowIndex = document.querySelectorAll(".kompetanse-row").length || 0;
-
-        document.getElementById("add-row").addEventListener("click", function () {
-            const container = document.getElementById("kompetanse-container");
-            const firstRow = container.querySelector(".kompetanse-row");
-            const clone = firstRow.cloneNode(true);
-
-            clone.setAttribute("data-index", rowIndex);
-
-            // Oppdater navn/id på inputs
-            clone.querySelectorAll("select, textarea").forEach(el => {
-                const name = el.getAttribute("name");
-                if (name) {
-                    el.name = name.replace(/\[\d+\]/, `[${rowIndex}]`);
-                }
-                const id = el.getAttribute("id");
-                if (id) {
-                    el.id = id.replace(/_\d+__/, `_${rowIndex}__`);
-                }
-            });
-
-            const fagSelect = clone.querySelector(".js-fagomrade");
-            const kompGroup = clone.querySelector(".kompetanse-group");
-            const kompSelect = clone.querySelector(".js-kompetanse");
-            const underGroup = clone.querySelector(".underkompetanse-group");
-            const underContainer = clone.querySelector(".js-underkompetanse-container");
-            const beskrivelse = clone.querySelector("textarea");
-
-            if (fagSelect) fagSelect.value = "";
-            if (kompSelect) {
-                kompSelect.innerHTML = '<option value="">Velg et fagområde først.</option>';
-                kompSelect.disabled = true;
-            }
-            if (kompGroup) kompGroup.classList.add("d-none");
-
-            if (underGroup && underContainer) {
-                underGroup.classList.add("d-none");
-                underContainer.innerHTML = '<p class="text-muted mb-0">Velg kompetanse først.</p>';
-            }
-            if (beskrivelse) beskrivelse.value = "";
-
-            // Nullstill valideringsmeldinger
-            clone.querySelectorAll("span[data-valmsg-for]").forEach(span => {
-                const valFor = span.getAttribute("data-valmsg-for");
-                if (valFor) {
-                    span.setAttribute("data-valmsg-for", valFor.replace(/\[\d+\]/, `[${rowIndex}]`));
-                }
-                span.innerHTML = "";
-            });
-
-            container.appendChild(clone);
-            rowIndex++;
-        });
-
-        // --- Fjern rad ---
-        document.addEventListener("click", function (e) {
-            if (e.target.matches(".js-remove-row")) {
-                const container = document.getElementById("kompetanse-container");
-                const rows = container.querySelectorAll(".kompetanse-row");
-                if (rows.length > 1) {
-                    e.target.closest(".kompetanse-row").remove();
-                }
-            }
-        });
-
-        function setLoading(selectEl, loading) {
-            if (!selectEl) return;
-            selectEl.disabled = loading;
-        }
-
-        // --- Fagområde → kompetanser ---
-        document.addEventListener("change", async function (e) {
-            if (!e.target.matches(".js-fagomrade")) return;
-
-            const fagSelect = e.target;
-            const row = fagSelect.closest(".kompetanse-row");
-            const fagId = fagSelect.value;
-
-            const kompGroup = row.querySelector(".kompetanse-group");
-            const kompSelect = row.querySelector(".js-kompetanse");
-            const underGroup = row.querySelector(".underkompetanse-group");
-            const underContainer = row.querySelector(".js-underkompetanse-container");
-
-            // Reset kompetanse + underkompetanse
-            kompSelect.innerHTML = '<option value="">Velg et fagområde først.</option>';
-            kompSelect.disabled = true;
-            if (kompGroup) kompGroup.classList.add("d-none");
-
-            if (underGroup && underContainer) {
-                underGroup.classList.add("d-none");
-                underContainer.innerHTML = '<p class="text-muted mb-0">Velg kompetanse først.</p>';
-            }
-
-            if (!fagId) return;
-
-            try {
-                setLoading(kompSelect, true);
-                const res = await fetch(`${getKompetanserUrl}?fagområdeId=${encodeURIComponent(fagId)}`);
-                if (!res.ok) throw new Error('Kunne ikke hente kompetanser');
-
-                const data = await res.json();
-                kompSelect.innerHTML = '<option value="">Velg kompetanse</option>';
-                for (const k of data) {
-                    const opt = document.createElement("option");
-                    opt.value = k.kompetanseId;
-                    opt.text = k.kompetanseKategori;
-                    kompSelect.appendChild(opt);
-                }
-                kompSelect.disabled = false;
-                if (kompGroup) kompGroup.classList.remove("d-none");
-            } catch (err) {
-                alert(err.message);
-            } finally {
-                setLoading(kompSelect, false);
-            }
-        });
-
-        // --- Kompetanse → underkompetanse (chips / sjekkbokser) ---
-        document.addEventListener("change", async function (e) {
-            if (!e.target.matches(".js-kompetanse")) return;
-
-            const kompSelect = e.target;
-            const row = kompSelect.closest(".kompetanse-row");
-            const rowIdx = row.getAttribute("data-index");
-            const kompetanseId = kompSelect.value;
-
-            const underGroup = row.querySelector(".underkompetanse-group");
-            const underContainer = row.querySelector(".js-underkompetanse-container");
-
-            underContainer.innerHTML = '';
-
-            if (!kompetanseId) {
-                underGroup.classList.add("d-none");
-                underContainer.innerHTML = '<p class="text-muted mb-0">Velg kompetanse først.</p>';
-                return;
-            }
-
-            try {
-                const res = await fetch(`${getUnderkompetanserUrl}?kompetanseId=${encodeURIComponent(kompetanseId)}`);
-                if (!res.ok) throw new Error('Kunne ikke hente underkompetanser');
-
-                const data = await res.json();
-
-                if (!data.length) {
-                    underContainer.innerHTML = '<p class="text-muted mb-0">Ingen underkompetanser registrert.</p>';
-                } else {
-                    for (const uk of data) {
-                        const wrapper = document.createElement("div");
-                        wrapper.className = "tag-check";              // chip-wrapper
-
-                        const input = document.createElement("input");
-                        input.type = "checkbox";
-                        input.className = "tag-check-input";          // skjult checkbox
-                        input.name = `Rader[${rowIdx}].UnderkompetanseId`;
-                        input.value = uk.underkompetanseId;
-                        const inputId = `Rader_${rowIdx}__UnderkompetanseId_${uk.underkompetanseId}`;
-                        input.id = inputId;
-
-                        const label = document.createElement("label");
-                        label.className = "tag-check-label";          // pill-knappen
-                        label.htmlFor = inputId;
-                        label.textContent = uk.underkompetanseNavn;
-
-                        wrapper.appendChild(input);
-                        wrapper.appendChild(label);
-                        underContainer.appendChild(wrapper);
-                    }
-                }
-
-                underGroup.classList.remove("d-none");
-            } catch (err) {
-                alert(err.message);
-                underGroup.classList.add("d-none");
-            }
-        });
+        window.getKompetanserUrl = '@Url.Action("GetKompetanser", "Home")';
+        window.getUnderkompetanserUrl = '@Url.Action("GetUnderkompetanser", "Home")';
     </script>
 }

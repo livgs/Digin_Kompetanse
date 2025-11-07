@@ -1,3 +1,12 @@
+:root {
+    --digin-blue: #0098D1;
+    --digin-blue-dark: #0087b8;
+    --font-digin-body: "DM Sans", sans-serif;
+    --font-digin-nav: "Mulish", sans-serif;
+}
+
+/* Layout generelt  */
+
 @media (min-width: 768px) {
     form .step {
         width: 90%;
@@ -16,23 +25,12 @@ body {
     flex-direction: column;
     min-height: 100vh;
     background-color: #f8f9fa;
-    font-family: "DM Sans", sans-serif;
 }
 
-/* Hvis admin */
-body.role-admin .navbar .nav-link {
-    margin-right: 0.8rem;
-}
-
-/* Hvis bedrift */
-body.role-bedrift .navbar .nav-link {
-    margin-right: 1rem;
-}
-
-/* Hvis gjest */
-body.role-guest .navbar .nav-link {
-    margin-right: 0.8rem;
-}
+/* Rolle-avhengig navbar spacing */
+body.role-admin .navbar .nav-link { margin-right: 0.8rem; }
+body.role-bedrift .navbar .nav-link { margin-right: 1rem; }
+body.role-guest .navbar .nav-link  { margin-right: 0.8rem; }
 
 main {
     flex: 1;
@@ -52,97 +50,81 @@ main {
     text-align: center;
 }
 
+.footer a {
+    color: var(--digin-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+.footer a:hover {
+    color: var(--digin-blue-dark);
+    text-decoration: underline;
+}
+
+/* Typografi */
+
 h1, h2, h3, h4, h6 {
     font-family: "DM Sans", sans-serif;
     font-weight: 500;
-    font-style: normal;
     text-align: center;
-
 }
 
-/* kompetansetabell */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 2rem;
-    font-size: 0.95rem;
-}
-
-.table th,
-.table td {
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-}
-
-.table thead {
-    background-color: #f5f5f5;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #f0f8ff;
-}
-
-/* tekstfarger */
-.text-primary {
-    color: #007BFF;
-}
-.text-muted {
-    color: #6c757d;
+h2 {
+    margin-bottom: 5px;
+    color: var(--digin-blue);
+    padding: 10px;
+    font-weight: 600;
 }
 
 h5, li, ol, ul {
     text-align: left;
     font-family: "DM Sans", sans-serif;
     font-weight: 500;
-    font-style: normal;
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 5px;
-    color: #0098D1;
-    padding: 10px;
-    font-weight: 600;
 }
 
 p {
     font-family: "DM Sans", sans-serif;
     font-weight: 500;
-    font-style: normal;
     margin: 20px;
     font-size: 16px;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+/* tekstfarger */
+.text-primary { color: var(--digin-blue); }
+.text-muted   { color: #6c757d; }
+
+/* Fokus */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-.nav-item .btn i {
-    font-size: 1.1em;
-    vertical-align: middle;
-}
+/* Skjema */
 
 form {
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 16px;
-    width: 100%;        
-    max-width: 100%;     
+    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
 }
 
 .form-container {
-    max-width: 700px;   
-    width: 100%;        
+    max-width: 700px;
+    width: 100%;
     margin: 0 auto;
-    padding: 20px 30px; 
+    padding: 20px 30px;
     display: flex;
     flex-direction: column;
-    align-items: stretch; 
+    align-items: stretch;
     background-color: #fff;
 }
-
 
 .form-group {
     display: flex;
@@ -153,96 +135,53 @@ form {
 
 .kompetanse-row.card {
     width: 100%;
+    border-radius: 12px;
+    border-color: #e5edf5;
 }
 
-form input, form textarea, form button, form select {
+.kompetanse-row .form-label { font-weight: 600; }
+
+.kompetanse-row .form-control,
+.kompetanse-row .form-select {
+    background-color: #f8fafc;
+    border-radius: 8px;
+}
+
+form input,
+form textarea,
+form button,
+form select {
     width: 100%;
     box-sizing: border-box;
     padding: 0 24px;
     font-size: 16px;
     height: 50px;
-    border: #0098D1 solid 1px;
+    border: 1px solid var(--digin-blue);
     border-radius: 6px;
     background-color: #F8F8F8;
 }
 
-/* Navbar container */
-.navbar {
+select[multiple] {
+    overflow-y: auto;
+    max-height: 40px;
+    min-height: 40px;
+    font-size: 16px;
+    border: 1px solid var(--digin-blue);
+    border-radius: 6px;
+    background-color: #F8F8F8;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.hidden { display: none; }
+
+.button-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
-    background-color: #F7F7F7;
-    font-family: "Mulish", sans-serif;
-    font-weight: 500;
-    font-size: 15px;
-    margin-top: 0;
-    padding: 10px 20px;
-}
-
-.navbar-nav {
-    display: flex;
-    align-items: center;
-    gap: 60px; /* avstand mellom lenker */
-    padding-left: 0;
-    margin-left: 50px;
-    list-style: none;
-}
-
-.navbar .nav-link {
-  font-family: "Mulish", sans-serif;
-  font-weight: 400;
-  font-size: 20px;
-  flex: unset; 
-  text-decoration: none;
-  text-align: center; 
-  position: relative;
-  transition: color 0.2s ease-in-out;
-  margin-right: 0;
-  margin-top: 0;  
-  color: #212529;
-  padding-bottom: 4px;
-}
-
-/* Hover effekt */
-.navbar .nav-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 0;
-  height: 2px;
-  background-color: #0098D1;
-  transition: width 0.25s ease-in-out;
-  border-radius: 1px;
-}
-
-.navbar .nav-link:hover {
-    color: #212529;}
-
-.navbar .nav-link:hover::after {
     width: 100%;
 }
 
-.navbar .nav-link.active {
-    font-weight: 700;
-    color: #0098D1;
-}
-
-/* Understrek aktiv side i navbar */
-.navbar .nav-link.active-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #0098D1; /* blå underline */
-    border-radius: 1px;
-}
-
-.navbar .nav-link:hover::after {
-    width: 100%;
-}
+/* Checkbokser */
 
 .tag-list {
     display: flex;
@@ -267,12 +206,14 @@ form input, form textarea, form button, form select {
     gap: 0.4rem;
     padding: 0.35rem 0.9rem;
     border-radius: 999px;
-    border: 1.5px solid #0098D1;
+    border: 1.5px solid var(--digin-blue);
     background-color: #ffffff;
     color: #222;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    transition: background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
     user-select: none;
 }
 
@@ -284,14 +225,14 @@ form input, form textarea, form button, form select {
     width: 16px;
     height: 16px;
     border-radius: 999px;
-    border: 1px solid #0098D1;
+    border: 1px solid var(--digin-blue);
     font-size: 0.75rem;
     line-height: 1;
 }
 
 .tag-check-input:checked + .tag-check-label {
-    background-color: #0098D1;
-    border-color: #0098D1;
+    background-color: var(--digin-blue);
+    border-color: var(--digin-blue);
     color: #ffffff;
 }
 
@@ -305,11 +246,76 @@ form input, form textarea, form button, form select {
     box-shadow: 0 0 0 2px rgba(0, 152, 209, 0.3);
 }
 
+/* Navbar */
 
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F7F7F7;
+    font-family: "Mulish", sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    margin-top: 0;
+    padding: 10px 20px;
+}
 
-/* Hjemside */
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    padding-left: 0;
+    margin-left: 50px;
+    list-style: none;
+}
 
-/*plassering av kompetanse elementer */
+.navbar .nav-link {
+    font-family: "Mulish", sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+    transition: color 0.2s ease-in-out;
+    margin-right: 0;
+    margin-top: 0;
+    color: #212529;
+    padding-bottom: 4px;
+}
+
+/* Hover */
+.navbar .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--digin-blue);
+    transition: width 0.25s ease-in-out;
+    border-radius: 1px;
+}
+
+.navbar .nav-link:hover { color: #212529; }
+.navbar .nav-link:hover::after { width: 100%; }
+
+.navbar .nav-link.active {
+    font-weight: 700;
+    color: var(--digin-blue);
+}
+
+.navbar .nav-link.active-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--digin-blue);
+    border-radius: 1px;
+}
+
+/* Hjemside / knapper */
 
 .kompetanse-group {
     display: flex;
@@ -320,19 +326,19 @@ form input, form textarea, form button, form select {
 
 .btn-submit {
     height: 50px;
-    width:245px;
+    width: 245px;
     padding: 0 24px;
     background-color: white;
     align-items: center;
-    color: #0098D1;
-    border-radius:6px;
-    border-color: #0098D1;
+    color: var(--digin-blue);
+    border-radius: 6px;
+    border-color: var(--digin-blue);
     margin: 0 auto;
     display: block;
 }
 
 .btn-submit:hover {
-    background-color: #0098D1;
+    background-color: var(--digin-blue-dark);
     color: white;
 }
 
@@ -342,13 +348,11 @@ form input, form textarea, form button, form select {
     cursor: pointer;
     text-align: center;
 }
-
 .no-link:hover {
     color: #6c757d;
     text-decoration: underline;
 }
 
-/* Knapper i tabeller/skjema */
 .actions {
     display: flex;
     justify-content: flex-end;
@@ -357,14 +361,15 @@ form input, form textarea, form button, form select {
     margin: .5rem 0;
 }
 
-/* Ikoner */
+.nav-item .btn i { font-size: 1.1em; vertical-align: middle; }
+
+/* Ikoner (edit/save) */
 .btn.btn--edit {
     --icon: url('data:image/svg+xml;utf8,\
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
 <path d="M3 17.25V21h3.75L20.81 6.94a1 1 0 0 0 0-1.41L18.47 3.2a1 1 0 0 0-1.41 0L3 17.25Z"/>\
 </svg>');
 }
-
 .btn.btn--save {
     --icon: url('data:image/svg+xml;utf8,\
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\
@@ -372,32 +377,8 @@ form input, form textarea, form button, form select {
 </svg>');
 }
 
-select[multiple] {
-    overflow-y: auto;
-    max-height: 40px;
-    min-height: 40px;
-    font-size: 16px;
-    border: #0098D1 solid 1px;
-    border-radius: 6px;
-    background-color: #F8F8F8;
-    width: 100%;
-    box-sizing: border-box;
-}
+/* Hjelp-side */
 
-.hidden {
-    display: none;
-}
-
-.button-wrapper {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-
-/* Hjelp side */
-
-/* Midtstill hele hjelpeseksjonen */
 .help {
     display: flex;
     flex-direction: column;
@@ -409,17 +390,17 @@ select[multiple] {
 .step {
     width: 600px;
     text-align: left;
-    background-color: #ffffff; 
-    padding: 20px 25px;         
-    border-radius: 8px;        
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
-    margin-bottom: 20px;        
+    background-color: #ffffff;
+    padding: 20px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
 .step h5 {
     margin: 20px 0 5px 0;
     padding-left: 10px;
-    color: #0098D1;
+    color: var(--digin-blue);
 }
 
 .step p {
@@ -430,32 +411,32 @@ select[multiple] {
 
 /* Generelle knapper */
 .custom-btn {
-    background-color: #0098D1; 
+    background-color: var(--digin-blue);
     color: white;
     border: none;
 }
 .custom-btn:hover {
-    background-color: #0087b8; /* mørkere blå ved hover */
+    background-color: var(--digin-blue-dark);
     color: white;
 }
 
-/* login-kortet */
+/* Login */
+
 .login-card {
     width: 100%;
     max-width: 420px;
     border: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Input-felt */
 .form-control {
     border-radius: 10px;
     padding: 0.8rem 1rem;
     font-size: 1rem;
 }
 
-/* Primærknapp */
+/* Primærknapp*/
 .btn-primary {
-    background-color: #4299E1;
+    background-color: var(--digin-blue);
     border: none;
     border-radius: 10px;
     padding: 0.8rem;
@@ -463,10 +444,10 @@ select[multiple] {
     transition: all 0.2s ease-in-out;
 }
 .btn-primary:hover {
-    background-color: #2B6CB0;
+    background-color: var(--digin-blue-dark);
 }
 
-/* Admin login*/
+/* Admin Login */
 
 .admin-login-page {
     display: flex;
@@ -476,24 +457,22 @@ select[multiple] {
     padding-top: 10px;
 }
 
-/* Selve boksen */
 .center-adm-login {
-    background-color: #ffffff; 
+    background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     padding: 40px 50px;
     width: 420px;
     text-align: center;
+    margin-bottom: 100px;
 }
 
-/* Tittel */
 .center-adm-login h2 {
-    color: #0098D1;
+    color: var(--digin-blue);
     font-weight: 600;
     margin-bottom: 28px;
 }
 
-/* Skjema */
 .center-adm-login form {
     display: flex;
     flex-direction: column;
@@ -501,31 +480,33 @@ select[multiple] {
     width: 100%;
 }
 
-/* Label */
 .center-adm-login label {
-    color: #0098D1;
+    color: #6c757d;
     font-weight: 600;
     width: 100%;
     text-align: left;
     margin-bottom: 5px;
 }
 
-/* Inputfelt */
 .center-adm-login .form-control {
     width: 100%;
     background-color: #ffffff;
-    border: 1px solid #0098D1;
+    border: 1px solid var(--digin-blue);
     border-radius: 6px;
     padding: 10px 14px;
     height: 44px;
     font-size: 16px;
     margin-bottom: 16px;
+    color: #000; /* <-- gjør teksten svart */
     box-sizing: border-box;
 }
 
-/* Knapp */
+.center-adm-login .form-control::placeholder {
+    color: #6c757d; /* dempet grå placeholder */
+}
+
 .center-adm-login .custom-btn {
-    background-color: #0098D1;
+    background-color: var(--digin-blue);
     color: white;
     border: none;
     border-radius: 6px;
@@ -535,13 +516,12 @@ select[multiple] {
     font-weight: 600;
     transition: background-color 0.2s ease-in-out;
 }
-
 .center-adm-login .custom-btn:hover {
-    background-color: #0087b8;
+    background-color: var(--digin-blue);
 }
 
-/* Feilmelding */
 .center-adm-login .alert-danger {
+    font-weight: bold;
     background-color: #dc3545;
     color: #fff;
     border-radius: 6px;
@@ -552,7 +532,6 @@ select[multiple] {
     margin-bottom: 15px;
 }
 
-/* Mobil */
 @media (max-width: 576px) {
     .center-adm-login {
         width: 90%;
@@ -560,33 +539,28 @@ select[multiple] {
     }
 }
 
-.center-adm-login {
-    margin-bottom: 100px;
-}
+/* Admin Dashboard*/
 
-/* Admin dashboard */ 
 body.admin-dashboard {
     font-family: 'Segoe UI', sans-serif;
     background-color: #ffffff;
     color: #222;
 }
 
-/* Overskrift */
 .admin-dashboard h2 {
     text-align: center;
-    color: #009FE3; /* Digin blå */
+    color: var(--digin-blue);
     font-weight: 600;
     margin-top: 2rem;
     margin-bottom: 2rem;
 }
 
-/* Bokser / seksjoner */
 .admin-dashboard .step {
-    background-color: #ffffff; 
+    background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     padding: 2rem 3rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     max-width: 1800px;
     width: 100%;
     margin-left: auto;
@@ -594,12 +568,11 @@ body.admin-dashboard {
 }
 
 .admin-dashboard .step h5 {
-    color: #009FE3;
+    color: var(--digin-blue);
     font-weight: 400;
     margin-bottom: 1rem;
 }
 
-/* Filterrad */
 .admin-dashboard .filter-row {
     display: flex;
     justify-content: flex-start;
@@ -608,18 +581,15 @@ body.admin-dashboard {
     gap: 2rem;
 }
 
-/* Nedtrekksmenyer */
 .admin-dashboard .form-select {
     border-radius: 8px;
     width: 100%;
-    min-width: 100%;
-    max-width: 100%;
     box-sizing: border-box;
 }
 
 /* Digin-knapper */
 .btn-digin {
-    background-color: #009FE3;
+    background-color: var(--digin-blue);
     border: none;
     color: #fff;
     border-radius: 6px;
@@ -627,21 +597,19 @@ body.admin-dashboard {
     transition: background-color 0.2s ease;
     height: 36px;
 }
-
 .btn-digin:hover {
-    background-color: #008AC5;
+    background-color: var(--digin-blue-dark);
 }
 
 .btn-outline-digin {
-    border: 1px solid #009FE3;
-    color: #009FE3;
+    border: 1px solid var(--digin-blue);
+    color: var(--digin-blue);
     border-radius: 6px;
     transition: all 0.2s ease;
     height: 36px;
 }
-
 .btn-outline-digin:hover {
-    background-color: #009FE3;
+    background-color: var(--digin-blue-dark);
     color: #fff;
 }
 
@@ -649,6 +617,12 @@ body.admin-dashboard {
     background-color: white;
     color: #dc3545;
     border-color: #dc3545;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
 }
 
 /* Tabell */
@@ -660,12 +634,10 @@ body.admin-dashboard {
     border-radius: 6px;
 }
 
-.admin-dashboard thead {
-    background-color: #E6F4FB;
-}
+.admin-dashboard thead { background-color: #E6F4FB; }
 
 .admin-dashboard th {
-    color: #009FE3;
+    color: var(--digin-blue);
     font-weight: 400;
     padding: 1rem;
 }
@@ -675,9 +647,7 @@ body.admin-dashboard {
     border-top: 1px solid #eee;
 }
 
-.admin-dashboard .text-muted {
-    color: #888;
-}
+.admin-dashboard .text-muted { color: #888; }
 
 .table-responsive {
     margin-bottom: 3rem;
@@ -687,42 +657,27 @@ body.admin-dashboard {
 .admin-div {
     position: relative;
     margin-bottom: 0.3rem;
-    padding-right: 20px; 
+    padding-right: 20px;
 }
 
-/* Slett-knappen */
 .admin-delete {
     position: absolute;
-    right: 0;             
-    top: 30%;             
-    transform: translateY(-50%); 
+    right: 0;
+    top: 30%;
+    transform: translateY(-50%);
     height: auto;
     width: auto;
     min-width: unset;
 }
 
 .admin-outline-danger {
-    padding: 0.25rem 0.5rem; /* mindre knapp */
-    font-size: 0.75rem;       /* mindre tekst */
-    height: auto;             /* tilpass høyden */
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;       
 }
 
-
-.btn-outline-danger {
-    border: 1px solid #dc3545;
-    color: #dc3545;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-/*ADMIN-INFORMASJONSBAR*/
+/* Admin-info-banner */
 .admin-banner {
-    background-color: #009FE3;
+    background-color: var(--digin-blue);
     color: white;
     text-align: center;
     font-weight: 400;
@@ -734,40 +689,13 @@ body.admin-dashboard {
     z-index: 10;
 }
 
-/* Ikon og tekst spacing */
+/* CSV-ikon */
 .btn-csv i {
     margin-right: 6px;
     font-size: 1rem;
 }
 
-/* --- Kompakt filterboks --- */
-.admin-dashboard .step {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    padding: 2rem 3rem; 
-    margin-bottom: 3rem;
-    max-width: 1800px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.kompetanse-row.card {
-    border-radius: 12px;
-    border-color: #e5edf5;
-}
-
-.kompetanse-row .form-label {
-    font-weight: 600;
-}
-
-.kompetanse-row .form-control,
-.kompetanse-row .form-select {
-    background-color: #f8fafc;
-    border-radius: 8px;
-}
-
+/* Filterboks */
 .filter-bar {
     display: flex;
     gap: 1rem;
@@ -777,8 +705,8 @@ body.admin-dashboard {
 }
 
 .filter-bar > div {
-    flex: 1 1 0;         
-    min-width: 0;    
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .filter-bar .form-select,
@@ -789,15 +717,11 @@ body.admin-dashboard {
 }
 
 @media (max-width: 80vw) {
-    .filter-bar > div {
-        flex: 1 1 40%;
-    }
+    .filter-bar > div { flex: 1 1 40%; }
 }
 
 @media (max-width: 50vw) {
-    .filter-bar > div {
-        flex: 1 1 100%;
-    }
+    .filter-bar > div { flex: 1 1 100%; }
 }
 
 .filter-row > div {
@@ -805,25 +729,15 @@ body.admin-dashboard {
     min-width: 200px;
 }
 
-/* KNAPP 1: Filtrer */
-.filter-btn-filtrer {
-    width: 100px;        
-    margin-right: 0;  
-}
-
-/* KNAPP 2: */
-.filter-btn-tom {
-    width: 100px;
-    margin-right: 0;  
-}
-
-/* KNAPP 3: Eksporter */
+/* Filterknapper */
+.filter-btn-filtrer,
+.filter-btn-tom,
 .filter-btn-eksporter {
-    width: 100px; 
+    width: 100px;
     margin-right: 0;
 }
 
-/* KNAPP 4, 5 og 6: Rediger, lagre og slett */
+/* Edit / save / delete ikoner i tabell */
 .btn-edit,
 .btn-save,
 .btn-delete {
@@ -842,10 +756,11 @@ body.admin-dashboard {
 }
 
 .btn-edit {
-    background-color: #009FE3;
+    background-color: var(--digin-blue);
 }
 .btn-edit:hover {
-    background-color: #005ecb;
+    background-color: var(--digin-blue-dark);
+    color: white;
 }
 
 .btn-save {
@@ -853,6 +768,7 @@ body.admin-dashboard {
 }
 .btn-save:hover {
     background-color: #218838;
+    color: white;
 }
 
 .btn-delete {
@@ -860,11 +776,10 @@ body.admin-dashboard {
 }
 .btn-delete:hover {
     background-color: #b02a37;
+    color: white;
 }
 
-.btn i {
-    font-size: 1.2rem;
-}
+.btn i { font-size: 1.2rem; }
 
 td .btn {
     margin-right: 4px;
@@ -883,10 +798,22 @@ td:last-child {
     vertical-align: middle;
 }
 
-td .btn {
-    margin: 3px;
-}
+td .btn { margin: 3px; }
 
-td .btn i {
-    vertical-align: middle;
+td .btn i { vertical-align: middle; }
+
+/* Tabeller */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
 }
+.table th,
+.table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+}
+.table thead { background-color: #f5f5f5; }
+.table-hover tbody tr:hover { background-color: #f0f8ff; }

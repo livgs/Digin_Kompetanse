@@ -29,8 +29,7 @@ namespace Digin_Kompetanse.Controllers
             return new SelectList(items, "FagområdeId", "FagområdeNavn", selectedId);
         }
 
-
-        // === LOGIN (bedrift) ===
+        
         [HttpGet("/auth/login")]
         public IActionResult Login()
         {
@@ -42,8 +41,7 @@ namespace Digin_Kompetanse.Controllers
 
             return View("~/Views/Auth/Login.cshtml");
         }
-
-        // === SLETT ENKELT-KOMPETANSERAD ===
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -62,7 +60,7 @@ namespace Digin_Kompetanse.Controllers
             return RedirectToAction(nameof(Overview));
         }
 
-        // === REGISTRERING – GET ===
+        // REGISTRERING 
         [HttpGet]
         public IActionResult Index()
         {
@@ -93,8 +91,7 @@ namespace Digin_Kompetanse.Controllers
             }
 
             ViewBag.Fagområder = BuildFagomradeSelectList();
-
-            // Filtrer bort tomme rader
+            
             var rader = model.Rader?
                 .Where(r => r.FagområdeId.HasValue && r.KompetanseId.HasValue)
                 .ToList() ?? new List<KompetanseRadViewModel>();
@@ -219,7 +216,7 @@ namespace Digin_Kompetanse.Controllers
             }
         }
 
-        // === AJAX: hent kompetanser for fagområde ===
+        // AJAX: hent kompetanser for fagområde
         [HttpGet]
         public JsonResult GetKompetanser(int fagområdeId)
         {
@@ -238,7 +235,7 @@ namespace Digin_Kompetanse.Controllers
         }
 
 
-        // === AJAX: hent underkompetanser for kompetanse ===
+        // AJAX: hent underkompetanser for kompetanse
         [HttpGet]
         public JsonResult GetUnderkompetanser(int kompetanseId)
         {
@@ -252,7 +249,7 @@ namespace Digin_Kompetanse.Controllers
             return Json(underkompetanser);
         }
 
-        // === OVERSIKT FOR BEDRIFT ===
+        // OVERSIKT FOR BEDRIFT
         [HttpGet]
         public IActionResult Overview()
         {
@@ -290,8 +287,7 @@ namespace Digin_Kompetanse.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
-
-        // === INLINE-REDIGERING AV ENKELT-POST (brukes fra admin-siden) ===
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditInline(int id, [FromBody] EditInlineDto dto)
@@ -357,7 +353,7 @@ namespace Digin_Kompetanse.Controllers
             public string Beskrivelse { get; set; } = "";
         }
 
-        // === AJAX for admin-filter (tekst-basert) ===
+        // AJAX for admin-filter
         [HttpGet]
         public async Task<IActionResult> GetFagomrader()
         {
