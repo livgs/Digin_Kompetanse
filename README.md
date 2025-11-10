@@ -155,17 +155,37 @@ SMTP_PORT=587
 SMTP_USER=din.epost@gmail.com
 SMTP_PASS=ditt_app_passord
 SMTP_FROM=din.epost@gmail.com
+SMTP_ENABLE_STARTTLS=true
 ```
 
 Applikasjonen validerer e-postadresser mot databasen og sender engangskoder via denne SMTP-tilkoblingen.
+
+OTP-flyten håndteres av:
+
+- OtpService (generering, lagring og validering av koder)
+
+- InMemoryOtpRateLimiter (IOtpRateLimiter) (begrensning på antall forespørsler)
+
+- OtpOptions (konfigurasjon for lengde, TTL og grense per e-post)
+
+- AuthController (sender e-posten via MailKit)
 
 > For Gmail-brukere må du opprette et **App Password** under Google-kontoens sikkerhetsinnstillinger.
 
 ---
 
 ### Mulig videreutvikling: SendGrid (ikke implementert)
-Prosjektet er bygget rundt SMTP/MailKit, men kan utvides til å bruke **SendGrid** for e-postutsending hvis ønskelig.  
-Dette er **ikke implementert i denne versjonen**, men kan legges til senere.
+Prosjektet er i dag bygget rundt SMTP via MailKit i AuthController for utsending av engangskoder (OTP).
+Selve OTP-flyten håndteres av:
+
+- OtpService (genererer, lagrer og verifiserer koder)
+
+- InMemoryOtpRateLimiter (IOtpRateLimiter) (begrensning på antall forespørsler per e-post)
+
+- OtpOptions (lengde, levetid og grenser)
+
+Disse kan gjenbrukes uendret dersom man ønsker å bytte fra SMTP til SendGrid som transportlag for e-post.
+**Sendgrid** er **ikke implementert** i denne versjonen, men kan legges til senere.
 
 Fremgangsmåte:
 1. Opprett en konto på [SendGrid](https://sendgrid.com/).
@@ -174,8 +194,13 @@ Fremgangsmåte:
    SENDGRID_API_KEY=din_sendgrid_nokkel
    SENDGRID_FROM_EMAIL=kontakt@dinbedrift.no
    ```
-3. Implementer en alternativ `IEmailService`-klasse som bruker SendGrid SDK.  
-4. Registrer den nye implementasjonen i `Program.cs`.
+3. Lag en egen klasse, for eksempel SendGridOtpEmailSender, som:
+   - bygger en e-post med OTP-koden
+   - sender e-posten ved hjelp av SendGrid sitt .NET-SDK og SENDGRID_API_KEY
+
+4. Bruk denne klassen i stedet for SMTP-delen i AuthController:
+   - enten ved å kalle SendGridOtpEmailSender direkte i RequestOtp-metoden,
+   - eller ved å injisere den som avhengighet og bruke den i OtpService.
 
 ---
 
