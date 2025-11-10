@@ -57,6 +57,18 @@ docker compose up -d
 docker compose exec app dotnet ef database update
 ```
 
+💾 Import av database-data
+
+Merk: Kommandoen **dotnet ef database update** oppretter kun tabellstrukturen.
+For å fylle databasen med ferdige fagområder, kompetanser og underkompetanser,
+kjør SQL-filen **init_data.sql** slik:
+
+```bash
+docker compose exec db psql -U postgres -d digin_kompetanse -f /init_data.sql
+```
+
+Dette legger inn nødvendig grunndata slik at applikasjonen fungerer som forventet.
+
 5. Åpne applikasjonen 
 - Når alt kjører, åpne nettleseren på: http://localhost:5068
 
@@ -87,6 +99,55 @@ VALUES (
   'Navn'
 );
 ```
+## 🐳 Docker-miljøer
+
+Prosjektet støtter både utvikling (dev) og produksjon (prod) via Docker Compose.
+
+🔧 Utvikling
+
+Start:
+
+```bash
+docker compose up -d
+```
+
+
+Se logger:
+
+```bash
+docker compose logs -f app
+```
+
+Stopp:
+```bash
+docker compose down
+```
+
+🚀 Produksjon
+
+Start:
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Stopp:
+```bash
+docker compose -f docker-compose.prod.yml down
+```
+
+💡 Tips:
+
+Bruk --build første gang for å bygge containerne:
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+Du kan bruke egne miljøfiler for prod:
+
+```bash
+docker compose --env-file .env.production up -d
+```
+
 
 ## Teknologistack
 
