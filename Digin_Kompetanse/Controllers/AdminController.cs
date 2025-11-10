@@ -2,7 +2,6 @@ using Digin_Kompetanse.data;
 using Digin_Kompetanse.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BCrypt.Net;
 using System.Text;
 
 namespace Digin_Kompetanse.Controllers
@@ -12,39 +11,66 @@ namespace Digin_Kompetanse.Controllers
         private readonly KompetanseContext _context;
         private readonly ILogger<AdminController> _logger;
 
-        public AdminController(KompetanseContext context, ILogger<AdminController> logger)
+        public AdminController(
+            KompetanseContext context,
+            ILogger<AdminController> logger)
         {
             _context = context;
             _logger = logger;
         }
-        
+
         [HttpGet]
-        public IActionResult AdminLogin() => View("AdminLogin");
+        public IActionResult AdminLogin()
+        {
+            if (HttpContext.Session.GetString("Role") == "Admin")
+                return RedirectToAction(nameof(AdminDashboard));
+
+            return View("AdminLogin");
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AdminLogin(string email, string password)
+        public async Task<IActionResult> AdminLogin(string email, string password)
         {
-            // Hardkodet adminbruker
-            const string hardcodedEmail = "digin@dgn.no";
-            const string hardcodedPasswordHash = "$2a$11$TTl31f/y3FAKOR3n0hwq4uJR6Q0u.mamXVDGIcPGmGoJNx0/SiFUO";
-
-            if (email == hardcodedEmail && BCrypt.Net.BCrypt.Verify(password, hardcodedPasswordHash))
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                HttpContext.Session.SetString("Role", "Admin");
-                HttpContext.Session.SetString("AdminEmail", email);
-                return RedirectToAction("AdminDashboard");
+                ViewBag.Error = "Skriv inn både e-post og passord.";
+                return View("AdminLogin");
             }
 
-            ViewBag.Error = "Feil e-post eller passord.";
-            return View();
+            var inputEmail = email.Trim().ToLowerInvariant();
+            var inputPassword = password ?? string.Empty;
+
+            try
+            {
+                // Slå opp admin i databasen
+                var admin = await _context.Admin
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.AdminEpost.ToLower() == inputEmail);
+
+                if (admin != null && BCrypt.Net.BCrypt.Verify(inputPassword, admin.AdminPassordHash))
+                {
+                    HttpContext.Session.SetString("Role", "Admin");
+                    HttpContext.Session.SetString("AdminEmail", admin.AdminEpost);
+                    return RedirectToAction(nameof(AdminDashboard));
+                }
+
+                ViewBag.Error = "Feil e-post eller passord.";
+                return View("AdminLogin");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Feil under admin-innlogging.");
+                ViewBag.Error = "Noe gikk galt under innlogging. Prøv igjen senere.";
+                return View("AdminLogin");
+            }
         }
-        
+
         [HttpGet]
         public IActionResult AdminDashboard(string? fagomrade, string? kompetanse, string? underkompetanse)
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
-                return RedirectToAction("AdminLogin");
+                return RedirectToAction(nameof(AdminLogin));
 
             try
             {
@@ -111,7 +137,7 @@ namespace Digin_Kompetanse.Controllers
                 return View(new List<AdminViewModel>());
             }
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse, string? underkompetanse)
         {
@@ -176,7 +202,7 @@ namespace Digin_Kompetanse.Controllers
                 return RedirectToAction(nameof(AdminDashboard));
             }
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult LogoutAdmin()
@@ -184,7 +210,7 @@ namespace Digin_Kompetanse.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("AdminLogin");
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteBedrift(int id)

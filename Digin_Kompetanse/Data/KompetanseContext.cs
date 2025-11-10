@@ -14,7 +14,6 @@ public class KompetanseContext : DbContext
     public virtual DbSet<UnderKompetanse> UnderKompetanse { get; set; }
     public virtual DbSet<BedriftKompetanse> BedriftKompetanse { get; set; }
     public virtual DbSet<LoginToken> LoginToken { get; set; }
-    
     public virtual DbSet<Admin> Admin { get; set; }
 
 

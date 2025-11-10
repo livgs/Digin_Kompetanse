@@ -15,20 +15,17 @@ namespace Digin_Kompetanse.Controllers;
 public class AuthController : Controller
 {
     private readonly KompetanseContext _db;
-    private readonly IOtpRateLimiter _limiter;
     private readonly IOtpService _otp;
     private readonly ILogger<AuthController> _logger;
     private readonly IConfiguration _config;
 
     public AuthController(
         KompetanseContext db,
-        IOtpRateLimiter limiter,
         IOtpService otp,
         ILogger<AuthController> logger,
         IConfiguration config)
     {
         _db = db;
-        _limiter = limiter;
         _otp = otp;
         _logger = logger;
         _config = config;
@@ -40,11 +37,12 @@ public class AuthController : Controller
         if (string.IsNullOrWhiteSpace(dto.Email))
             return BadRequest(new { message = "E-post mangler." });
 
-        if (!_limiter.CanRequest(dto.Email))
-            return StatusCode(429, new { message = "For mange forespørsler, prøv senere." });
-
         var email = dto.Email.Trim().ToLowerInvariant();
-        var bedrift = await _db.Bedrift.FirstOrDefaultAsync(b => b.BedriftEpost.ToLower() == email);
+
+        // Slå opp med normalisert e-post
+        var bedrift = await _db.Bedrift
+            .FirstOrDefaultAsync(b => b.BedriftEpost.ToLower() == email);
+
         if (bedrift == null)
             return NotFound(new { message = "E-post er ikke registrert." });
 
@@ -118,14 +116,22 @@ public class AuthController : Controller
     [HttpPost("verify-otp")]
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Email))
+            return BadRequest(new { message = "E-post mangler." });
+
         if (string.IsNullOrWhiteSpace(dto.Code))
             return BadRequest(new { message = "Kode mangler." });
 
-        var isValid = await _otp.VerifyOtpAsync(dto.Email, dto.Code);
+        var email = dto.Email.Trim().ToLowerInvariant();
+
+        // Bruk samme normaliserte e-post inn i OTP-service
+        var isValid = await _otp.VerifyOtpAsync(email, dto.Code);
         if (!isValid)
             return BadRequest(new { message = "Ugyldig eller utløpt kode." });
 
-        var bedrift = await _db.Bedrift.FirstOrDefaultAsync(b => b.BedriftEpost.ToLower() == dto.Email.Trim().ToLowerInvariant());
+        var bedrift = await _db.Bedrift
+            .FirstOrDefaultAsync(b => b.BedriftEpost.ToLower() == email);
+
         if (bedrift == null)
             return NotFound(new { message = "Bedrift ikke funnet." });
 
@@ -149,8 +155,8 @@ public class AuthController : Controller
         if (role != "Bedrift" || bedriftId == null)
         {
             TempData["Message"] = "Ingen bedrift er logget inn.";
-            TempData["MessageType"] = "warning"; 
-            return RedirectToAction("Index", "Home"); 
+            TempData["MessageType"] = "warning";
+            return RedirectToAction("Index", "Home");
         }
 
         HttpContext.Session.Remove("BedriftId");
