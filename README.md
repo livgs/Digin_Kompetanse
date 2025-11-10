@@ -205,7 +205,7 @@ Fremgangsmåte:
 ---
 
 ## 👤 Utviklet av
-Liv Gudrun Staaland, Camilla Uglem Remøy, Adrian Mallinckrodt Øien 
+Liv Gudrun Staaland, Camilla Uglem Remøy, Adrian Van Mallinckrodt Øien 
 
 
 
