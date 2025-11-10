@@ -95,3 +95,130 @@ var grupper = rader
     }
     }
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const table = document.querySelector("table");
+
+        table.addEventListener("click", async (e) => {
+            const editBtn = e.target.closest(".edit-btn");
+            const saveBtn = e.target.closest(".save-btn");
+
+            // === START REDIGERING ===
+            if (editBtn) {
+                const row = editBtn.closest("tr");
+                editBtn.classList.add("d-none");
+                row.querySelector(".save-btn").classList.remove("d-none");
+
+                const id = editBtn.dataset.id;
+                const cells = row.querySelectorAll("td");
+
+                const fagomradeVal = cells[0].textContent.trim();
+                const kompetanseVal = cells[1].textContent.trim();
+                const underVal = cells[2].textContent.trim();
+                const beskrivelseVal = cells[3].textContent.trim();
+
+                // Hent fagområder
+                const fagResponse = await fetch('/fagomrade');
+                const fagomrader = await fagResponse.json();
+
+                // Lag dropdown for fagområde
+                const fagSelect = document.createElement("select");
+                fagSelect.classList.add("form-select", "form-select-sm");
+                fagSelect.innerHTML = fagomrader.map(f =>
+                    `<option value="${f}" ${f === fagomradeVal ? 'selected' : ''}>${f}</option>`).join('');
+
+                cells[0].innerHTML = "";
+                cells[0].appendChild(fagSelect);
+
+                // Kompetanse dropdown
+                const kompSelect = document.createElement("select");
+                kompSelect.classList.add("form-select", "form-select-sm");
+                cells[1].innerHTML = "";
+                cells[1].appendChild(kompSelect);
+
+                // Underkompetanse dropdown
+                const underSelect = document.createElement("select");
+                underSelect.classList.add("form-select", "form-select-sm");
+                cells[2].innerHTML = "";
+                cells[2].appendChild(underSelect);
+
+                async function loadKompetanser(fag) {
+                    const res = await fetch(`/kompetanse/byFagomrade?fagomrade=${encodeURIComponent(fag)}`);
+                    const kompetanser = await res.json();
+                    kompSelect.innerHTML = kompetanser.map(k =>
+                        `<option value="${k}" ${k === kompetanseVal ? 'selected' : ''}>${k}</option>`).join('');
+                    await loadUnderkompetanser(kompSelect.value);
+                }
+
+                async function loadUnderkompetanser(kompetanse) {
+                    const res = await fetch(`/underkompetanse/byKompetanse?kompetanse=${encodeURIComponent(kompetanse)}`);
+                    const underkompetanser = await res.json();
+                    underSelect.innerHTML = underkompetanser.map(u =>
+                        `<option value="${u}" ${u === underVal ? 'selected' : ''}>${u}</option>`).join('');
+                }
+
+                fagSelect.addEventListener("change", async () => {
+                    await loadKompetanser(fagSelect.value);
+                });
+
+                kompSelect.addEventListener("change", async () => {
+                    await loadUnderkompetanser(kompSelect.value);
+                });
+
+                await loadKompetanser(fagSelect.value);
+
+                cells[3].innerHTML = `<textarea class="form-control form-control-sm">${beskrivelseVal}</textarea>`;
+            }
+
+            // === LAGRE ENDRINGER ===
+            if (saveBtn) {
+                const row = saveBtn.closest("tr");
+                const id = saveBtn.getAttribute("data-id");
+                const cells = row.querySelectorAll("td");
+
+                const fagomrade = cells[0].querySelector("select").value;
+                const kompetanse = cells[1].querySelector("select").value;
+                const underkompetanse = cells[2].querySelector("select").value;
+                const beskrivelse = cells[3].querySelector("textarea").value;
+
+                const response = await fetch(`/Home/EditInline/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        fagomrade, kompetanse, underkompetanse, beskrivelse
+                    })
+                });
+
+                if (response.ok) {
+                    cells[0].textContent = fagomrade;
+                    cells[1].textContent = kompetanse;
+                    cells[2].textContent = underkompetanse;
+                    cells[3].textContent = beskrivelse;
+
+                    saveBtn.classList.add("d-none");
+                    row.querySelector(".edit-btn").classList.remove("d-none");
+                } else {
+                    alert("Feil ved lagring!");
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".btn-delete").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const confirmed = confirm("Er du sikker på at du vil slette kompetansen?");
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+

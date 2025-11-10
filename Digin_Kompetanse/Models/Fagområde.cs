@@ -8,5 +8,3 @@ public class Fagområde
 
     public virtual ICollection<Kompetanse> Kompetanser { get; set; } = new List<Kompetanse>();
 }
-
-

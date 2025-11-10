@@ -219,3 +219,5 @@ namespace Digin_Kompetanse.Controllers
         }
     }
 }
+
+
