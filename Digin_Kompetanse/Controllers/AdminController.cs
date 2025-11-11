@@ -39,23 +39,50 @@ namespace Digin_Kompetanse.Controllers
             }
 
             var inputEmail = email.Trim().ToLowerInvariant();
-            var inputPassword = password ?? string.Empty;
 
             try
             {
+                // Slår opp admin i databasen 
                 var admin = await _context.Admin
-                    .AsNoTracking()
                     .FirstOrDefaultAsync(a => a.AdminEpost.ToLower() == inputEmail);
 
-                if (admin != null && BCrypt.Net.BCrypt.Verify(inputPassword, admin.AdminPassordHash))
+                if (admin == null)
                 {
-                    HttpContext.Session.SetString("Role", "Admin");
-                    HttpContext.Session.SetString("AdminEmail", admin.AdminEpost);
-                    return RedirectToAction(nameof(AdminDashboard));
+                    ViewBag.Error = "Feil e-post eller passord.";
+                    return View("AdminLogin");
                 }
 
-                ViewBag.Error = "Feil e-post eller passord.";
-                return View("AdminLogin");
+                // Sjekk om konto er låst
+                if (admin.LockoutUntil != null && admin.LockoutUntil > DateTime.UtcNow)
+                {
+                    ModelState.AddModelError("", "Kontoinnlogging er midlertidig låst. Prøv igjen senere.");
+                    return View("AdminLogin");
+                }
+
+                // Verifiser passord
+                var isValid = BCrypt.Net.BCrypt.Verify(password, admin.AdminPassordHash);
+                if (!isValid)
+                {
+                    admin.FailedAttempts++;
+                    if (admin.FailedAttempts >= 5)
+                    {
+                        admin.LockoutUntil = DateTime.UtcNow.AddMinutes(15);
+                    }
+
+                    await _context.SaveChangesAsync();
+                    ModelState.AddModelError("", "Feil e-post eller passord.");
+                    return View("AdminLogin");
+                }
+
+                // Ved vellykket innlogging:
+                admin.FailedAttempts = 0;
+                admin.LockoutUntil = null;
+                await _context.SaveChangesAsync();
+
+                HttpContext.Session.SetString("Role", "Admin");
+                HttpContext.Session.SetString("AdminEmail", admin.AdminEpost);
+
+                return RedirectToAction(nameof(AdminDashboard));
             }
             catch (Exception ex)
             {
@@ -241,40 +268,6 @@ namespace Digin_Kompetanse.Controllers
             }
 
             return RedirectToAction(nameof(AdminDashboard));
-        }
-
-        [HttpGet]
-        public JsonResult GetKompetanserByFagomrade(string fagomradeNavn)
-        {
-            if (string.IsNullOrWhiteSpace(fagomradeNavn))
-                return Json(new List<object>());
-            var kompetanser = (
-                    from f in _context.Fagområde
-                    from k in f.Kompetanser
-                    where f.FagområdeNavn == fagomradeNavn
-                    select new { k.KompetanseKategori }
-                )
-                .Distinct()
-                .OrderBy(k => k.KompetanseKategori)
-                .ToList();
-            return Json(kompetanser);
-        }
-
-        [HttpGet]
-        public JsonResult GetUnderkompetanserByKompetanse(string kompetanseNavn)
-        {
-            if (string.IsNullOrWhiteSpace(kompetanseNavn))
-                return Json(new List<object>());
-            var underkompetanser = (
-                    from k in _context.Kompetanse
-                    from uk in k.UnderKompetanser
-                    where k.KompetanseKategori == kompetanseNavn
-                    select new { uk.UnderkompetanseNavn }
-                )
-                .Distinct()
-                .OrderBy(uk => uk.UnderkompetanseNavn)
-                .ToList();
-            return Json(underkompetanser);
         }
     }
 }

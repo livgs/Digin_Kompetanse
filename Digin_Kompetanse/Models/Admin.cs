@@ -18,5 +18,11 @@ public class Admin
 
     [Column("navn")]
     public string? Navn { get; set; }
+    
+    [Column("failed_attempts")]
+    public int FailedAttempts { get; set; }
+
+    [Column("lockout_until")]
+    public DateTime? LockoutUntil { get; set; }
 }
 

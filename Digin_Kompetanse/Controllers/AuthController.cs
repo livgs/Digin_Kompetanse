@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using System.ComponentModel.DataAnnotations;
 
 namespace Digin_Kompetanse.Controllers;
 
@@ -34,6 +35,9 @@ public class AuthController : Controller
     [HttpPost("request-otp")]
     public async Task<IActionResult> RequestOtp([FromBody] RequestOtpDto dto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(new { message = "Ugyldig input." });
+        
         if (string.IsNullOrWhiteSpace(dto.Email))
             return BadRequest(new { message = "E-post mangler." });
 
@@ -183,10 +187,19 @@ public class AuthController : Controller
 
 public class RequestOtpDto
 {
+    [Required]
+    [EmailAddress]
+    [MaxLength(100)]
     public string Email { get; set; } = null!;
 }
 public class VerifyOtpDto
 {
+    [Required]
+    [EmailAddress]
+    [MaxLength(100)]
     public string Email { get; set; } = null!;
+    
+    [Required]
+    [StringLength(6, MinimumLength = 4)]
     public string Code { get; set; } = null!;
 }
