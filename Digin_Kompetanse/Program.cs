@@ -49,7 +49,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
+app.UseMiddleware<SimpleIpRateLimitMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

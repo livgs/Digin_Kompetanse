@@ -3,9 +3,11 @@ using Digin_Kompetanse.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Digin_Kompetanse.Filters;
 
 namespace Digin_Kompetanse.Controllers
-{
+{ 
+   
     public class AdminController : Controller
     {
         private readonly KompetanseContext _context;
@@ -93,10 +95,9 @@ namespace Digin_Kompetanse.Controllers
         }
 
         [HttpGet]
+        [RequireAdmin]
         public IActionResult AdminDashboard(string? fagomrade, string? kompetanse, string? underkompetanse)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-                return RedirectToAction(nameof(AdminLogin));
 
             try
             {
@@ -165,10 +166,9 @@ namespace Digin_Kompetanse.Controllers
         }
 
         [HttpGet]
+        [RequireAdmin]
         public async Task<IActionResult> ExportCsv(string? fagomrade, string? kompetanse, string? underkompetanse)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
-                return RedirectToAction("AdminLogin");
 
             try
             {
@@ -231,6 +231,7 @@ namespace Digin_Kompetanse.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireAdmin]
         public IActionResult LogoutAdmin()
         {
             HttpContext.Session.Clear();
@@ -239,6 +240,7 @@ namespace Digin_Kompetanse.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireAdmin]
         public IActionResult DeleteBedrift(int id)
         {
             try
