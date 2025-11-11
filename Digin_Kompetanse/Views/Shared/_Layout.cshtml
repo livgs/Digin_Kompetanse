@@ -40,8 +40,7 @@
 
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-
-                    @* HJEM – kun for gjest (ikke Bedrift, ikke Admin) *@
+                    
                     @if (role != "Bedrift" && role != "Admin")
                     {
                         <li class="nav-item">

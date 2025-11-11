@@ -388,7 +388,7 @@ function initOverviewEditing() {
                 const beskrivelseVal = cells[3].textContent.trim();
 
                 // Hent fagområder
-                const fagResponse = await fetch('/fagomrade');
+                const fagResponse = await fetch("/Home/GetFagomrader");
                 const fagomrader = await fagResponse.json();
 
                 // Lag dropdown for fagområde
@@ -413,7 +413,7 @@ function initOverviewEditing() {
                 cells[2].appendChild(underSelect);
 
                 async function loadKompetanser(fag) {
-                    const res = await fetch(`/kompetanse/byFagomrade?fagomrade=${encodeURIComponent(fag)}`);
+                    const res = await fetch(`/Home/GetKompetanserByFagomrade?fagomrade=${encodeURIComponent(fag)}`);
                     const kompetanser = await res.json();
                     kompSelect.innerHTML = kompetanser.map(k =>
                         `<option value="${k}" ${k === kompetanseVal ? 'selected' : ''}>${k}</option>`).join('');
@@ -421,11 +421,12 @@ function initOverviewEditing() {
                 }
 
                 async function loadUnderkompetanser(kompetanse) {
-                    const res = await fetch(`/underkompetanse/byKompetanse?kompetanse=${encodeURIComponent(kompetanse)}`);
+                    const res = await fetch(`/Home/GetUnderkompetanserByKompetanse?kompetanse=${encodeURIComponent(kompetanse)}`);
                     const underkompetanser = await res.json();
                     underSelect.innerHTML = underkompetanser.map(u =>
                         `<option value="${u}" ${u === underVal ? 'selected' : ''}>${u}</option>`).join('');
                 }
+
 
                 fagSelect.addEventListener("change", async () => {
                     await loadKompetanser(fagSelect.value);
@@ -471,7 +472,7 @@ function initOverviewEditing() {
                 if (response.ok) {
                     cells[0].textContent = fagomrade;
                     cells[1].textContent = kompetanse;
-                    cells[2].textContent = underkompetanse;
+                    cells[2].textContent = underkompetanse || "Ingen";
                     cells[3].textContent = beskrivelse;
 
                     saveBtn.classList.add("d-none");

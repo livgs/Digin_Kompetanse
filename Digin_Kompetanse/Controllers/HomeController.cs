@@ -184,38 +184,6 @@ namespace Digin_Kompetanse.Controllers
             return RedirectToAction(nameof(Overview));
         }
 
-
-        private void LagreEllerOppdater(int bedriftId, int fagId, int kompId, int? underId, string? beskrivelse)
-        {
-            var eksisterende = _context.BedriftKompetanse.FirstOrDefault(bk =>
-                bk.BedriftId == bedriftId &&
-                bk.FagområdeId == fagId &&
-                bk.KompetanseId == kompId &&
-                bk.UnderKompetanseId == underId
-            );
-
-            if (eksisterende == null)
-            {
-                var bk = new BedriftKompetanse
-                {
-                    BedriftId = bedriftId,
-                    FagområdeId = fagId,
-                    KompetanseId = kompId,
-                    UnderKompetanseId = underId,
-                    Beskrivelse = beskrivelse,
-                    CreatedAt = DateTime.UtcNow,
-                    IsActive = true
-                };
-                _context.BedriftKompetanse.Add(bk);
-            }
-            else
-            {
-                eksisterende.Beskrivelse = beskrivelse;
-                eksisterende.ModifiedAt = DateTime.UtcNow;
-                eksisterende.ModifiedByBedriftId = bedriftId;
-            }
-        }
-
         // AJAX: hent kompetanser for fagområde
         [HttpGet]
         public JsonResult GetKompetanser(int fagområdeId)

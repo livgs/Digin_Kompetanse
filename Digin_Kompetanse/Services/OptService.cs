@@ -31,13 +31,28 @@ public class OtpService : IOtpService
 
     public async Task<string?> GenerateOtpAsync(string email)
     {
-        var bedrift = await _context.Bedrift.FirstOrDefaultAsync(b => b.BedriftEpost == email);
-        if (bedrift == null) return null;
-        if (!_rateLimiter.CanRequest(email)) return null;
+        if (string.IsNullOrWhiteSpace(email))
+            return null;
 
-        var code = RandomNumberGenerator.GetInt32(0, (int)Math.Pow(10, _options.CodeLength))
-                    .ToString("D" + _options.CodeLength);
+        // Normaliser e-post
+        var normalizedEmail = email.Trim().ToLowerInvariant();
 
+        var bedrift = await _context.Bedrift
+            .FirstOrDefaultAsync(b => b.BedriftEpost.ToLower() == normalizedEmail);
+
+        if (bedrift == null)
+            return null;
+
+        // Rate limiting på normalisert e-post
+        if (!_rateLimiter.CanRequest(normalizedEmail))
+            return null;
+
+        // Generer kode
+        var code = RandomNumberGenerator
+            .GetInt32(0, (int)Math.Pow(10, _options.CodeLength))
+            .ToString("D" + _options.CodeLength);
+
+        // Lagre hash i databasen
         var token = new LoginToken
         {
             BedriftId = bedrift.BedriftId,
@@ -49,23 +64,34 @@ public class OtpService : IOtpService
         _context.LoginToken.Add(token);
         await _context.SaveChangesAsync();
 
-        _rateLimiter.RegisterRequest(email);
+        _rateLimiter.RegisterRequest(normalizedEmail);
 
-        Console.WriteLine($"OTP for {email}: {code} (gyldig til {token.ExpiresAt:u})");
         return code;
     }
 
     public async Task<bool> VerifyOtpAsync(string email, string code)
     {
-        var bedrift = await _context.Bedrift.FirstOrDefaultAsync(b => b.BedriftEpost == email);
-        if (bedrift == null) return false;
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(code))
+            return false;
+
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+
+        var bedrift = await _context.Bedrift
+            .FirstOrDefaultAsync(b => b.BedriftEpost.ToLower() == normalizedEmail);
+
+        if (bedrift == null)
+            return false;
 
         var token = await _context.LoginToken
             .Where(t => t.BedriftId == bedrift.BedriftId && t.ConsumedAt == null)
             .OrderByDescending(t => t.Id)
             .FirstOrDefaultAsync();
 
-        if (token == null || token.ExpiresAt < DateTime.UtcNow) return false;
+        if (token == null)
+            return false;
+
+        if (token.ExpiresAt < DateTime.UtcNow)
+            return false;
 
         if (token.CodeHash != Hash(code))
         {
@@ -76,6 +102,7 @@ public class OtpService : IOtpService
 
         token.ConsumedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
+
         return true;
     }
 
