@@ -16,7 +16,6 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
     <div class="step">
         <form method="get" asp-action="AdminDashboard">
             <div class="filter-bar">
-                <!-- Fagområde -->
                 <div>
                     <label for="fagomrade" class="form-label fw-semibold mb-1">Fagområde</label>
                     <select id="fagomrade" name="fagomrade" class="form-select form-select-sm">
@@ -27,8 +26,6 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         }
                     </select>
                 </div>
-
-                <!-- Kompetanse -->
                 <div>
                     <label for="kompetanse" class="form-label fw-semibold mb-1">Kompetanse</label>
                     <select id="kompetanse" name="kompetanse" class="form-select form-select-sm">
@@ -39,8 +36,6 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         }
                     </select>
                 </div>
-
-                <!-- Underkompetanse -->
                 <div>
                     <label for="underkompetanse" class="form-label fw-semibold mb-1">Underkompetanse</label>
                     <select id="underkompetanse" name="underkompetanse" class="form-select form-select-sm">
@@ -51,9 +46,6 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         }
                     </select>
                 </div>
-
-                <!-- Filtrer -->
-         
                 <div>
                     <label class="form-label invisible">Filtrer</label>
                     <button type="submit"
@@ -61,8 +53,6 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         <i class="bi bi-search me-1"></i> Filtrer
                     </button>
                 </div>
-
-                <!-- Tøm -->
                 <div>
                     <label class="form-label invisible">Tøm</label>
                     <a asp-action="AdminDashboard"
@@ -70,8 +60,6 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
                         <i class="bi bi-x-circle me-1"></i> Tøm
                     </a>
                 </div>
-
-                <!-- Eksporter -->
                 <div>
                     <label class="form-label invisible">Eksporter</label>
                     <a asp-action="ExportCsv"
@@ -87,10 +75,6 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
             </div>
         </form>
     </div>
-
-    
-
-    <!-- Innsendingstabell -->
     <div class="step">
         <h5 class="center"><strong>Innsendinger</strong></h5>
 
@@ -115,8 +99,7 @@ var valgtUnder = Context.Request.Query["underkompetanse"].ToString();
             {
                 var navn = gruppe.Key.Navn;
                 var epost = gruppe.Key.Epost;
-
-                <!-- Bedrift og e-post som tekst over tabellen -->
+                
                 <div class="admin-div">
                     <p style="color: #555;" class="mb-0">@navn: @epost</p>
                     <form asp-action="DeleteBedrift"

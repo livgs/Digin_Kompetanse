@@ -484,3 +484,134 @@ function initOverviewEditing() {
         });
     });
 }
+
+// ADMIN-DASHBOARD – filtrering
+function initAdminFilters() {
+    const fagSelect = document.getElementById("fagomrade");
+    const kompSelect = document.getElementById("kompetanse");
+    const underSelect = document.getElementById("underkompetanse");
+    if (!fagSelect || !kompSelect || !underSelect) return;
+
+    const setLoading = (select, text = "Laster…") => {
+        select.innerHTML = `<option>${text}</option>`;
+        select.disabled = true;
+    };
+
+    const resetSelect = (select, placeholder = "Alle") => {
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        select.disabled = false;
+    };
+
+    const getParams = () => new URLSearchParams(window.location.search);
+
+    // === Fagområde → Kompetanse ===
+    fagSelect.addEventListener("change", async function () {
+        const selectedFag = this.value;
+
+        // Reset begge undernivåer
+        setLoading(kompSelect);
+        setLoading(underSelect);
+
+        if (!selectedFag) {
+            resetSelect(kompSelect);
+            resetSelect(underSelect);
+            return;
+        }
+
+        try {
+            const res = await fetch(`/Admin/GetKompetanserByFagomrade?fagomradeNavn=${encodeURIComponent(selectedFag)}`);
+            if (!res.ok) throw new Error("Kunne ikke hente kompetanser");
+            const data = await res.json();
+
+            resetSelect(kompSelect);
+            resetSelect(underSelect);
+
+            if (!data.length) {
+                kompSelect.innerHTML = `<option value="">Ingen kompetanser funnet</option>`;
+                kompSelect.disabled = true;
+                underSelect.innerHTML = `<option value="">Ingen underkompetanser</option>`;
+                underSelect.disabled = true;
+                return;
+            }
+
+            // Fyll kompetanseliste
+            data.forEach(k => {
+                const opt = document.createElement("option");
+                opt.value = k.kompetanseKategori;
+                opt.textContent = k.kompetanseKategori;
+                kompSelect.appendChild(opt);
+            });
+
+            const urlParams = getParams();
+            const valgtKompetanse = urlParams.get("kompetanse");
+            const valgtUnder = urlParams.get("underkompetanse");
+
+            if (valgtKompetanse) {
+                kompSelect.value = valgtKompetanse;
+
+                // Last underkompetanser når kompetanselisten er satt
+                setTimeout(() => {
+                    kompSelect.dispatchEvent(new Event("change", { bubbles: true }));
+                }, 100);
+
+                // Gjenopprett valgt underkompetanse
+                setTimeout(() => {
+                    if (valgtUnder) underSelect.value = valgtUnder;
+                }, 400);
+            }
+        } catch (err) {
+            console.error(err);
+            resetSelect(kompSelect, "Feil – prøv igjen");
+            resetSelect(underSelect);
+        }
+    });
+
+    // === Kompetanse → Underkompetanse ===
+    kompSelect.addEventListener("change", async function () {
+        const selectedKomp = this.value;
+        resetSelect(underSelect);
+        if (!selectedKomp) return;
+
+        await loadUnderkompetanser(selectedKomp);
+    });
+
+    // === Hjelpefunksjon for å hente underkompetanser ===
+    async function loadUnderkompetanser(kompetanseNavn, valgtUnder = null) {
+        setLoading(underSelect);
+
+        try {
+            const res = await fetch(`/Admin/GetUnderkompetanserByKompetanse?kompetanseNavn=${encodeURIComponent(kompetanseNavn)}`);
+            if (!res.ok) throw new Error("Kunne ikke hente underkompetanser");
+            const data = await res.json();
+
+            resetSelect(underSelect);
+
+            if (!data.length) {
+                underSelect.innerHTML = `<option value="">Ingen underkompetanser</option>`;
+                underSelect.disabled = true;
+                return;
+            }
+
+            data.forEach(uk => {
+                const opt = document.createElement("option");
+                opt.value = uk.underkompetanseNavn;
+                opt.textContent = uk.underkompetanseNavn;
+                underSelect.appendChild(opt);
+            });
+
+            if (valgtUnder) underSelect.value = valgtUnder;
+        } catch (err) {
+            console.error(err);
+            resetSelect(underSelect, "Feil – prøv igjen");
+        }
+    }
+
+    // === Gjenopprett ved reload ===
+    const urlParams = getParams();
+    const valgtFag = urlParams.get("fagomrade");
+
+    if (valgtFag) {
+        fagSelect.value = valgtFag;
+        fagSelect.dispatchEvent(new Event("change"));
+    }
+}

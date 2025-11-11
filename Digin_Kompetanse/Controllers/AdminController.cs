@@ -43,7 +43,6 @@ namespace Digin_Kompetanse.Controllers
 
             try
             {
-                // Slå opp admin i databasen
                 var admin = await _context.Admin
                     .AsNoTracking()
                     .FirstOrDefaultAsync(a => a.AdminEpost.ToLower() == inputEmail);
@@ -243,7 +242,39 @@ namespace Digin_Kompetanse.Controllers
 
             return RedirectToAction(nameof(AdminDashboard));
         }
+
+        [HttpGet]
+        public JsonResult GetKompetanserByFagomrade(string fagomradeNavn)
+        {
+            if (string.IsNullOrWhiteSpace(fagomradeNavn))
+                return Json(new List<object>());
+            var kompetanser = (
+                    from f in _context.Fagområde
+                    from k in f.Kompetanser
+                    where f.FagområdeNavn == fagomradeNavn
+                    select new { k.KompetanseKategori }
+                )
+                .Distinct()
+                .OrderBy(k => k.KompetanseKategori)
+                .ToList();
+            return Json(kompetanser);
+        }
+
+        [HttpGet]
+        public JsonResult GetUnderkompetanserByKompetanse(string kompetanseNavn)
+        {
+            if (string.IsNullOrWhiteSpace(kompetanseNavn))
+                return Json(new List<object>());
+            var underkompetanser = (
+                    from k in _context.Kompetanse
+                    from uk in k.UnderKompetanser
+                    where k.KompetanseKategori == kompetanseNavn
+                    select new { uk.UnderkompetanseNavn }
+                )
+                .Distinct()
+                .OrderBy(uk => uk.UnderkompetanseNavn)
+                .ToList();
+            return Json(underkompetanser);
+        }
     }
 }
-
-
