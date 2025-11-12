@@ -1,0 +1,4 @@
+- [ ] Legg til SendGrid .NET SDK
+- [ ] Implementer SendGridOtpEmailSender (bruk API-key og From)
+- [ ] E2E-test (testnøkkel)
+- [ ] Oppdater README med SendGrid-troubleshooting
