@@ -3,6 +3,7 @@
 @{
 ViewData["Title"] = "Kompetanseoversikt";
 
+
 var rader = Model
 .OrderBy(bk => bk.Bedrift?.BedriftNavn)
 .ThenBy(bk => bk.Fagområde?.FagområdeNavn)
@@ -12,87 +13,110 @@ var rader = Model
 var grupper = rader
     .GroupBy(bk => new { 
         Navn = bk.Bedrift?.BedriftNavn ?? "(Ukjent bedrift)",
-        Epost = bk.Bedrift?.BedriftEpost ?? "(Ukjent epost)"
+        Epost = bk.Bedrift?.BedriftEpost ?? "(Ukjent epost)",
+        BedriftId = bk.BedriftId
     })
     .OrderBy(g => g.Key.Navn)
     .ThenBy(g => g.Key.Epost)
     .ToList();
 }
 
+<div id="fagområderData" 
+     data-fagområder='@Html.Raw(Json.Serialize(ViewBag.Fagområder))'
+     style="display:none"></div>
+
+<div id="kompetanserData" 
+     data-kompetanser='@Html.Raw(Json.Serialize(ViewBag.Kompetanser))'
+     style="display:none"></div>
+
+<div id="underkompetanserData" 
+     data-underkompetanser='@Html.Raw(Json.Serialize(ViewBag.Underkompetanser))'
+     style="display:none"></div>
+
+
 <div class="container mt-5">
     <h2>Kompetanseoversikt</h2>
 
     @if (!grupper.Any())
     {
-    <p class="text-muted">Ingen innsendte kompetanser ennå.</p>
+        <p class="text-muted">Ingen innsendte kompetanser ennå.</p>
     }
     else
     {
-    foreach (var bedriftGruppe in grupper)
-    {
-        var navn = bedriftGruppe.Key.Navn;
-        var epost = bedriftGruppe.Key.Epost;
+        
+        
+        foreach (var bedriftGruppe in grupper)
+        {
+            var navn = bedriftGruppe.Key.Navn;
+            var epost = bedriftGruppe.Key.Epost;
 
-    <div class="mb-5">
-        <h4 class="text-secondary border-bottom pb-2">
-            @navn
-            <small class="text-muted">(@epost)</small>
-        </h4>
+            <div class="mb-5">
+                <h4 class="text-secondary border-bottom pb-2">
+                    @navn
+                    <small class="text-muted">(@epost)</small>
+                </h4>
+        
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead class="table-light">
+                        <tr class="kompetanse-row">
+                            <th scope="col" style="width:20%">Fagområde</th>
+                            <th scope="col" style="width:20%">Kompetanse</th>
+                            <th scope="col" style="width:20%">Underkompetanse</th>
+                            <th scope="col" style="width:22%">Beskrivelse</th>
+                            <th scope="col" style="width:10%">Dato</th>
+                            <th scope="col" style="width:8%">Handling</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in bedriftGruppe)
+                        {
+                            <tr class="kompetanse-row">
+                                <td>@(item.Fagområde?.FagområdeNavn ?? "—")</td>
+                                <td>@(item.Kompetanse?.KompetanseKategori ?? "—")</td>
+                                <td>@(item.UnderKompetanse?.UnderkompetanseNavn ?? "Ingen")</td>
+                                <td>
+                                    @{
+                                        var text = string.IsNullOrWhiteSpace(item.Beskrivelse) ? "—" : item.Beskrivelse!;
+                                        var shortText = text.Length > 120 ? text[..120] + "…" : text;
+                                    }
+                                    <span class="d-inline-block text-truncate"
+                                          style="max-width: 420px"
+                                          title="@text">
+                                        @shortText
+                                    </span>
+                                </td>
+                                <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <button type="button" class="btn btn-edit btn-sm me-1 edit-btn" title="Rediger" data-id="@item.Id">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
 
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead class="table-light">
-                <tr>
-                    <th scope="col" style="width:20%">Fagområde</th>
-                    <th scope="col" style="width:20%">Kompetanse</th>
-                    <th scope="col" style="width:20%">Underkompetanse</th>
-                    <th scope="col" style="width:22%">Beskrivelse</th>
-                    <th scope="col" style="width:10%">Dato</th>
-                    <th scope="col" style="width:8%">Handling</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in bedriftGruppe)
-                {
-                <tr>
-                    <td>@(item.Fagområde?.FagområdeNavn ?? "—")</td>
-                    <td>@(item.Kompetanse?.KompetanseKategori ?? "—")</td>
-                    <td>@(item.UnderKompetanse?.UnderkompetanseNavn ?? "Ingen")</td>
-                    <td>
-                        @{
-                        var text = string.IsNullOrWhiteSpace(item.Beskrivelse) ? "—" : item.Beskrivelse!;
-                        var shortText = text.Length > 120 ? text[..120] + "…" : text;
+                                    <button type="button" class="btn btn-save btn-sm me-1 save-btn d-none" title="Lagre" data-id="@item.Id">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-add btn-sm me-1 add-btn d-none" title="Legg til" data-id="@item.Id">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                        
+                                    <form asp-action="Delete" asp-controller="Home" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-delete btn-sm" title="Slett" onclick="return confirm('Er du sikker på at du vil slette denne kompetansen? Denne handlingen kan ikke angres.');">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         }
-                        <span class="d-inline-block text-truncate"
-                              style="max-width: 420px"
-                              title="@text">
-                                            @shortText
-                                        </span>
-                    </td>
-                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
-                    <td>
-                        <button type="button" class="btn btn-edit btn-sm me-1 edit-btn" title="Rediger" data-id="@item.Id">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
+                        </tbody>
+                    </table>
+                    
+                    <button type="button" class="btn btn-outline-digin btn-sm add-row">+ Legg til kompetanse</button>
 
-                        <button type="button" class="btn btn-save btn-sm me-1 save-btn d-none" title="Lagre" data-id="@item.Id">
-                            <i class="bi bi-check-lg"></i>
-                        </button>
-
-                        <form asp-action="Delete" asp-controller="Home" asp-route-id="@item.Id" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-delete btn-sm" title="Slett" onclick="return confirm('Er du sikker på at du vil slette denne kompetansen? Denne handlingen kan ikke angres.');">
-                                <i class="bi bi-trash-fill"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    }
+                </div>
+            </div>
+        }
     }
 </div>
 

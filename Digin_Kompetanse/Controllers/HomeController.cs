@@ -29,7 +29,7 @@ namespace Digin_Kompetanse.Controllers
             return new SelectList(items, "FagområdeId", "FagområdeNavn", selectedId);
         }
 
-        
+
         [HttpGet("/auth/login")]
         public IActionResult Login()
         {
@@ -41,7 +41,7 @@ namespace Digin_Kompetanse.Controllers
 
             return View("~/Views/Auth/Login.cshtml");
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -91,7 +91,7 @@ namespace Digin_Kompetanse.Controllers
             }
 
             ViewBag.Fagområder = BuildFagomradeSelectList();
-            
+
             var rader = model.Rader?
                 .Where(r => r.FagområdeId.HasValue && r.KompetanseId.HasValue)
                 .ToList() ?? new List<KompetanseRadViewModel>();
@@ -144,7 +144,7 @@ namespace Digin_Kompetanse.Controllers
                         var under = _context.UnderKompetanse
                             .AsNoTracking()
                             .FirstOrDefault(uk => uk.UnderkompetanseId == underId.Value
-                                               && uk.KompetanseId == kompetanse.KompetanseId);
+                                                  && uk.KompetanseId == kompetanse.KompetanseId);
                         if (under == null)
                             continue; // ugyldig kobling → hopp over
                     }
@@ -192,13 +192,8 @@ namespace Digin_Kompetanse.Controllers
                 .AsNoTracking()
                 .Where(k => k.Fagområder.Any(f => f.FagområdeId == fagområdeId))
                 .OrderBy(k => k.KompetanseKategori)
-                .Select(k => new
-                {
-                    k.KompetanseId,
-                    k.KompetanseKategori
-                })
+                .Select(k => new { k.KompetanseId, k.KompetanseKategori })
                 .ToList();
-
             return Json(kompetanser);
         }
 
@@ -241,6 +236,38 @@ namespace Digin_Kompetanse.Controllers
                 return RedirectToAction("Index");
             }
 
+            // SKAFF ALLE FAGOMRÅDER
+            ViewBag.Fagområder = _context.Fagområde
+                .AsNoTracking()
+                .Select(f => new {
+                    id = f.FagområdeId,
+                    navn = f.FagområdeNavn
+                })
+                .OrderBy(f => f.navn)
+                .ToList();
+
+// SKAFF ALLE KOMPETANSER GRUPPERT PER FAGOMRÅDE
+            ViewBag.Kompetanser = _context.Kompetanse
+                .AsNoTracking()
+                .Select(k => new {
+                    id = k.KompetanseId,
+                    navn = k.KompetanseKategori,
+                    fagomradeIds = k.Fagområder.Select(f => f.FagområdeId).ToList()
+                })
+                .OrderBy(k => k.navn)
+                .ToList();
+
+// SKAFF ALLE UNDERKOMPETANSER
+            ViewBag.Underkompetanser = _context.UnderKompetanse
+                .AsNoTracking()
+                .Select(u => new {
+                    id = u.UnderkompetanseId,
+                    navn = u.UnderkompetanseNavn,
+                    kompetanseId = u.KompetanseId
+                })
+                .OrderBy(u => u.navn)
+                .ToList();
+            
             return View(rader);
         }
 
@@ -255,7 +282,7 @@ namespace Digin_Kompetanse.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditInline(int id, [FromBody] EditInlineDto dto)
@@ -326,7 +353,7 @@ namespace Digin_Kompetanse.Controllers
         public async Task<IActionResult> GetFagomrader()
         {
             var fagomrader = await _context.Fagområde
-                .Select(f => f.FagområdeNavn)
+                .Select(f => new { f.FagområdeId, f.FagområdeNavn })
                 .Distinct()
                 .ToListAsync();
 
@@ -334,12 +361,39 @@ namespace Digin_Kompetanse.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetKompetanserByFagomradeId(int fagomradeId)
+        {
+            var kompetanser = await _context.Kompetanse
+                .Where(k => k.Fagområder.Any(f => f.FagområdeId == fagomradeId))
+                .Select(k => new { k.KompetanseId, k.KompetanseKategori })
+                .ToListAsync();
+
+            return Json(kompetanser);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetUnderkompetanserByKompetanseId(int kompetanseId)
+        {
+            var under = await _context.UnderKompetanse
+                .Where(u => u.KompetanseId == kompetanseId)
+                .Select(u => new { u.UnderkompetanseId, u.UnderkompetanseNavn })
+                .ToListAsync();
+
+            return Json(under);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetKompetanserByFagomrade(string fagomrade)
         {
+            if (string.IsNullOrWhiteSpace(fagomrade))
+                return Json(Array.Empty<string>());
+
             var kompetanser = await _context.Kompetanse
                 .Where(k => k.Fagområder.Any(f => f.FagområdeNavn == fagomrade))
                 .Select(k => k.KompetanseKategori)
                 .Distinct()
+                .OrderBy(k => k)
                 .ToListAsync();
 
             return Json(kompetanser);
@@ -348,13 +402,71 @@ namespace Digin_Kompetanse.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUnderkompetanserByKompetanse(string kompetanse)
         {
-            var underkompetanser = await _context.UnderKompetanse
+            if (string.IsNullOrWhiteSpace(kompetanse))
+                return Json(Array.Empty<string>());
+
+            var under = await _context.UnderKompetanse
                 .Where(u => u.Kompetanse.KompetanseKategori == kompetanse)
                 .Select(u => u.UnderkompetanseNavn)
                 .Distinct()
+                .OrderBy(u => u)
                 .ToListAsync();
 
-            return Json(underkompetanser);
+            return Json(under);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddKompetanse([FromBody] KompetanseRadViewModel rad)
+        {
+            // Hent innlogget bedrift fra session
+            var bedriftId = HttpContext.Session.GetInt32("BedriftId");
+            if (bedriftId == null)
+                return Unauthorized(new { message = "Ingen bedrift er logget inn." });
+
+            if (!rad.FagområdeId.HasValue || !rad.KompetanseId.HasValue)
+                return BadRequest(new { message = "Fagområde eller kompetanse mangler." });
+
+            // Hvis flere underkompetanser, lag en rad per underkompetanse
+            var underKompetanser = rad.UnderkompetanseId.Any()
+                ? rad.UnderkompetanseId.Select(i => (int?)i).ToList()
+                : new List<int?>() { null };
+            
+
+            var nyeRader = new List<BedriftKompetanse>();
+
+            foreach (var uk in underKompetanser)
+            {
+                var nyRad = new BedriftKompetanse
+                {
+                    BedriftId = bedriftId.Value,
+                    FagområdeId = rad.FagområdeId.Value,
+                    KompetanseId = rad.KompetanseId.Value,
+                    UnderKompetanseId = uk,
+                    Beskrivelse = rad.Beskrivelse
+                };
+                nyeRader.Add(nyRad);
+                _context.BedriftKompetanse.Add(nyRad);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Returner første rad (eller tilpass for å returnere alle)
+            var førsteRad = nyeRader.First();
+            var fagNavn = (await _context.Fagområde.FindAsync(førsteRad.FagområdeId))?.FagområdeNavn;
+            var kompNavn = (await _context.Kompetanse.FindAsync(førsteRad.KompetanseId))?.KompetanseKategori;
+            var underNavn = førsteRad.UnderKompetanseId.HasValue
+                ? (await _context.UnderKompetanse.FindAsync(førsteRad.UnderKompetanseId.Value))?.UnderkompetanseNavn
+                : null;
+
+            return Json(new
+            {
+                id = førsteRad.Id,
+                fagomradeNavn = fagNavn,
+                kompetanseNavn = kompNavn,
+                underkompetanseNavn = underNavn != null ? new[] { underNavn } : null,
+                createdAt = førsteRad.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")
+            });
         }
     }
 }
