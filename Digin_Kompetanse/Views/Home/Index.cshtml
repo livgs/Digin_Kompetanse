@@ -26,13 +26,14 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="Rader[i].FagområdeId" class="form-label fw-semibold">Fagområde</label>
-                        <select asp-for="Rader[i].FagområdeId" asp-items="@(ViewBag.Fagområder as SelectList)" class="form-select js-fagomrade">
+                        <select asp-for="Rader[i].FagområdeId"
+                                asp-items="@(ViewBag.Fagområder as SelectList)"
+                                class="form-select js-fagomrade">
                             <option value="">Velg fagområde</option>
                         </select>
                         <span asp-validation-for="Rader[i].FagområdeId" class="text-danger"></span>
                     </div>
 
-                    <!-- Kompetanse (vises etter valg av fagområde) -->
                     <div class="mb-3 kompetanse-group d-none">
                         <label asp-for="Rader[i].KompetanseId" class="form-label fw-semibold">
                             Kompetanse
@@ -57,7 +58,10 @@
                         <label asp-for="Rader[i].Beskrivelse" class="form-label fw-semibold">
                             Beskrivelse
                         </label>
-                        <textarea asp-for="Rader[i].Beskrivelse" rows="2" class="form-control" placeholder="Beskrivelse (valgfritt)"></textarea>
+                        <textarea asp-for="Rader[i].Beskrivelse"
+                                  rows="2"
+                                  class="form-control"
+                                  placeholder="Beskrivelse (valgfritt)"></textarea>
                         <span asp-validation-for="Rader[i].Beskrivelse" class="text-danger"></span>
                     </div>
                     
@@ -85,9 +89,11 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
+    
     <script>
         window.getKompetanserUrl = '@Url.Action("GetKompetanser", "Home")';
         window.getUnderkompetanserUrl = '@Url.Action("GetUnderkompetanser", "Home")';
     </script>
+
+    <script src="~/js/kompetanseSkjema.js"></script>
 }

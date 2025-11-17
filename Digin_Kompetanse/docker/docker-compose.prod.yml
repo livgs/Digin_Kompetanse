@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:17
+    container_name: digin_postgres_prod
+    env_file: .env.prod
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    #    ports:
+    #      - "5433:5432"
+    volumes:
+      - digin_kompetanse_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: digin_kompetanse-prod
+    build:
+      context: .
+      target: final
+    env_file: .env.prod
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - digin_keys:/keys
+
+volumes:
+  digin_kompetanse_pgdata:
+  digin_keys:
