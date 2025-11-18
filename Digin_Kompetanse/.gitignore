@@ -24,6 +24,7 @@ workspace.xml
 
 # Miljøfiler
 .env
+.env.prod
 appsettings.json
 
 # Qodana configuration
