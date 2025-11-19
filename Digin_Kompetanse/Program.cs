@@ -49,7 +49,9 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 app.UseMiddleware<SimpleIpRateLimitMiddleware>();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -59,8 +61,26 @@ app.UseSession();
 app.UseAuthorization();
 
 app.MapControllers();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// En enkel health-check for Docker / load balancer
+app.MapGet("/live", () => Results.Ok("OK"));
+
+// En veldig enkel /metrics – kan gjøres mer avansert senere
+app.MapGet("/metrics", () =>
+{
+    // Her kan du senere koble på ekte metrikker
+    var text = "digin_requests_total 1\n";
+    return Results.Text(text, "text/plain");
+});
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<KompetanseContext>();
+    db.Database.Migrate();
+}
 
 app.Run();
