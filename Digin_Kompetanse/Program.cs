@@ -77,10 +77,4 @@ app.MapGet("/metrics", () =>
     return Results.Text(text, "text/plain");
 });
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<KompetanseContext>();
-    db.Database.Migrate();
-}
-
 app.Run();
