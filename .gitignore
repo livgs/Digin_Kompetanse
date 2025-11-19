@@ -1,0 +1,37 @@
+# =============================
+# Visual Studio / .NET
+# =============================
+
+# Build-mapper
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio workspace
+.vs/
+workspace.xml
+
+# Rider / JetBrains
+.idea/
+
+# Loggfiler
+*.log
+
+# Miljøfiler
+.env
+.env.prod
+appsettings.json
+
+# Qodana configuration
+qodana.yaml
+
+# Andre filer som kan genereres
+*.cache
+*.bak
+*.tmp
+*.swp
