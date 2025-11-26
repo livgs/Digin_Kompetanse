@@ -1,18 +1,53 @@
 using Digin_Kompetanse.data;
 using Digin_Kompetanse.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
+using Npgsql; 
 using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<KompetanseContext>(options =>
+{
+    var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+    var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+    var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+    var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+    var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+
+    string connectionString;
+
+    if (!string.IsNullOrWhiteSpace(dbHost) &&
+        !string.IsNullOrWhiteSpace(dbName) &&
+        !string.IsNullOrWhiteSpace(dbUser))
+    {
+        var csb = new NpgsqlConnectionStringBuilder
+        {
+            Host = dbHost,
+            Port = int.Parse(dbPort),
+            Database = dbName,
+            Username = dbUser,
+            Password = dbPassword ?? string.Empty,
+        };
+
+        connectionString = csb.ToString();
+
+        Console.WriteLine($"[DB] Using env connection: Host={csb.Host}, Port={csb.Port}, Db={csb.Database}, User={csb.Username}");
+    }
+    else
+    {
+        connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                           ?? throw new InvalidOperationException("DefaultConnection mangler i konfigurasjon.");
+        Console.WriteLine("[DB] Using DefaultConnection fra config (ingen DB_HOST satt).");
+    }
+
+    options.UseNpgsql(connectionString);
+});
 
 builder.Services.AddControllersWithViews(options =>
 {
     options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
 });
-
-builder.Services.AddDbContext<KompetanseContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/keys"))
