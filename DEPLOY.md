@@ -32,7 +32,7 @@ docker buildx build \
 
 1. Gå til: https://console.cloud.google.com/
 2. Velg **New Project**
-3. Gi det navnet: `digin-kompetanse-prod` e.l
+3. Gi det navnet: `digin-kompetanse-prod` (e.l)
 <br><br>
 
 # Cloud SQL (PostgreSQL) – Databaseoppsett
@@ -47,7 +47,7 @@ docker buildx build \
 2. Velg:
     - PostgreSQL 15–17 (17 anbefalt)
     - Edition Preset: Vi brukte Sandbox
-    - Instance ID: digin-kompetanse-db e.l
+    - Instance ID: digin-kompetanse-db
     - Region: `europe-north2` (Stockholm)
 3. Sett passord for brukeren `postgres`
 4. Vent til instansen er ferdig
@@ -58,7 +58,7 @@ docker buildx build \
 1. Gå inn i instansen
 2. Velg **Databases**
 3. Klikk **Create database**
-4. Navngi databasen: digin_kompetanse e.l
+4. Navngi databasen: digin_kompetanse (e.l)
 <br>
 
 ## 4. Importer SQL-filer
