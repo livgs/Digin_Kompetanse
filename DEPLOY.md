@@ -90,12 +90,8 @@ Du skal importere begge:
 
 ✔ Først `01_schema.sql`
 
-<video src="https://github.com/user-attachments/assets/47a6f72a-25ba-4461-ae42-a32e464eef62" />
-
 
 ✔ Deretter `02_init_data.sql`
-
-<img width="2940" height="1664" alt="image" src="https://github.com/user-attachments/assets/c8ae3936-08bb-4a69-b892-5553fa485245" />
 
 
 ## 5. Legg inn admin og bedrift manuelt i Cloud SQL Studio:
