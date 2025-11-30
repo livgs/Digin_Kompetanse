@@ -133,9 +133,11 @@ docker.io/camillaur/digin_kompetanse:latest
 
 ## 8. Legg inn miljøvariabler i Cloud Run
 
+Klikk på "Edit & Deploy new revision"
+
 <img width="2930" height="224" alt="image" src="https://github.com/user-attachments/assets/e21215d8-3ab0-4676-ad9e-0efe405c346e" />
 
-<br>
+Klikk deretter på knappen "Variables & Secrets"
 
 
 <img width="1610" height="790" alt="image" src="https://github.com/user-attachments/assets/5f9e1119-b424-4cba-b54d-17942265df1b" />
