@@ -189,5 +189,5 @@ https://digin-kompetanse-xxxxxxx-uc.a.run.app
 6. Lag en Cloud Run service med:
 [docker.io/camillaur/digin_kompetanse:latest](http://docker.io/camillaur/digin_kompetanse:latest)
 7. Koble Cloud SQL-instansen til Cloud Run
-8. Legg inn DB_ og EMAIL_ miljøvariabler
+8. Legg inn DB_ og SMTP_ miljøvariabler
 9. Deploy → åpne nettadressen
