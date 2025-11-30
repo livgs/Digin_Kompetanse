@@ -82,14 +82,15 @@ Du skal importere begge:
 <img width="555" height="473" alt="Skjermbilde 2025-11-30 kl  19 50 51" src="https://github.com/user-attachments/assets/f2351573-209b-4ccd-b176-13604ea18a3f" />
 
 <img width="575" height="737" alt="Skjermbilde 2025-11-30 kl  19 51 27" src="https://github.com/user-attachments/assets/785be5ae-bf58-40e2-82db-d59b2797d300" />
-   - Trykk "Create" og deretter trykk på knappen "Select"
+  
+  - Trykk "Create" og deretter trykk på knappen "Select"
 
 6. Kjør begge SQL-filene i denne rekkefølgen:
 <img width="533" height="419" alt="Skjermbilde 2025-11-30 kl  19 55 11" src="https://github.com/user-attachments/assets/83593ec0-735d-42a8-b652-7e21caa76625" />
 
 ✔ Først `01_schema.sql`
 
-<img width="2940" height="1664" alt="image" src="https://github.com/user-attachments/assets/47a6f72a-25ba-4461-ae42-a32e464eef62" />
+<video src="https://github.com/user-attachments/assets/47a6f72a-25ba-4461-ae42-a32e464eef62" />
 
 
 ✔ Deretter `02_init_data.sql`
@@ -99,10 +100,10 @@ Du skal importere begge:
 
 ## 5. Legg inn admin og bedrift manuelt i Cloud SQL Studio:
 
-<img width="2938" height="1578" alt="image" src="https://github.com/user-attachments/assets/507741b8-f369-4e7c-8bad-4545e26202dc" />
+<img width="2938" height="1578" alt="image" src="https://github.com/user-attachments/assets/507741b8-f369-4e7c-8bad-4545e26202dc" />  <br><br>		
+		
 
-
-**Bedrift**
+### Bedrift
 
 ```sql
 INSERT INTO bedrift (bedrift_navn, bedrift_epost)
@@ -111,7 +112,7 @@ VALUES ('Bedriftnavn', 'bedriftepost@gmail.com');
 
 ### Admin
 
-Passordet må være **bcrypt-hash**
+Passordet må være **bcrypt-hash**  
 
 ```sql
 INSERT INTO admin (admin_epost, admin_passord_hash, navn)
@@ -119,7 +120,7 @@ VALUES ('admin@epost.no', '<bcrypt-hash>', 'Administrator');
 
 ```
 
-Trykk “Run” når du har lagt det inn
+- Trykk “Run” når du har lagt det inn
 
 # Deploy til Google Cloud Run
 
@@ -156,11 +157,11 @@ docker.io/camillaur/digin_kompetanse:latest
 
 ## 8. Legg inn miljøvariabler i Cloud Run
 
-Klikk på **"Edit & Deploy new revision"**
+Klikk på **"Edit & Deploy new revision":** <br>
 
-<img width="2930" height="224" alt="image" src="https://github.com/user-attachments/assets/e21215d8-3ab0-4676-ad9e-0efe405c346e" />
+<img width="2930" height="224" alt="image" src="https://github.com/user-attachments/assets/e21215d8-3ab0-4676-ad9e-0efe405c346e" /> <br>
 
-Klikk deretter på knappen **"Variables & Secrets"**
+Klikk deretter på knappen **"Variables & Secrets":**
 
 
 <img width="1610" height="790" alt="image" src="https://github.com/user-attachments/assets/5f9e1119-b424-4cba-b54d-17942265df1b" />
