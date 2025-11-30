@@ -133,11 +133,11 @@ docker.io/camillaur/digin_kompetanse:latest
 
 ## 8. Legg inn miljøvariabler i Cloud Run
 
-Klikk på "Edit & Deploy new revision"
+Klikk på **"Edit & Deploy new revision"**
 
 <img width="2930" height="224" alt="image" src="https://github.com/user-attachments/assets/e21215d8-3ab0-4676-ad9e-0efe405c346e" />
 
-Klikk deretter på knappen "Variables & Secrets"
+Klikk deretter på knappen **"Variables & Secrets"**
 
 
 <img width="1610" height="790" alt="image" src="https://github.com/user-attachments/assets/5f9e1119-b424-4cba-b54d-17942265df1b" />
@@ -159,12 +159,12 @@ ASPNETCORE_ENVIRONMENT=Production
 E-post / SMTP (OTP system)
 
 ```sql
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=<gmailkonto>
-EMAIL_PASS=<gmail app passord>
-EMAIL_FROM=<gmailkonto>
-EMAIL_ENABLE_STARTTLS=true
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=<gmailkonto>
+SMTP_PASS=<gmail app passord>
+SMTP_FROM=<gmailkonto>
+SMTP_ENABLE_STARTTLS=true
 ```
 
 ✔ Ingen `ASPNETCORE_URLS`
