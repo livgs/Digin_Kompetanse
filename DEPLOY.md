@@ -43,6 +43,8 @@ docker buildx build \
     
 2. Velg:
     - PostgreSQL 15–17 (17 anbefalt)
+    - Edition Preset: Sandbox (eller en som er ønskelig)
+    - Instance ID: digin-kompetanse-db (eller noe lignende)
     - Region: `europe-north2` (Stockholm)
 3. Sett passord for brukeren `postgres`
 4. Vent til instansen er ferdig
@@ -71,13 +73,34 @@ Du skal importere begge:
 1. Gå til Cloud SQL-instansen
 2. Velg **Import**
 3. Velg fil (må lastes opp til Google Cloud Storage først)
-4. Kjør begge SQL-filene i denne rekkefølgen:
+4. Trykk på **"Create a bucket"** (kan hete f.eks "digin-kompetanse" e.l)
+   - Velg region: `europe-north2` (Stockholm)
+   - På **Set a default class**, velg "Standard"
+   - På **Prevent Public Access**, kryss av på "Enforce public access prevention on this bucket"
+   - På **Access Control**, velg "Uniform"
+ Innstillingene skal se slik ut når du er ferdig:
+<img width="555" height="473" alt="Skjermbilde 2025-11-30 kl  19 50 51" src="https://github.com/user-attachments/assets/f2351573-209b-4ccd-b176-13604ea18a3f" />
+
+<img width="575" height="737" alt="Skjermbilde 2025-11-30 kl  19 51 27" src="https://github.com/user-attachments/assets/785be5ae-bf58-40e2-82db-d59b2797d300" />
+   - Trykk "Create" og deretter trykk på knappen "Select"
+
+6. Kjør begge SQL-filene i denne rekkefølgen:
+<img width="533" height="419" alt="Skjermbilde 2025-11-30 kl  19 55 11" src="https://github.com/user-attachments/assets/83593ec0-735d-42a8-b652-7e21caa76625" />
 
 ✔ Først `01_schema.sql`
 
+<img width="2940" height="1664" alt="image" src="https://github.com/user-attachments/assets/47a6f72a-25ba-4461-ae42-a32e464eef62" />
+
+
 ✔ Deretter `02_init_data.sql`
 
+<img width="2940" height="1664" alt="image" src="https://github.com/user-attachments/assets/c8ae3936-08bb-4a69-b892-5553fa485245" />
+
+
 ## 5. Legg inn admin og bedrift manuelt i Cloud SQL Studio:
+
+<img width="2938" height="1578" alt="image" src="https://github.com/user-attachments/assets/507741b8-f369-4e7c-8bad-4545e26202dc" />
+
 
 **Bedrift**
 
