@@ -78,7 +78,7 @@ Du skal importere begge:
    - På **Set a default class**, velg "Standard"
    - På **Prevent Public Access**, kryss av på "Enforce public access prevention on this bucket"
    - På **Access Control**, velg "Uniform"
- Innstillingene skal se slik ut når du er ferdig:
+   - Innstillingene skal se slik ut når du er ferdig:
 <img width="555" height="473" alt="Skjermbilde 2025-11-30 kl  19 50 51" src="https://github.com/user-attachments/assets/f2351573-209b-4ccd-b176-13604ea18a3f" />
 
 <img width="575" height="737" alt="Skjermbilde 2025-11-30 kl  19 51 27" src="https://github.com/user-attachments/assets/785be5ae-bf58-40e2-82db-d59b2797d300" />
