@@ -1,0 +1,188 @@
+# Digin Kompetanse – Produksjonsoppsett (Docker Hub + Google Cloud)
+
+Dette dokumentet viser **hvordan man setter opp Digin Kompetanse i produksjon**, basert på:
+
+- Ferdig bygget Docker-image på Docker Hub
+- PostgreSQL i **Google Cloud SQL**
+- Import av SQL-skjema + init-data
+- Webhost med **Google Cloud Run**
+- Miljøvariabler (DB + SMTP)
+- Admin- og bedriftinnlogging
+
+**Ferdig bygget image på Docker Hub** 
+
+```
+docker.io/camillaur/digin_kompetanse:latest
+
+```
+
+**Alternativ: Hvis du trenger å bygge nytt image selv**
+
+```docker
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t camillaur/digin_kompetanse:latest \
+  --push .
+```
+
+# Sett opp Google Cloud
+
+## 1. Opprett Google Cloud-prosjekt
+
+1. Gå til: https://console.cloud.google.com/
+2. Velg **New Project**
+3. Gi det navnet: `digin-kompetanse-prod` (eller noe lignende)
+
+# Cloud SQL (PostgreSQL) – Databaseoppsett
+
+## 2. Opprett Cloud SQL-instans
+
+1. Gå til:
+    
+    **SQL → Create Instance → PostgreSQL**
+    
+2. Velg:
+    - PostgreSQL 15–17 (17 anbefalt)
+    - Region: `europe-north2` (Stockholm)
+3. Sett passord for brukeren `postgres`
+4. Vent til instansen er ferdig
+
+## 3. Opprett database
+
+1. Gå inn i instansen
+2. Velg **Databases**
+3. Klikk **Create database**
+4. Navngi databasen (digin_kompetanse eller lignende)
+
+## 4. Importer SQL-filer
+
+<img width="1104" height="1356" alt="image" src="https://github.com/user-attachments/assets/c1f32ea5-9a75-459c-83f7-07ee7338ea02" />
+
+
+Du skal importere begge:
+
+```
+01_schema.sql
+02_init_data.sql
+```
+
+### Slik gjør du det:
+
+1. Gå til Cloud SQL-instansen
+2. Velg **Import**
+3. Velg fil (må lastes opp til Google Cloud Storage først)
+4. Kjør begge SQL-filene i denne rekkefølgen:
+
+✔ Først `01_schema.sql`
+
+✔ Deretter `02_init_data.sql`
+
+## 5. Legg inn admin og bedrift manuelt i Cloud SQL Studio:
+
+**Bedrift**
+
+```sql
+INSERT INTO bedrift (bedrift_navn, bedrift_epost)
+VALUES ('Bedriftnavn', 'bedriftepost@gmail.com');
+```
+
+### Admin
+
+Passordet må være **bcrypt-hash**
+
+```sql
+INSERT INTO admin (admin_epost, admin_passord_hash, navn)
+VALUES ('admin@epost.no', '<bcrypt-hash>', 'Administrator');
+
+```
+
+Trykk “Run” når du har lagt det inn
+
+# Deploy til Google Cloud Run
+
+## 6. Opprett Cloud Run service
+
+1. Gå til:
+    
+    **Cloud Run → Create Service**
+    
+2. Velg:
+    
+    **Deploy from an existing container image**
+    
+3. I feltet “Container image URL”, skriv:
+
+```sql
+docker.io/camillaur/digin_kompetanse:latest
+```
+
+## 7. Koble Cloud Run til Cloud SQL
+
+1. Under **Connections**
+2. Velg:
+    - `Add connection`
+    - Velg Cloud SQL-instansen:
+        
+        `digin-kompetanse-db`
+        
+3. Cloud Run lager automatisk mount:
+
+```sql
+/cloudsql/<INSTANCE_CONNECTION_NAME>
+```
+
+## 8. Legg inn miljøvariabler i Cloud Run
+
+<img width="2930" height="224" alt="image" src="https://github.com/user-attachments/assets/e21215d8-3ab0-4676-ad9e-0efe405c346e" />
+
+<img width="1610" height="790" alt="image" src="https://github.com/user-attachments/assets/5f9e1119-b424-4cba-b54d-17942265df1b" />
+
+
+I Cloud Run → Environment Variables:
+
+Database (OBLIGATORISK)
+
+```sql
+DB_HOST=/cloudsql/<INSTANCE_CONNECTION_NAME>
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=<det du satte da du opprettet databasen>
+DB_NAME=digin_kompetanse
+ASPNETCORE_ENVIRONMENT=Production
+```
+
+E-post / SMTP (OTP system)
+
+```sql
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=<gmailkonto>
+EMAIL_PASS=<gmail app passord>
+EMAIL_FROM=<gmailkonto>
+EMAIL_ENABLE_STARTTLS=true
+```
+
+✔ Ingen `ASPNETCORE_URLS`
+
+✔ Ingen connection string manuelt – Program.cs bygger det
+
+## 9. Deploy
+
+Når du klikker **Deploy**, får du en URL:
+
+```sql
+https://digin-kompetanse-xxxxxxx-uc.a.run.app
+```
+
+# Oppsummering
+
+1. Lag et nytt Google Cloud-prosjekt
+2. Opprett Cloud SQL (PostgreSQL)
+3. Lag database: digin_kompetanse
+4. Importer 01_schema.sql og 02_init_data.sql
+5. Legg inn admin og bedrift manuelt i databasen
+6. Lag en Cloud Run service med:
+[docker.io/camillaur/digin_kompetanse:latest](http://docker.io/camillaur/digin_kompetanse:latest)
+7. Koble Cloud SQL-instansen til Cloud Run
+8. Legg inn DB_ og EMAIL_ miljøvariabler
+9. Deploy → åpne nettadressen
