@@ -26,14 +26,17 @@ docker buildx build \
 ```
 
 # Sett opp Google Cloud
+<br>
 
 ## 1. Opprett Google Cloud-prosjekt
 
 1. Gå til: https://console.cloud.google.com/
 2. Velg **New Project**
-3. Gi det navnet: `digin-kompetanse-prod` (eller noe lignende)
+3. Gi det navnet: `digin-kompetanse-prod` e.l
+<br><br>
 
 # Cloud SQL (PostgreSQL) – Databaseoppsett
+<br>
 
 ## 2. Opprett Cloud SQL-instans
 
@@ -43,24 +46,26 @@ docker buildx build \
     
 2. Velg:
     - PostgreSQL 15–17 (17 anbefalt)
-    - Edition Preset: Sandbox (eller en som er ønskelig)
-    - Instance ID: digin-kompetanse-db (eller noe lignende)
+    - Edition Preset: Vi brukte Sandbox
+    - Instance ID: digin-kompetanse-db e.l
     - Region: `europe-north2` (Stockholm)
 3. Sett passord for brukeren `postgres`
 4. Vent til instansen er ferdig
+<br>
 
 ## 3. Opprett database
 
 1. Gå inn i instansen
 2. Velg **Databases**
 3. Klikk **Create database**
-4. Navngi databasen (digin_kompetanse eller lignende)
+4. Navngi databasen: digin_kompetanse e.l
+<br>
 
 ## 4. Importer SQL-filer
 
 <img width="1104" height="1356" alt="image" src="https://github.com/user-attachments/assets/c1f32ea5-9a75-459c-83f7-07ee7338ea02" />
 
-
+<br><br>
 Du skal importere begge:
 
 ```
@@ -79,26 +84,34 @@ Du skal importere begge:
    - På **Prevent Public Access**, kryss av på "Enforce public access prevention on this bucket"
    - På **Access Control**, velg "Uniform"
    - Innstillingene skal se slik ut når du er ferdig:
-<img width="555" height="473" alt="Skjermbilde 2025-11-30 kl  19 50 51" src="https://github.com/user-attachments/assets/f2351573-209b-4ccd-b176-13604ea18a3f" />
+     <br><br>
+![Bilde2](https://github.com/user-attachments/assets/bb3195c3-a320-4008-9bbd-8e13c2c52752)
 
-<img width="575" height="737" alt="Skjermbilde 2025-11-30 kl  19 51 27" src="https://github.com/user-attachments/assets/785be5ae-bf58-40e2-82db-d59b2797d300" />
+![Bilde4](https://github.com/user-attachments/assets/11758c3a-71ba-44cb-a034-f42d7e7fb214)
+
   
   - Trykk "Create" og deretter trykk på knappen "Select"
+<br>
 
 6. Kjør begge SQL-filene i denne rekkefølgen:
-<img width="533" height="419" alt="Skjermbilde 2025-11-30 kl  19 55 11" src="https://github.com/user-attachments/assets/83593ec0-735d-42a8-b652-7e21caa76625" />
+
+⚠️ **NB: Se instruksjonsvideo ved å trykke på bildet:**
+
+[![Se video på YouTube](https://img.youtube.com/vi/q_rOq6QV5vs/maxresdefault.jpg)](https://youtu.be/q_rOq6QV5vs)
+
 
 ✔ Først `01_schema.sql`
 
 
 ✔ Deretter `02_init_data.sql`
-
+<br><br>
 
 ## 5. Legg inn admin og bedrift manuelt i Cloud SQL Studio:
 
-<img width="2938" height="1578" alt="image" src="https://github.com/user-attachments/assets/507741b8-f369-4e7c-8bad-4545e26202dc" />  <br><br>		
-		
+![Bilde5](https://github.com/user-attachments/assets/15bc46ab-987c-45cc-bf07-d2af1902f508)
 
+<br>		
+		
 ### Bedrift
 
 ```sql
@@ -117,8 +130,9 @@ VALUES ('admin@epost.no', '<bcrypt-hash>', 'Administrator');
 ```
 
 - Trykk “Run” når du har lagt det inn
-
+<br><br>
 # Deploy til Google Cloud Run
+<br>
 
 ## 6. Opprett Cloud Run service
 
@@ -135,6 +149,7 @@ VALUES ('admin@epost.no', '<bcrypt-hash>', 'Administrator');
 ```sql
 docker.io/camillaur/digin_kompetanse:latest
 ```
+<br>
 
 ## 7. Koble Cloud Run til Cloud SQL
 
@@ -150,17 +165,18 @@ docker.io/camillaur/digin_kompetanse:latest
 ```sql
 /cloudsql/<INSTANCE_CONNECTION_NAME>
 ```
+<br>
 
 ## 8. Legg inn miljøvariabler i Cloud Run
 
-Klikk på **"Edit & Deploy new revision":** <br>
-
-<img width="2930" height="224" alt="image" src="https://github.com/user-attachments/assets/e21215d8-3ab0-4676-ad9e-0efe405c346e" /> <br>
-
-Klikk deretter på knappen **"Variables & Secrets":**
+Klikk på **"Edit & Deploy new revision":** 
+<br><br>
+![Bilde3](https://github.com/user-attachments/assets/07ba1d8c-8741-435c-8b58-0b0911515864)
 
 
-<img width="1610" height="790" alt="image" src="https://github.com/user-attachments/assets/5f9e1119-b424-4cba-b54d-17942265df1b" />
+Klikk deretter på knappen **"Variables & Secrets":** 
+<br><br>
+![Bilde1](https://github.com/user-attachments/assets/979a146c-bbb2-4332-b1b4-622c8fb2e567)
 
 
 I Cloud Run → Environment Variables:
@@ -191,6 +207,8 @@ SMTP_ENABLE_STARTTLS=true
 
 ✔ Ingen connection string manuelt – Program.cs bygger det
 
+<br>
+
 ## 9. Deploy
 
 Når du klikker **Deploy**, får du en URL:
@@ -198,8 +216,9 @@ Når du klikker **Deploy**, får du en URL:
 ```sql
 https://digin-kompetanse-xxxxxxx-uc.a.run.app
 ```
+<br>
 
-# Oppsummering
+## Oppsummering
 
 1. Lag et nytt Google Cloud-prosjekt
 2. Opprett Cloud SQL (PostgreSQL)
