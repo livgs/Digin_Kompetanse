@@ -85,15 +85,20 @@ Du skal importere begge:
    - På **Access Control**, velg "Uniform"
    - Innstillingene skal se slik ut når du er ferdig:
      <br><br>
-![Bilde2](https://github.com/user-attachments/assets/bb3195c3-a320-4008-9bbd-8e13c2c52752)
 
-![Bilde4](https://github.com/user-attachments/assets/11758c3a-71ba-44cb-a034-f42d7e7fb214)
+	 <table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/bb3195c3-a320-4008-9bbd-8e13c2c52752" width="400"></td>
+    <td><img src="https://github.com/user-attachments/assets/11758c3a-71ba-44cb-a034-f42d7e7fb214" width="400"></td>
+  </tr>
+</table>
 
-  
-  - Trykk "Create" og deretter trykk på knappen "Select"
+- Trykk "Create" og deretter trykk på knappen "Select"
 <br>
 
-6. Kjør begge SQL-filene i denne rekkefølgen:
+5\. Kjør begge SQL-filene i denne rekkefølgen:
+
+<br>
 
 ⚠️ **NB: Se instruksjonsvideo ved å trykke på bildet:**
 
@@ -108,7 +113,7 @@ Du skal importere begge:
 
 ## 5. Legg inn admin og bedrift manuelt i Cloud SQL Studio:
 
-![Bilde5](https://github.com/user-attachments/assets/15bc46ab-987c-45cc-bf07-d2af1902f508)
+![**Bilde5**](https://github.com/user-attachments/assets/15bc46ab-987c-45cc-bf07-d2af1902f508)
 
 <br>		
 		
@@ -136,15 +141,15 @@ VALUES ('admin@epost.no', '<bcrypt-hash>', 'Administrator');
 
 ## 6. Opprett Cloud Run service
 
-1. Gå til:
+1\. Gå til:
     
     **Cloud Run → Create Service**
     
-2. Velg:
+2\. Velg:
     
     **Deploy from an existing container image**
     
-3. I feltet “Container image URL”, skriv:
+3\. I feltet “Container image URL”, skriv:
 
 ```sql
 docker.io/camillaur/digin_kompetanse:latest
@@ -153,14 +158,14 @@ docker.io/camillaur/digin_kompetanse:latest
 
 ## 7. Koble Cloud Run til Cloud SQL
 
-1. Under **Connections**
-2. Velg:
+1\. Under **Connections**
+2\. Velg:
     - `Add connection`
     - Velg Cloud SQL-instansen:
         
         `digin-kompetanse-db`
         
-3. Cloud Run lager automatisk mount:
+3\. Cloud Run lager automatisk mount:
 
 ```sql
 /cloudsql/<INSTANCE_CONNECTION_NAME>
@@ -171,7 +176,9 @@ docker.io/camillaur/digin_kompetanse:latest
 
 Klikk på **"Edit & Deploy new revision":** 
 <br><br>
-![Bilde3](https://github.com/user-attachments/assets/07ba1d8c-8741-435c-8b58-0b0911515864)
+
+![Bilde6](https://github.com/user-attachments/assets/bca6191c-5ebb-49c3-adfe-dfe2d1cc65ab)
+
 
 
 Klikk deretter på knappen **"Variables & Secrets":** 
@@ -220,13 +227,13 @@ https://digin-kompetanse-xxxxxxx-uc.a.run.app
 
 ## Oppsummering
 
-1. Lag et nytt Google Cloud-prosjekt
-2. Opprett Cloud SQL (PostgreSQL)
-3. Lag database: digin_kompetanse
-4. Importer 01_schema.sql og 02_init_data.sql
-5. Legg inn admin og bedrift manuelt i databasen
-6. Lag en Cloud Run service med:
+1\. Lag et nytt Google Cloud-prosjekt
+2\. Opprett Cloud SQL (PostgreSQL)
+3\. Lag database: digin_kompetanse
+4\. Importer 01_schema.sql og 02_init_data.sql
+5\. Legg inn admin og bedrift manuelt i databasen
+6\. Lag en Cloud Run service med:
 [docker.io/camillaur/digin_kompetanse:latest](http://docker.io/camillaur/digin_kompetanse:latest)
-7. Koble Cloud SQL-instansen til Cloud Run
-8. Legg inn DB_ og SMTP_ miljøvariabler
-9. Deploy → åpne nettadressen
+7\. Koble Cloud SQL-instansen til Cloud Run
+8\. Legg inn DB_ og SMTP_ miljøvariabler
+9\. Deploy → åpne nettadressen
