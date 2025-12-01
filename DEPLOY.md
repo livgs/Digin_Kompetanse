@@ -227,13 +227,14 @@ https://digin-kompetanse-xxxxxxx-uc.a.run.app
 
 ## Oppsummering
 
-1\. Lag et nytt Google Cloud-prosjekt
-2\. Opprett Cloud SQL (PostgreSQL)
-3\. Lag database: digin_kompetanse
-4\. Importer 01_schema.sql og 02_init_data.sql
-5\. Legg inn admin og bedrift manuelt i databasen
-6\. Lag en Cloud Run service med:
+
+- Lag et nytt Google Cloud-prosjekt
+- Opprett Cloud SQL (PostgreSQL)
+- Lag database: digin_kompetanse
+- Importer 01_schema.sql og 02_init_data.sql
+- Legg inn admin og bedrift manuelt i databasen
+- Lag en Cloud Run service med:
 [docker.io/camillaur/digin_kompetanse:latest](http://docker.io/camillaur/digin_kompetanse:latest)
-7\. Koble Cloud SQL-instansen til Cloud Run
-8\. Legg inn DB_ og SMTP_ miljøvariabler
-9\. Deploy → åpne nettadressen
+- Koble Cloud SQL-instansen til Cloud Run
+- Legg inn DB_ og SMTP_ miljøvariabler
+- Deploy → åpne nettadressen
